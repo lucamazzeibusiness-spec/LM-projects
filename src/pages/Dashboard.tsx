@@ -1,12 +1,15 @@
 import { ArrowRight, BookOpen, CalendarCheck, ClipboardCheck, GraduationCap } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { GewerkBadge, PrioBadge, StatusBadge } from '../components/Badges'
+import { useAzubiProfil } from '../context/AzubiProfilContext'
 import { useBerichtsheft } from '../hooks/useBerichtsheft'
 import { heuteISO, heutigesDatumLabel } from '../lib/wochen'
-import { azubiProfil, lernaufgaben, naechstePruefung } from '../data/mock'
+import { lernaufgaben, naechstePruefung } from '../data/mock'
 
 export default function Dashboard() {
+  const { profil } = useAzubiProfil()
   const { eintraege } = useBerichtsheft()
+  if (!profil) return null
   const offen = lernaufgaben.filter((a) => a.status !== 'Erledigt')
   const heute = offen.filter((a) => a.faelligkeit.startsWith('Heute'))
 
@@ -25,9 +28,10 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-db-navy">Guten Tag, {azubiProfil.name}</h1>
+        <h1 className="text-xl font-semibold text-db-navy">Guten Tag, {profil.name}</h1>
         <p className="text-sm text-db-navy-light">
-          {azubiProfil.lehrjahr}. Lehrjahr · {azubiProfil.abteilung} · Ausbilder: {azubiProfil.ausbilder}
+          {profil.lehrjahr}. Lehrjahr · {profil.abteilung}
+          {profil.ausbilder ? ` · Ausbilder: ${profil.ausbilder}` : ''}
         </p>
       </div>
 

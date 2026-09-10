@@ -4,22 +4,25 @@ export type LernaufgabeStatus = 'Offen' | 'In Arbeit' | 'Zur Kontrolle' | 'Erled
 
 export interface AzubiProfil {
   name: string
-  ausbildungsberuf: string
+  unternehmensbereich: string
+  ausbildungsberuf: AusbildungsberufName
   lehrjahr: number
   lehrjahreGesamt: number
   abteilung: string
-  standort: string
+  werk: string
   ausbilder: string
 }
 
-export const azubiProfil: AzubiProfil = {
-  name: 'Max',
+// Nur Vorbelegung für das Onboarding-Formular – das tatsächliche Profil trägt jede:r selbst ein.
+export const azubiProfilBeispiel: AzubiProfil = {
+  name: '',
+  unternehmensbereich: 'DB Fahrzeuginstandhaltung',
   ausbildungsberuf: 'Elektroniker für Betriebstechnik',
-  lehrjahr: 2,
+  lehrjahr: 1,
   lehrjahreGesamt: 3,
-  abteilung: 'Werk Rummelsburg – Fahrzeuginstandhaltung',
-  standort: 'Werk Rummelsburg',
-  ausbilder: 'Herr Kowalski',
+  abteilung: '',
+  werk: '',
+  ausbilder: '',
 }
 
 export interface ChecklistItem {
@@ -506,6 +509,12 @@ export const curricula: AusbildungsberufCurriculum[] = [
     quelle: 'KMK-Rahmenlehrplan Mechatroniker/-in, IHK-Prüfungsordnung (gestreckte Abschlussprüfung)',
   },
 ]
+
+export function lehrjahreGesamtFuer(beruf: AusbildungsberufName): number {
+  const curriculum = curricula.find((c) => c.beruf === beruf)
+  if (!curriculum) return 3
+  return Math.max(...curriculum.lernfelder.map((lf) => lf.ausbildungsjahr))
+}
 
 export interface Lernkarte {
   id: string

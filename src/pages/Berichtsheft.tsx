@@ -1,6 +1,7 @@
 import { CalendarCheck, Download, Loader2, Pencil, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { BerichtStatusBadge } from '../components/Badges'
+import { useAzubiProfil } from '../context/AzubiProfilContext'
 import { useBerichtsheft } from '../hooks/useBerichtsheft'
 import type { BerichtsheftEintrag, BerichtsheftKategorie } from '../data/mock'
 import { heuteISO, heutigesDatumLabel, wochenLabel, wochenSchluessel } from '../lib/wochen'
@@ -26,6 +27,7 @@ interface Wochengruppe {
 }
 
 export default function Berichtsheft() {
+  const { profil } = useAzubiProfil()
   const { eintraege, setEintraege } = useBerichtsheft()
   const [bearbeitung, setBearbeitung] = useState<BerichtsheftEintrag | null>(null)
   const [exportierendeWoche, setExportierendeWoche] = useState<string | null>(null)
@@ -50,6 +52,8 @@ export default function Berichtsheft() {
       }))
   }, [eintraege])
 
+  if (!profil) return null
+
   const aktuelleWoche = wochen.find((w) => w.schluessel === wochenSchluessel(heute))
   const stundenDieseWoche = aktuelleWoche?.eintraege.reduce((sum, e) => sum + e.stunden, 0) ?? 0
   const offeneEntwuerfe = eintraege.filter((e) => e.status === 'Entwurf' && e.taetigkeiten.trim()).length
@@ -72,7 +76,7 @@ export default function Berichtsheft() {
     setExportierendeWoche(gruppe.schluessel)
     try {
       const { exportBerichtsheftPdf } = await import('../lib/exportBerichtsheft')
-      exportBerichtsheftPdf(gruppe.eintraege, {
+      exportBerichtsheftPdf(profil, gruppe.eintraege, {
         titel: 'Wochenbericht',
         zeitraum: gruppe.label,
         dateiSuffix: gruppe.schluessel,

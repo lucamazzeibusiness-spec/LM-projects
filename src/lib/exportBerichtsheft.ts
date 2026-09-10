@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
-import { azubiProfil, type BerichtsheftEintrag } from '../data/mock'
+import type { AzubiProfil, BerichtsheftEintrag } from '../data/mock'
 
 interface ExportOptions {
   titel?: string
@@ -8,7 +8,11 @@ interface ExportOptions {
   dateiSuffix?: string
 }
 
-export function exportBerichtsheftPdf(eintraege: BerichtsheftEintrag[], optionen: ExportOptions = {}) {
+export function exportBerichtsheftPdf(
+  profil: AzubiProfil,
+  eintraege: BerichtsheftEintrag[],
+  optionen: ExportOptions = {},
+) {
   const { titel = 'Ausbildungsnachweis', zeitraum, dateiSuffix } = optionen
 
   const doc = new jsPDF({ unit: 'mm', format: 'a4' })
@@ -22,11 +26,11 @@ export function exportBerichtsheftPdf(eintraege: BerichtsheftEintrag[], optionen
   doc.setFontSize(10)
   doc.setFont('helvetica', 'normal')
   const kopfzeilen = [
-    `Name: ${azubiProfil.name}`,
-    `Ausbildungsberuf: ${azubiProfil.ausbildungsberuf}`,
-    `Lehrjahr: ${azubiProfil.lehrjahr}. von ${azubiProfil.lehrjahreGesamt}`,
-    `Ausbildungsbetrieb: ${azubiProfil.abteilung}`,
-    `Ausbilder/-in: ${azubiProfil.ausbilder}`,
+    `Name: ${profil.name}`,
+    `Ausbildungsberuf: ${profil.ausbildungsberuf}`,
+    `Lehrjahr: ${profil.lehrjahr}. von ${profil.lehrjahreGesamt}`,
+    `Ausbildungsbetrieb: ${profil.abteilung} · ${profil.werk}`,
+    `Ausbilder/-in: ${profil.ausbilder || '–'}`,
   ]
   if (zeitraum) kopfzeilen.splice(1, 0, `Zeitraum: ${zeitraum}`)
   doc.text(kopfzeilen, linksRechts, 26)
@@ -64,6 +68,6 @@ export function exportBerichtsheftPdf(eintraege: BerichtsheftEintrag[], optionen
   doc.text('Datum, Unterschrift Ausbilder/-in', seitenbreite - linksRechts - 70, unterschriftY + 5)
 
   const suffix = dateiSuffix ?? new Date().toISOString().slice(0, 10)
-  const dateiname = `Ausbildungsnachweis_${azubiProfil.name}_${suffix}.pdf`
+  const dateiname = `Ausbildungsnachweis_${profil.name}_${suffix}.pdf`
   doc.save(dateiname)
 }

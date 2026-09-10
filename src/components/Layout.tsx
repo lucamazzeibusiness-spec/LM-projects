@@ -10,7 +10,7 @@ import {
 } from 'lucide-react'
 import { useEffect, useState, type ReactNode } from 'react'
 import { NavLink } from 'react-router-dom'
-import { azubiProfil } from '../data/mock'
+import { useAzubiProfil } from '../context/AzubiProfilContext'
 
 const navItems = [
   { to: '/', label: 'Start', icon: LayoutGrid, end: true },
@@ -47,7 +47,9 @@ function OnlineBadge() {
 }
 
 export default function Layout({ children }: { children: ReactNode }) {
-  const initialen = azubiProfil.name.slice(0, 2).toUpperCase()
+  const { profil } = useAzubiProfil()
+  if (!profil) return null
+  const initialen = profil.name.slice(0, 2).toUpperCase() || '?'
 
   return (
     <div className="min-h-screen bg-db-gray-50">
@@ -59,14 +61,18 @@ export default function Layout({ children }: { children: ReactNode }) {
           <div className="flex flex-col leading-tight">
             <span className="text-sm font-bold tracking-tight text-db-navy">DB Azubi</span>
             <span className="text-xs text-db-navy-light">
-              {azubiProfil.ausbildungsberuf} · {azubiProfil.lehrjahr}. Lehrjahr
+              {profil.ausbildungsberuf} · {profil.lehrjahr}. Lehrjahr
             </span>
           </div>
           <div className="ml-auto flex items-center gap-3">
             <OnlineBadge />
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-db-gray-100 text-xs font-semibold text-db-navy">
+            <NavLink
+              to="/profil"
+              title="Profil bearbeiten"
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-db-gray-100 text-xs font-semibold text-db-navy hover:bg-db-gray-200"
+            >
               {initialen}
-            </div>
+            </NavLink>
           </div>
         </div>
         <nav className="hidden max-w-6xl gap-1 px-4 md:mx-auto md:flex">

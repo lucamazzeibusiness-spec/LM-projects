@@ -1,9 +1,9 @@
 import { ExternalLink, Pencil, Plus, X } from 'lucide-react'
 import { useState } from 'react'
+import { useAzubiProfil } from '../context/AzubiProfilContext'
 import { useAusbildungsplan } from '../hooks/useAusbildungsplan'
 import { aktuelleWochentage, heutigerWochentagIndex } from '../lib/wochen'
 import {
-  azubiProfil,
   curricula,
   naechstePruefung,
   type Ausbildungsblock,
@@ -36,13 +36,16 @@ function entwurfAus(eintrag: Ausbildungsblock | null): Entwurf {
 }
 
 export default function Ausbildungsplan() {
+  const { profil } = useAzubiProfil()
   const { vorlage, tagSetzen } = useAusbildungsplan()
   const wochentage = aktuelleWochentage()
   const heuteIndex = heutigerWochentagIndex()
-  const curriculum = curricula.find((c) => c.beruf === azubiProfil.ausbildungsberuf)
 
   const [bearbeitungsIndex, setBearbeitungsIndex] = useState<number | null>(null)
   const [entwurf, setEntwurf] = useState<Entwurf>({ typ: 'Betrieb', thema: '', ort: '' })
+
+  if (!profil) return null
+  const curriculum = curricula.find((c) => c.beruf === profil.ausbildungsberuf)
 
   const bearbeiten = (index: number) => {
     setEntwurf(entwurfAus(vorlage[index]))
