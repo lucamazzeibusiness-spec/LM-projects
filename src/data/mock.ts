@@ -294,8 +294,8 @@ export interface Ausbildungsblock {
 export const ausbildungsplan: Ausbildungsblock[] = [
   { tag: 'Montag', datum: '08.09.', typ: 'Betrieb', thema: 'Fahrzeuginstandhaltung – Elektrik', ort: 'Werk Rummelsburg' },
   { tag: 'Dienstag', datum: '09.09.', typ: 'Betrieb', thema: 'Fahrzeuginstandhaltung – Elektrik', ort: 'Werk Rummelsburg' },
-  { tag: 'Mittwoch', datum: '10.09.', typ: 'Berufsschule', thema: 'Steuerungstechnik, Lernfeld 6', ort: 'OSZ Gustav-Meyer' },
-  { tag: 'Donnerstag', datum: '11.09.', typ: 'Berufsschule', thema: 'Steuerungstechnik, Lernfeld 6', ort: 'OSZ Gustav-Meyer' },
+  { tag: 'Mittwoch', datum: '10.09.', typ: 'Berufsschule', thema: 'LF6: Anlagen und Geräte analysieren und prüfen', ort: 'OSZ Gustav-Meyer' },
+  { tag: 'Donnerstag', datum: '11.09.', typ: 'Berufsschule', thema: 'LF6: Anlagen und Geräte analysieren und prüfen', ort: 'OSZ Gustav-Meyer' },
   { tag: 'Freitag', datum: '12.09.', typ: 'Betrieb', thema: 'Fahrzeuginstandhaltung – Elektrik', ort: 'Werk Rummelsburg' },
   { tag: 'Samstag', datum: '13.09.', typ: 'Betrieb', thema: 'Frei', ort: '-' },
   { tag: 'Sonntag', datum: '14.09.', typ: 'Betrieb', thema: 'Frei', ort: '-' },
@@ -364,10 +364,148 @@ export interface Pruefung {
 }
 
 export const naechstePruefung: Pruefung = {
-  titel: 'Zwischenprüfung',
+  titel: 'Abschlussprüfung Teil 1',
   datum: '12. November',
   tageVerbleibend: 63,
 }
+
+export type AusbildungsberufName = 'Elektroniker für Betriebstechnik' | 'Industriemechaniker' | 'Mechatroniker'
+export type LernfeldStatus = 'Abgeschlossen' | 'Aktuell' | 'Geplant'
+
+export interface Lernfeld {
+  nummer: number
+  titel: string
+  ausbildungsjahr: number
+  stunden: number
+  status: LernfeldStatus
+}
+
+export interface Pruefungsbereich {
+  name: string
+  gewichtung: string
+  dauer?: string
+}
+
+export interface Pruefungsteil {
+  bezeichnung: string
+  zeitpunkt: string
+  gewichtungGesamt: string
+  bereiche: Pruefungsbereich[]
+}
+
+export interface AusbildungsberufCurriculum {
+  beruf: AusbildungsberufName
+  lernfelder: Lernfeld[]
+  teil1: Pruefungsteil
+  teil2: Pruefungsteil
+  quelle: string
+}
+
+// Quelle: KMK-Rahmenlehrpläne und IHK-Prüfungsordnungen (öffentlich zugänglich, Stand 2018er-Neuordnung).
+// Kein Abbild eines internen Systems – dient nur als grobe Orientierung, ersetzt nicht den offiziellen Rahmenlehrplan.
+export const curricula: AusbildungsberufCurriculum[] = [
+  {
+    beruf: 'Elektroniker für Betriebstechnik',
+    lernfelder: [
+      { nummer: 1, titel: 'Elektrotechnische Systeme analysieren und Funktionen prüfen', ausbildungsjahr: 1, stunden: 80, status: 'Abgeschlossen' },
+      { nummer: 2, titel: 'Elektrische Installationen planen und ausführen', ausbildungsjahr: 1, stunden: 80, status: 'Abgeschlossen' },
+      { nummer: 3, titel: 'Steuerungen analysieren und anpassen', ausbildungsjahr: 1, stunden: 80, status: 'Abgeschlossen' },
+      { nummer: 4, titel: 'Informationstechnische Systeme bereitstellen', ausbildungsjahr: 1, stunden: 80, status: 'Abgeschlossen' },
+      { nummer: 5, titel: 'Elektroenergieversorgung und Sicherheit von Betriebsmitteln gewährleisten', ausbildungsjahr: 2, stunden: 80, status: 'Abgeschlossen' },
+      { nummer: 6, titel: 'Anlagen und Geräte analysieren und prüfen', ausbildungsjahr: 2, stunden: 60, status: 'Aktuell' },
+      { nummer: 7, titel: 'Steuerungen für Anlagen programmieren und realisieren', ausbildungsjahr: 3, stunden: 80, status: 'Geplant' },
+      { nummer: 8, titel: 'Antriebssysteme auswählen und integrieren', ausbildungsjahr: 3, stunden: 60, status: 'Geplant' },
+    ],
+    teil1: {
+      bezeichnung: 'Abschlussprüfung Teil 1',
+      zeitpunkt: 'Vor Ende des 2. Ausbildungsjahres',
+      gewichtungGesamt: '40 %',
+      bereiche: [{ name: 'Prüfungsbereich Teil 1 (Lernfelder 1–6)', gewichtung: '40 % der Gesamtnote' }],
+    },
+    teil2: {
+      bezeichnung: 'Abschlussprüfung Teil 2',
+      zeitpunkt: 'Am Ende der Ausbildung',
+      gewichtungGesamt: '60 %',
+      bereiche: [
+        { name: 'Praktische Arbeitsaufgaben', gewichtung: '70 % (zusammen)' },
+        { name: 'Wirtschafts- und Sozialkunde', gewichtung: 'schriftlich' },
+      ],
+    },
+    quelle: 'IHK-Rahmenlehrplan Elektroniker/-in für Betriebstechnik, Prüfungsordnung (gestreckte Abschlussprüfung)',
+  },
+  {
+    beruf: 'Industriemechaniker',
+    lernfelder: [
+      { nummer: 1, titel: 'Fertigen und Fügen', ausbildungsjahr: 1, stunden: 80, status: 'Abgeschlossen' },
+      { nummer: 2, titel: 'Fertigen von Bauelementen mit handgeführten Werkzeugen', ausbildungsjahr: 1, stunden: 80, status: 'Abgeschlossen' },
+      { nummer: 3, titel: 'Fertigen von Bauelementen mit Maschinen', ausbildungsjahr: 1, stunden: 80, status: 'Abgeschlossen' },
+      { nummer: 4, titel: 'Herstellen von einfachen Baugruppen', ausbildungsjahr: 1, stunden: 60, status: 'Abgeschlossen' },
+      { nummer: 5, titel: 'Fertigen von Einzelteilen mit Maschinen', ausbildungsjahr: 2, stunden: 80, status: 'Aktuell' },
+      { nummer: 6, titel: 'Installieren und Inbetriebnehmen steuerungstechnischer Maschinen', ausbildungsjahr: 2, stunden: 80, status: 'Geplant' },
+      { nummer: 7, titel: 'Montieren von technischen Teilsystemen', ausbildungsjahr: 2, stunden: 60, status: 'Geplant' },
+      { nummer: 8, titel: 'Fertigen auf numerisch gesteuerten Werkzeugmaschinen', ausbildungsjahr: 3, stunden: 60, status: 'Geplant' },
+      { nummer: 9, titel: 'Instandsetzen von technischen Systemen', ausbildungsjahr: 3, stunden: 40, status: 'Geplant' },
+      { nummer: 10, titel: 'Herstellen und Inbetriebnehmen von technischen Systemen', ausbildungsjahr: 3, stunden: 80, status: 'Geplant' },
+      { nummer: 11, titel: 'Überwachen der Produkt- und Prozessqualität', ausbildungsjahr: 3, stunden: 60, status: 'Geplant' },
+      { nummer: 12, titel: 'Instandhalten von technischen Systemen', ausbildungsjahr: 4, stunden: 60, status: 'Geplant' },
+      { nummer: 13, titel: 'Sicherstellen der Betriebsfähigkeit automatisierter Systeme', ausbildungsjahr: 4, stunden: 60, status: 'Geplant' },
+      { nummer: 14, titel: 'Planen und Realisieren technischer Systeme', ausbildungsjahr: 4, stunden: 80, status: 'Geplant' },
+    ],
+    teil1: {
+      bezeichnung: 'Abschlussprüfung Teil 1',
+      zeitpunkt: 'Nach ca. 1,5 Ausbildungsjahren (Lernfelder 1–6)',
+      gewichtungGesamt: '40 %',
+      bereiche: [{ name: 'Prüfungsbereich Teil 1', gewichtung: '40 % der Gesamtnote' }],
+    },
+    teil2: {
+      bezeichnung: 'Abschlussprüfung Teil 2',
+      zeitpunkt: 'Am Ende der Ausbildung (nach 3,5 Jahren)',
+      gewichtungGesamt: '60 %',
+      bereiche: [
+        { name: 'Arbeitsauftrag', gewichtung: '30 %' },
+        { name: 'Auftrags- und Funktionsanalyse', gewichtung: 'schriftlich', dauer: '120 Min.' },
+        { name: 'Fertigungstechnik', gewichtung: 'schriftlich', dauer: '120 Min.' },
+        { name: 'Wirtschafts- und Sozialkunde', gewichtung: 'schriftlich', dauer: '60 Min.' },
+      ],
+    },
+    quelle: 'KMK-Rahmenlehrplan Industriemechaniker/-in, IHK-Prüfungsordnung (gestreckte Abschlussprüfung)',
+  },
+  {
+    beruf: 'Mechatroniker',
+    lernfelder: [
+      { nummer: 1, titel: 'Analysieren von Funktionszusammenhängen in mechatronischen Systemen', ausbildungsjahr: 1, stunden: 40, status: 'Abgeschlossen' },
+      { nummer: 2, titel: 'Herstellen mechanischer Teilsysteme', ausbildungsjahr: 1, stunden: 80, status: 'Abgeschlossen' },
+      { nummer: 3, titel: 'Installieren elektrischer Betriebsmittel unter Beachtung sicherheitstechnischer Aspekte', ausbildungsjahr: 1, stunden: 100, status: 'Abgeschlossen' },
+      { nummer: 4, titel: 'Untersuchen der Energie- und Informationsflüsse in elektrischen, hydraulischen und pneumatischen Baugruppen', ausbildungsjahr: 1, stunden: 80, status: 'Abgeschlossen' },
+      { nummer: 5, titel: 'Kommunizieren mit Hilfe von Datenverarbeitungssystemen', ausbildungsjahr: 2, stunden: 60, status: 'Aktuell' },
+      { nummer: 6, titel: 'Planen und Organisieren von Arbeitsabläufen', ausbildungsjahr: 2, stunden: 60, status: 'Geplant' },
+      { nummer: 7, titel: 'Realisieren mechatronischer Teilsysteme', ausbildungsjahr: 2, stunden: 80, status: 'Geplant' },
+      { nummer: 8, titel: 'Design und Erstellen mechatronischer Systeme', ausbildungsjahr: 3, stunden: 80, status: 'Geplant' },
+      { nummer: 9, titel: 'Untersuchen des Informationsflusses in komplexen mechatronischen Systemen', ausbildungsjahr: 3, stunden: 60, status: 'Geplant' },
+      { nummer: 10, titel: 'Planen der Montage und Demontage', ausbildungsjahr: 3, stunden: 60, status: 'Geplant' },
+      { nummer: 11, titel: 'Inbetriebnahme, Fehlersuche und Instandsetzung', ausbildungsjahr: 4, stunden: 80, status: 'Geplant' },
+      { nummer: 12, titel: 'Vorbeugende Instandhaltung', ausbildungsjahr: 4, stunden: 60, status: 'Geplant' },
+    ],
+    teil1: {
+      bezeichnung: 'Abschlussprüfung Teil 1',
+      zeitpunkt: 'Vor Ende des 2. Ausbildungsjahres',
+      gewichtungGesamt: '40 %',
+      bereiche: [{ name: 'Arbeiten an einem mechatronischen Teilsystem', gewichtung: '40 %', dauer: '8 Std. (Arbeitsaufgabe + Fachgespräch + schriftlich)' }],
+    },
+    teil2: {
+      bezeichnung: 'Abschlussprüfung Teil 2',
+      zeitpunkt: 'Am Ende der Ausbildung',
+      gewichtungGesamt: '60 %',
+      bereiche: [
+        { name: 'Arbeitsauftrag', gewichtung: '50 %' },
+        { name: 'Arbeitsplanung', gewichtung: '20 %' },
+        { name: 'Funktionsanalyse', gewichtung: '20 %' },
+        { name: 'Wirtschafts- und Sozialkunde', gewichtung: '10 %' },
+      ],
+    },
+    quelle: 'KMK-Rahmenlehrplan Mechatroniker/-in, IHK-Prüfungsordnung (gestreckte Abschlussprüfung)',
+  },
+]
 
 export interface Lernkarte {
   id: string
