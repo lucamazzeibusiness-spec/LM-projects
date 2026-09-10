@@ -1,9 +1,12 @@
-import { ExternalLink } from 'lucide-react'
+import { ExternalLink, Pencil, Plus, X } from 'lucide-react'
+import { useState } from 'react'
+import { useAusbildungsplan } from '../hooks/useAusbildungsplan'
+import { aktuelleWochentage, heutigerWochentagIndex } from '../lib/wochen'
 import {
-  ausbildungsplan,
   azubiProfil,
   curricula,
   naechstePruefung,
+  type Ausbildungsblock,
   type AusbildungsblockTyp,
   type LernfeldStatus,
 } from '../data/mock'
@@ -14,21 +17,55 @@ const typStyle: Record<AusbildungsblockTyp, string> = {
   'DB Training': 'bg-orange-50 text-orange-700',
 }
 
+const typen: AusbildungsblockTyp[] = ['Betrieb', 'Berufsschule', 'DB Training']
+
 const lernfeldStyle: Record<LernfeldStatus, string> = {
   Abgeschlossen: 'bg-db-green/10 text-db-green',
   Aktuell: 'bg-db-red/10 text-db-red',
   Geplant: 'bg-db-gray-100 text-db-navy-light',
 }
 
+interface Entwurf {
+  typ: AusbildungsblockTyp | 'Frei'
+  thema: string
+  ort: string
+}
+
+function entwurfAus(eintrag: Ausbildungsblock | null): Entwurf {
+  return eintrag ? { ...eintrag } : { typ: 'Betrieb', thema: '', ort: '' }
+}
+
 export default function Ausbildungsplan() {
-  const heuteIndex = 2
+  const { vorlage, tagSetzen } = useAusbildungsplan()
+  const wochentage = aktuelleWochentage()
+  const heuteIndex = heutigerWochentagIndex()
   const curriculum = curricula.find((c) => c.beruf === azubiProfil.ausbildungsberuf)
+
+  const [bearbeitungsIndex, setBearbeitungsIndex] = useState<number | null>(null)
+  const [entwurf, setEntwurf] = useState<Entwurf>({ typ: 'Betrieb', thema: '', ort: '' })
+
+  const bearbeiten = (index: number) => {
+    setEntwurf(entwurfAus(vorlage[index]))
+    setBearbeitungsIndex(index)
+  }
+
+  const speichern = () => {
+    if (bearbeitungsIndex === null) return
+    if (entwurf.typ === 'Frei') {
+      tagSetzen(bearbeitungsIndex, null)
+    } else {
+      tagSetzen(bearbeitungsIndex, { typ: entwurf.typ, thema: entwurf.thema, ort: entwurf.ort })
+    }
+    setBearbeitungsIndex(null)
+  }
 
   return (
     <div className="space-y-4">
       <div>
         <h1 className="text-xl font-semibold text-db-navy">Ausbildungsplan</h1>
-        <p className="text-sm text-db-navy-light">Diese Woche · Betrieb, Berufsschule und DB Training</p>
+        <p className="text-sm text-db-navy-light">
+          Dein eigener Rhythmus · trag hier ein, wann Betrieb, Berufsschule oder DB Training ist
+        </p>
       </div>
 
       <div className="rounded-xl border border-db-navy/10 bg-db-navy p-4 text-white">
@@ -41,30 +78,94 @@ export default function Ausbildungsplan() {
 
       <div className="overflow-hidden rounded-xl border border-db-gray-200 bg-white">
         <ul className="divide-y divide-db-gray-100">
-          {ausbildungsplan.map((b, i) => (
-            <li
-              key={b.tag}
-              className={`flex items-center justify-between gap-3 px-4 py-3 ${
-                i === heuteIndex ? 'bg-db-red/5' : ''
-              }`}
-            >
-              <div className="w-20 shrink-0">
-                <p className={`text-sm font-semibold ${i === heuteIndex ? 'text-db-red' : 'text-db-navy'}`}>
-                  {b.tag}
-                </p>
-                <p className="text-xs text-db-navy-light">{b.datum}</p>
-              </div>
-              <div className="flex-1">
-                <p className="text-sm text-db-navy">{b.thema}</p>
-                <p className="text-xs text-db-navy-light">{b.ort}</p>
-              </div>
-              {b.thema !== 'Frei' && (
-                <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${typStyle[b.typ]}`}>
-                  {b.typ}
-                </span>
-              )}
-            </li>
-          ))}
+          {wochentage.map(({ tag, datum }, i) => {
+            const eintrag = vorlage[i]
+            const wirdBearbeitet = bearbeitungsIndex === i
+
+            return (
+              <li key={tag} className={i === heuteIndex ? 'bg-db-red/5' : ''}>
+                {wirdBearbeitet ? (
+                  <div className="space-y-2.5 px-4 py-3">
+                    <div className="flex items-center justify-between">
+                      <p className={`text-sm font-semibold ${i === heuteIndex ? 'text-db-red' : 'text-db-navy'}`}>
+                        {tag}, {datum}
+                      </p>
+                      <button onClick={() => setBearbeitungsIndex(null)} className="text-db-navy-light hover:text-db-navy">
+                        <X size={16} />
+                      </button>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {[...typen, 'Frei' as const].map((t) => (
+                        <button
+                          key={t}
+                          onClick={() => setEntwurf((d) => ({ ...d, typ: t }))}
+                          className={`rounded-full border px-2.5 py-1 text-xs font-medium transition-colors ${
+                            entwurf.typ === t
+                              ? 'border-db-navy bg-db-navy text-white'
+                              : 'border-db-gray-200 bg-white text-db-navy-light'
+                          }`}
+                        >
+                          {t}
+                        </button>
+                      ))}
+                    </div>
+                    {entwurf.typ !== 'Frei' && (
+                      <>
+                        <input
+                          value={entwurf.thema}
+                          onChange={(e) => setEntwurf((d) => ({ ...d, thema: e.target.value }))}
+                          placeholder="z. B. Fahrzeuginstandhaltung – Elektrik / Lernfeld 6"
+                          className="w-full rounded-lg border border-db-gray-200 px-3 py-2 text-sm text-db-navy outline-none focus:border-db-red"
+                        />
+                        <input
+                          value={entwurf.ort}
+                          onChange={(e) => setEntwurf((d) => ({ ...d, ort: e.target.value }))}
+                          placeholder="Ort, z. B. Werk Rummelsburg"
+                          className="w-full rounded-lg border border-db-gray-200 px-3 py-2 text-sm text-db-navy outline-none focus:border-db-red"
+                        />
+                      </>
+                    )}
+                    <button
+                      onClick={speichern}
+                      className="w-full rounded-full bg-db-red px-4 py-2 text-sm font-semibold text-white hover:bg-db-red-dark"
+                    >
+                      Speichern
+                    </button>
+                  </div>
+                ) : (
+                  <button onClick={() => bearbeiten(i)} className="flex w-full items-center gap-3 px-4 py-3 text-left">
+                    <div className="w-20 shrink-0">
+                      <p className={`text-sm font-semibold ${i === heuteIndex ? 'text-db-red' : 'text-db-navy'}`}>
+                        {tag}
+                      </p>
+                      <p className="text-xs text-db-navy-light">{datum}</p>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      {eintrag ? (
+                        <>
+                          <p className="truncate text-sm text-db-navy">{eintrag.thema || eintrag.typ}</p>
+                          {eintrag.ort && <p className="text-xs text-db-navy-light">{eintrag.ort}</p>}
+                        </>
+                      ) : (
+                        <p className="text-sm text-db-navy-light italic">Frei / kein Eintrag</p>
+                      )}
+                    </div>
+                    {eintrag ? (
+                      <span
+                        className={`flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${typStyle[eintrag.typ]}`}
+                      >
+                        <Pencil size={11} /> {eintrag.typ}
+                      </span>
+                    ) : (
+                      <span className="flex shrink-0 items-center gap-1 rounded-full border border-dashed border-db-gray-200 px-2.5 py-1 text-xs font-medium text-db-navy-light">
+                        <Plus size={11} /> Eintragen
+                      </span>
+                    )}
+                  </button>
+                )}
+              </li>
+            )
+          })}
         </ul>
       </div>
 

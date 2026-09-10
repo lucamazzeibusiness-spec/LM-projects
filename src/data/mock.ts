@@ -284,21 +284,21 @@ export const ersatzteile: Ersatzteil[] = [
 export type AusbildungsblockTyp = 'Betrieb' | 'Berufsschule' | 'DB Training'
 
 export interface Ausbildungsblock {
-  tag: string
-  datum: string
   typ: AusbildungsblockTyp
   thema: string
   ort: string
 }
 
-export const ausbildungsplan: Ausbildungsblock[] = [
-  { tag: 'Montag', datum: '08.09.', typ: 'Betrieb', thema: 'Fahrzeuginstandhaltung – Elektrik', ort: 'Werk Rummelsburg' },
-  { tag: 'Dienstag', datum: '09.09.', typ: 'Betrieb', thema: 'Fahrzeuginstandhaltung – Elektrik', ort: 'Werk Rummelsburg' },
-  { tag: 'Mittwoch', datum: '10.09.', typ: 'Berufsschule', thema: 'LF6: Anlagen und Geräte analysieren und prüfen', ort: 'OSZ Gustav-Meyer' },
-  { tag: 'Donnerstag', datum: '11.09.', typ: 'Berufsschule', thema: 'LF6: Anlagen und Geräte analysieren und prüfen', ort: 'OSZ Gustav-Meyer' },
-  { tag: 'Freitag', datum: '12.09.', typ: 'Betrieb', thema: 'Fahrzeuginstandhaltung – Elektrik', ort: 'Werk Rummelsburg' },
-  { tag: 'Samstag', datum: '13.09.', typ: 'Betrieb', thema: 'Frei', ort: '-' },
-  { tag: 'Sonntag', datum: '14.09.', typ: 'Betrieb', thema: 'Frei', ort: '-' },
+// Wochentag-Vorlage (Mo–So), wiederholt sich jede Woche. Ein Tag ohne Eintrag (null) gilt als frei.
+// Das ist nur eine Beispielvorlage – jede:r Azubi trägt in der App den eigenen echten Rhythmus ein.
+export const ausbildungsplanVorlage: (Ausbildungsblock | null)[] = [
+  { typ: 'Betrieb', thema: 'Fahrzeuginstandhaltung – Elektrik', ort: 'Werk Rummelsburg' },
+  { typ: 'Betrieb', thema: 'Fahrzeuginstandhaltung – Elektrik', ort: 'Werk Rummelsburg' },
+  { typ: 'Berufsschule', thema: 'LF6: Anlagen und Geräte analysieren und prüfen', ort: 'OSZ Gustav-Meyer' },
+  { typ: 'Berufsschule', thema: 'LF6: Anlagen und Geräte analysieren und prüfen', ort: 'OSZ Gustav-Meyer' },
+  { typ: 'Betrieb', thema: 'Fahrzeuginstandhaltung – Elektrik', ort: 'Werk Rummelsburg' },
+  null,
+  null,
 ]
 
 export type BerichtsheftStatus = 'Entwurf' | 'Eingereicht' | 'Freigegeben'

@@ -31,3 +31,24 @@ export function wochenLabel(datumISO: string): string {
 export function heutigesDatumLabel(): string {
   return new Date().toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: '2-digit' })
 }
+
+const wochentagsnamen = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag']
+
+export function heutigerWochentagIndex(): number {
+  return (new Date().getDay() + 6) % 7 // 0 = Montag ... 6 = Sonntag
+}
+
+export interface Wochentag {
+  tag: string
+  datum: string
+}
+
+export function aktuelleWochentage(): Wochentag[] {
+  const montag = montagDerWoche(heuteISO())
+  const fmt = (d: Date) => d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })
+  return wochentagsnamen.map((tag, i) => {
+    const d = new Date(montag)
+    d.setDate(d.getDate() + i)
+    return { tag, datum: fmt(d) }
+  })
+}
