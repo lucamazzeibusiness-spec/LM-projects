@@ -1,6 +1,6 @@
 export type Gewerk = 'Elektrik' | 'Mechanik' | 'Mechatronik'
 export type Prioritaet = 'Hoch' | 'Mittel' | 'Niedrig'
-export type LernaufgabeStatus = 'Offen' | 'In Arbeit' | 'Zur Kontrolle' | 'Erledigt'
+export type LernaufgabeStatus = 'Offen' | 'In Arbeit' | 'Erledigt'
 
 export interface AzubiProfil {
   name: string
@@ -49,40 +49,38 @@ export interface Lernaufgabe {
 export const lernaufgaben: Lernaufgabe[] = [
   {
     id: 'L-241',
-    titel: 'Bremsprobe & Drehgestell-Inspektion begleiten',
+    titel: 'Bremsprüfung am Drehgestell',
     anlage: 'Triebzug ICE 4',
     baureihe: 'BR 412',
-    ort: 'Werk Rummelsburg, Gleis 7',
+    ort: 'Werkhalle 2',
     gewerk: 'Mechanik',
     prioritaet: 'Hoch',
     status: 'In Arbeit',
     faelligkeit: 'Heute, 14:00',
     lernziel: 'Aufbau eines Drehgestells verstehen und die Prüfschritte einer Bremsprobe nach Vorschrift durchführen können.',
-    beschreibung:
-      'Du begleitest die planmäßige Inspektion der Drehgestelle sowie die Bremsprobe. Dein Ausbilder zeigt dir zunächst Schritt 1–2, danach übernimmst du unter Aufsicht.',
-    ausbilderHinweis: 'Vorher unbedingt Kapitel „Drehgestelltechnik" im Lernheft wiederholen.',
+    beschreibung: 'Inspektion der Drehgestelle und Bremsprobe nach Prüfvorschrift durchführen.',
+    ausbilderHinweis: 'Kapitel „Drehgestelltechnik" im Lernheft vorher wiederholen.',
     checklist: [
       { id: 'c1', label: 'Sichtprüfung Drehgestellrahmen auf Risse' },
       { id: 'c2', label: 'Radsatzlager auf Spiel/Temperatur prüfen' },
       { id: 'c3', label: 'Bremsbeläge Stärke messen' },
-      { id: 'c4', label: 'Bremsprobe (Vollbremsung) unter Aufsicht durchführen' },
+      { id: 'c4', label: 'Bremsprobe (Vollbremsung) durchführen' },
       { id: 'c5', label: 'Federspeicher auf Dichtheit prüfen' },
-      { id: 'c6', label: 'Ergebnis mit Ausbilder besprechen' },
+      { id: 'c6', label: 'Prüfergebnis dokumentieren' },
     ],
   },
   {
     id: 'L-242',
-    titel: 'Störung Türsteuerung selbstständig eingrenzen',
+    titel: 'Fehlersuche Türsteuerung',
     anlage: 'Doppelstockwagen',
     baureihe: 'DBpza',
-    ort: 'Abstellgruppe Süd, Gleis 12',
+    ort: 'Werkstatt Elektrik',
     gewerk: 'Elektrik',
     prioritaet: 'Hoch',
     status: 'Offen',
     faelligkeit: 'Heute, 11:30',
     lernziel: 'Systematische Fehlersuche nach Schaltplan üben – vom Symptom zur Ursache.',
-    beschreibung:
-      'Fehlercode E-4471 liegt vor (Türsteuergerät meldet Timeout). Versuch die Ursache selbst einzugrenzen, bevor du im Wissensbereich nachschlägst. Bei Unsicherheit: Ausbilder rufen, nicht raten.',
+    beschreibung: 'Fehlercode E-4471 liegt vor (Türsteuergerät meldet Timeout). Ursache eingrenzen und beheben.',
     checklist: [
       { id: 'c1', label: 'Fehlerspeicher Türsteuergerät auslesen' },
       { id: 'c2', label: 'Verkabelung Türantrieb auf Beschädigung prüfen' },
@@ -93,16 +91,15 @@ export const lernaufgaben: Lernaufgabe[] = [
   },
   {
     id: 'L-243',
-    titel: 'Wartung Weichenheizung – Grundlagen Steuerungstechnik',
-    anlage: 'Weiche 34a',
-    ort: 'Bahnhof Süd, Gleis 4/5',
+    titel: 'Funktionsprüfung Weichenheizung',
+    anlage: 'Weichenantrieb',
+    ort: 'Außenanlage',
     gewerk: 'Mechatronik',
     prioritaet: 'Mittel',
     status: 'Offen',
     faelligkeit: 'Morgen, 08:00',
     lernziel: 'Zusammenspiel von Sensorik (Temperaturfühler) und Aktorik (Heizstäbe) an einem realen Beispiel nachvollziehen.',
-    beschreibung:
-      'Saisonale Funktionsprüfung der Weichenheizung vor Wintereinsatz. Gute Gelegenheit, Steuerungslogik in der Praxis zu sehen statt nur im Simulator.',
+    beschreibung: 'Saisonale Funktionsprüfung der Weichenheizung vor Wintereinsatz.',
     checklist: [
       { id: 'c1', label: 'Heizstäbe auf Durchgang prüfen' },
       { id: 'c2', label: 'Temperaturfühler kalibrieren' },
@@ -112,37 +109,35 @@ export const lernaufgaben: Lernaufgabe[] = [
   },
   {
     id: 'L-235',
-    titel: 'Klimaanlage – Kältekreislauf erklärt bekommen',
+    titel: 'Fehlersuche Klimaanlage',
     anlage: 'Regionaltriebwagen',
     baureihe: 'BR 442',
-    ort: 'Werk Rummelsburg, Halle 2',
+    ort: 'Werkhalle 2',
     gewerk: 'Mechatronik',
     prioritaet: 'Mittel',
     status: 'Erledigt',
     faelligkeit: 'Gestern, 16:00',
     lernziel: 'Grundprinzip des Kältekreislaufs (Verdichten, Kondensieren, Entspannen, Verdampfen) an der Anlage erkennen.',
-    beschreibung: 'Klimakompressor schaltete nach ca. 5 Minuten ab. Gemeinsam mit Ausbilder Ursache gesucht und gefunden.',
-    ausbilderHinweis: 'Gut mitgedacht – Druckwächter-Logik beim nächsten Mal selbst vorschlagen.',
+    beschreibung: 'Klimakompressor schaltete nach ca. 5 Minuten ab. Ursache finden und beheben.',
     checklist: [
       { id: 'c1', label: 'Kältemittelstand prüfen' },
       { id: 'c2', label: 'Druckwächter testen' },
       { id: 'c3', label: 'Kondensator reinigen' },
-      { id: 'c4', label: 'Probelauf 30 Minuten begleiten' },
+      { id: 'c4', label: 'Probelauf 30 Minuten durchführen' },
     ],
   },
   {
     id: 'L-228',
-    titel: 'Hauptschalter tauschen – erste eigenständige Aufgabe',
+    titel: 'Hauptschalter tauschen',
     anlage: 'E-Lok',
     baureihe: 'BR 185',
-    ort: 'Werk Rummelsburg, Gleis 3',
+    ort: 'Werkhalle 1',
     gewerk: 'Elektrik',
     prioritaet: 'Niedrig',
     status: 'Erledigt',
     faelligkeit: 'Gestern, 09:00',
     lernziel: 'Sicherheitsregeln beim Arbeiten an Hochspannungsanlagen (Freischalten, Erden) korrekt anwenden.',
-    beschreibung: 'Planmäßiger Austausch des Hauptschalters – erste Aufgabe, die du komplett allein durchgeführt hast.',
-    ausbilderHinweis: 'Sauber gearbeitet, Freischaltreihenfolge korrekt eingehalten.',
+    beschreibung: 'Planmäßiger Austausch des Hauptschalters gemäß Instandhaltungsplan.',
     checklist: [
       { id: 'c1', label: 'Fahrzeug spannungsfrei schalten, erden' },
       { id: 'c2', label: 'Hauptschalter ausbauen' },

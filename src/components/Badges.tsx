@@ -3,7 +3,6 @@ import type { BerichtsheftStatus, Gewerk, LernaufgabeStatus, Prioritaet } from '
 const statusStyles: Record<LernaufgabeStatus, string> = {
   Offen: 'bg-db-gray-100 text-db-navy-light',
   'In Arbeit': 'bg-db-amber/10 text-db-amber',
-  'Zur Kontrolle': 'bg-blue-50 text-blue-700',
   Erledigt: 'bg-db-green/10 text-db-green',
 }
 

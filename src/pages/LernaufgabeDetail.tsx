@@ -1,4 +1,4 @@
-import { Camera, Check, ChevronLeft, MessageSquare, Save, Send, Target } from 'lucide-react'
+import { Camera, Check, CheckCircle2, ChevronLeft, MessageSquare, Save, Target } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { GewerkBadge, PrioBadge, StatusBadge } from '../components/Badges'
@@ -7,10 +7,10 @@ import { lernaufgaben } from '../data/mock'
 interface Draft {
   checked: Record<string, boolean>
   notiz: string
-  eingereicht: boolean
+  erledigt: boolean
 }
 
-const leererDraft: Draft = { checked: {}, notiz: '', eingereicht: false }
+const leererDraft: Draft = { checked: {}, notiz: '', erledigt: false }
 
 function ladeDraft(storageKey: string): Draft {
   try {
@@ -167,15 +167,15 @@ export default function LernaufgabeDetail() {
         </div>
 
         <button
-          onClick={() => aktualisieren((d) => ({ ...d, eingereicht: !d.eingereicht }))}
+          onClick={() => aktualisieren((d) => ({ ...d, erledigt: !d.erledigt }))}
           className={`mt-4 flex w-full items-center justify-center gap-2 rounded-full border px-3 py-3 text-sm font-semibold transition-colors ${
-            draft.eingereicht
+            draft.erledigt
               ? 'border-db-green bg-db-green/10 text-db-green'
               : 'border-db-red bg-db-red text-white hover:bg-db-red-dark'
           }`}
         >
-          <Send size={16} />
-          {draft.eingereicht ? 'Zur Kontrolle eingereicht' : 'Zur Kontrolle beim Ausbilder einreichen'}
+          <CheckCircle2 size={16} />
+          {draft.erledigt ? 'Als erledigt markiert' : 'Als erledigt markieren'}
         </button>
 
         <p className="mt-2 flex items-center justify-center gap-1 text-xs text-db-navy-light">

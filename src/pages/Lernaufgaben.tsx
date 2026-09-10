@@ -5,7 +5,7 @@ import { GewerkBadge, PrioBadge, StatusBadge } from '../components/Badges'
 import { lernaufgaben, type Gewerk, type LernaufgabeStatus } from '../data/mock'
 
 const gewerke: (Gewerk | 'Alle')[] = ['Alle', 'Elektrik', 'Mechanik', 'Mechatronik']
-const stati: (LernaufgabeStatus | 'Alle')[] = ['Alle', 'Offen', 'In Arbeit', 'Zur Kontrolle', 'Erledigt']
+const stati: (LernaufgabeStatus | 'Alle')[] = ['Alle', 'Offen', 'In Arbeit', 'Erledigt']
 
 export default function Lernaufgaben() {
   const [gewerk, setGewerk] = useState<Gewerk | 'Alle'>('Alle')
