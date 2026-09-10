@@ -510,98 +510,500 @@ export function lehrjahreGesamtFuer(beruf: AusbildungsberufName): number {
 
 export interface Lernkarte {
   id: string
-  gewerk: Gewerk | 'Allgemein'
+  themenbereich: Themenbereich
+  pruefungsteil: Pruefungsphase
   schwierigkeit: FehlerfallSchwierigkeit
   frage: string
   antwort: string
 }
 
+export type Themenbereich =
+  | 'Mathematik'
+  | 'Elektrotechnik'
+  | 'Sicherheit'
+  | 'Metalltechnik'
+  | 'Steuerungstechnik'
+  | 'Wirtschaft & Soziales'
+  | 'Ausbildung'
+
+export type Pruefungsphase = 'AP1' | 'AP2'
+
 export const lernkarten: Lernkarte[] = [
+  // --- Mathematik ---
   {
-    id: 'LK-1',
-    gewerk: 'Elektrik',
+    id: 'LK-M1',
+    themenbereich: 'Mathematik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Ein Kabel von 8 m kostet 24 €. Was kosten 12 m? Wie gehst du beim Dreisatz vor?',
+    antwort: 'Erst auf 1 m runterrechnen: 24 € / 8 m = 3 €/m. Dann hoch auf 12 m: 3 €/m · 12 = 36 €.',
+  },
+  {
+    id: 'LK-M2',
+    themenbereich: 'Mathematik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Ein Werkstück wiegt nach der Bearbeitung 850 g, das waren 85 % des Rohgewichts. Wie schwer war das Rohteil?',
+    antwort: 'Rohgewicht = 850 g / 0,85 = 1000 g.',
+  },
+  {
+    id: 'LK-M3',
+    themenbereich: 'Mathematik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Wie berechnest du die Fläche eines Kreises, z. B. den Querschnitt einer Bohrung?',
+    antwort: 'A = π · r² (r = Radius, die Hälfte des Durchmessers).',
+  },
+  {
+    id: 'LK-M4',
+    themenbereich: 'Mathematik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Wie berechnest du das Volumen eines zylindrischen Werkstücks?',
+    antwort: 'V = π · r² · h (Grundfläche mal Höhe).',
+  },
+  {
+    id: 'LK-M5',
+    themenbereich: 'Mathematik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Wie rechnest du 0,75 mm in µm um?',
+    antwort: '1 mm = 1000 µm, also 0,75 mm = 750 µm.',
+  },
+  {
+    id: 'LK-M6',
+    themenbereich: 'Mathematik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Fortgeschritten',
+    frage: 'Wofür brauchst du den Satz des Pythagoras in der Praxis, z. B. beim Anreißen?',
+    antwort: 'a² + b² = c². Damit prüfst oder berechnest du z. B. rechte Winkel oder die Diagonale eines rechteckigen Bauteils.',
+  },
+  {
+    id: 'LK-M7',
+    themenbereich: 'Mathematik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Fortgeschritten',
+    frage: 'Wie berechnest du eine unbekannte Kathete in einem rechtwinkligen Dreieck, wenn du einen Winkel und die Hypotenuse kennst?',
+    antwort: 'Mit Sinus/Kosinus: Gegenkathete = Hypotenuse · sin(Winkel), Ankathete = Hypotenuse · cos(Winkel).',
+  },
+  {
+    id: 'LK-M8',
+    themenbereich: 'Mathematik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Eine Maschine fertigt 45 Teile in 15 Minuten. Wie viele Teile schafft sie in einer Stunde?',
+    antwort: '45 Teile / 15 Min = 3 Teile/Min. In 60 Min: 3 · 60 = 180 Teile.',
+  },
+  {
+    id: 'LK-M9',
+    themenbereich: 'Mathematik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Welche Rechenregel gilt bei einer Aufgabe wie 5 + 3 · 4?',
+    antwort: 'Punktrechnung vor Strichrechnung: erst 3 · 4 = 12 rechnen, dann 5 + 12 = 17.',
+  },
+  {
+    id: 'LK-M10',
+    themenbereich: 'Mathematik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Ein Bauteil ist im Maßstab 1:5 gezeichnet und misst in der Zeichnung 40 mm. Wie lang ist es real?',
+    antwort: '40 mm · 5 = 200 mm = 20 cm.',
+  },
+
+  // --- Elektrotechnik ---
+  {
+    id: 'LK-E1',
+    themenbereich: 'Elektrotechnik',
+    pruefungsteil: 'AP1',
     schwierigkeit: 'Grundlagen',
     frage: 'Wie lautet das Ohmsche Gesetz und wonach löst du bei gegebener Spannung und Widerstand auf?',
     antwort: 'U = R · I. Nach dem Strom aufgelöst: I = U / R.',
   },
   {
-    id: 'LK-2',
-    gewerk: 'Elektrik',
+    id: 'LK-E2',
+    themenbereich: 'Elektrotechnik',
+    pruefungsteil: 'AP1',
     schwierigkeit: 'Grundlagen',
     frage: 'Was ist der Unterschied zwischen Reihen- und Parallelschaltung beim Gesamtwiderstand?',
     antwort:
       'Reihenschaltung: Widerstände addieren sich (R_ges = R1 + R2 + ...). Parallelschaltung: der Kehrwert des Gesamtwiderstands ist die Summe der Kehrwerte (1/R_ges = 1/R1 + 1/R2 + ...), R_ges wird kleiner als der kleinste Einzelwiderstand.',
   },
   {
-    id: 'LK-3',
-    gewerk: 'Elektrik',
+    id: 'LK-E3',
+    themenbereich: 'Elektrotechnik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Wie berechnest du die elektrische Leistung aus Spannung und Strom?',
+    antwort: 'P = U · I. Einheit Watt (W).',
+  },
+  {
+    id: 'LK-E4',
+    themenbereich: 'Elektrotechnik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Wozu dient der Schutzleiter (PE) an elektrischen Geräten?',
+    antwort:
+      'Er verbindet leitfähige Gehäuseteile mit der Erde. Bei einem Isolationsfehler fließt so ein hoher Strom ab, der die Sicherung schnell auslöst, statt das Gehäuse dauerhaft unter Spannung zu setzen.',
+  },
+  {
+    id: 'LK-E5',
+    themenbereich: 'Elektrotechnik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Wie funktioniert ein Fehlerstromschutzschalter (FI/RCD) und wovor schützt er?',
+    antwort:
+      'Er vergleicht den Strom im Außen- und Neutralleiter. Fließt ein Teil z. B. über einen Menschen zur Erde ab, entsteht eine Differenz und der FI schaltet in Millisekunden ab – schützt vor lebensgefährlichem Stromschlag.',
+  },
+  {
+    id: 'LK-E6',
+    themenbereich: 'Elektrotechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage: 'Was gibt der Effektivwert einer Wechselspannung an, z. B. bei 230 V Netzspannung?',
+    antwort:
+      'Den Gleichspannungswert, der die gleiche Leistung/Wärmewirkung erzeugen würde. Bei 230 V Effektivwert liegt der Scheitelwert (Spitzenwert) bei ca. 325 V.',
+  },
+  {
+    id: 'LK-E7',
+    themenbereich: 'Elektrotechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage: 'Wie hängt das Übersetzungsverhältnis eines Transformators mit den Windungszahlen zusammen?',
+    antwort:
+      'U1/U2 = N1/N2. Mehr Windungen auf der Primär- als auf der Sekundärseite bedeutet, die Spannung wird heruntertransformiert (und umgekehrt).',
+  },
+  {
+    id: 'LK-E8',
+    themenbereich: 'Elektrotechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage: 'Was besagt die Kirchhoffsche Knotenregel?',
+    antwort: 'Die Summe aller Ströme, die in einen Knotenpunkt hineinfließen, ist gleich der Summe aller Ströme, die herausfließen.',
+  },
+  {
+    id: 'LK-E9',
+    themenbereich: 'Elektrotechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Welche Grundfunktion hat eine Diode in einer Schaltung?',
+    antwort:
+      'Sie lässt Strom nur in eine Richtung durch (Durchlassrichtung) und sperrt in die andere (Sperrrichtung) – z. B. zum Gleichrichten von Wechselspannung.',
+  },
+  {
+    id: 'LK-E10',
+    themenbereich: 'Elektrotechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Was macht eine NICHT-Verknüpfung (NOT) in der Steuerungstechnik?',
+    antwort: 'Sie kehrt das Eingangssignal um: aus 1 wird 0, aus 0 wird 1 (Invertierung).',
+  },
+
+  // --- Sicherheit ---
+  {
+    id: 'LK-S1',
+    themenbereich: 'Sicherheit',
+    pruefungsteil: 'AP1',
     schwierigkeit: 'Fortgeschritten',
     frage: 'Welche 5 Sicherheitsregeln gelten beim Freischalten elektrischer Anlagen?',
     antwort:
       '1. Freischalten, 2. Gegen Wiedereinschalten sichern, 3. Spannungsfreiheit feststellen, 4. Erden und Kurzschließen, 5. Benachbarte, unter Spannung stehende Teile abdecken oder abschranken.',
   },
   {
-    id: 'LK-4',
-    gewerk: 'Mechanik',
+    id: 'LK-S2',
+    themenbereich: 'Sicherheit',
+    pruefungsteil: 'AP1',
     schwierigkeit: 'Grundlagen',
-    frage: 'Was versteht man unter „Passung" bei zwei zusammengefügten Bauteilen?',
-    antwort:
-      'Die Passung beschreibt das Verhältnis von Bohrung und Welle zueinander (Spiel-, Übergangs- oder Presspassung) und legt fest, wie fest oder locker zwei Teile ineinander sitzen.',
+    frage: 'Was zählt zur persönlichen Schutzausrüstung (PSA) in der Werkstatt?',
+    antwort: 'U. a. Sicherheitsschuhe, Schutzbrille, Gehörschutz, Schutzhandschuhe, je nach Tätigkeit auch Helm.',
   },
   {
-    id: 'LK-5',
-    gewerk: 'Mechanik',
-    schwierigkeit: 'Grundlagen',
-    frage: 'Wofür steht die Abkürzung „NDT" in der Fahrzeuginstandhaltung und wozu dient sie?',
-    antwort:
-      'NDT = Non-Destructive Testing (zerstörungsfreie Prüfung), z. B. Ultraschall- oder Magnetpulverprüfung, um Risse in Bauteilen wie Radsätzen zu finden, ohne sie zu zerstören.',
-  },
-  {
-    id: 'LK-6',
-    gewerk: 'Mechanik',
+    id: 'LK-S3',
+    themenbereich: 'Sicherheit',
+    pruefungsteil: 'AP1',
     schwierigkeit: 'Fortgeschritten',
-    frage: 'Warum wird ein Drehmomentschlüssel beim Verschrauben sicherheitsrelevanter Bauteile vorgeschrieben?',
+    frage: 'Welche Brandklasse betrifft brennende Metalle und darf nicht mit Wasser gelöscht werden?',
     antwort:
-      'Er stellt sicher, dass die Schraubverbindung exakt mit dem vom Hersteller vorgegebenen Anzugsmoment angezogen wird – zu locker kann sich lösen, zu fest kann das Gewinde oder Bauteil beschädigen.',
+      'Brandklasse D (Metallbrände). Wasser würde bei brennenden Metallen wie Magnesium eine heftige Reaktion auslösen – spezielle Metallbrandlöscher verwenden.',
   },
   {
-    id: 'LK-7',
-    gewerk: 'Mechatronik',
+    id: 'LK-S4',
+    themenbereich: 'Sicherheit',
+    pruefungsteil: 'AP1',
     schwierigkeit: 'Grundlagen',
-    frage: 'Was ist der Unterschied zwischen einem Sensor und einem Aktor?',
+    frage: 'Wofür stehen die GHS-Gefahrstoffsymbole (z. B. Flamme, Totenkopf)?',
     antwort:
-      'Ein Sensor erfasst eine physikalische Größe (z. B. Temperatur, Position) und wandelt sie in ein elektrisches Signal um. Ein Aktor wandelt ein elektrisches Signal in eine Bewegung oder Aktion um (z. B. Motor, Ventil).',
+      'Sie kennzeichnen genormt die Gefahr eines Stoffes (z. B. entzündlich, giftig, ätzend) nach dem weltweit einheitlichen GHS-System (Globally Harmonized System).',
   },
   {
-    id: 'LK-8',
-    gewerk: 'Mechatronik',
+    id: 'LK-S5',
+    themenbereich: 'Sicherheit',
+    pruefungsteil: 'AP1',
     schwierigkeit: 'Grundlagen',
-    frage: 'Was bedeutet SPS und welche Aufgabe hat sie in einer Steuerung?',
+    frage: 'Wann wird die stabile Seitenlage bei der Ersten Hilfe angewendet?',
     antwort:
-      'SPS = Speicherprogrammierbare Steuerung. Sie liest Eingangssignale (Sensoren), verarbeitet sie nach einem hinterlegten Programm und steuert darüber Ausgänge (Aktoren) an.',
+      'Bei bewusstlosen Personen mit normaler Atmung, um die Atemwege freizuhalten und ein Ersticken an Erbrochenem zu verhindern.',
   },
   {
-    id: 'LK-9',
-    gewerk: 'Mechatronik',
-    schwierigkeit: 'Fortgeschritten',
-    frage: 'Wie unterscheiden sich eine UND- und eine ODER-Verknüpfung in der Steuerungstechnik?',
-    antwort:
-      'UND: Ausgang wird nur aktiv, wenn ALLE Eingänge erfüllt sind. ODER: Ausgang wird aktiv, wenn MINDESTENS EIN Eingang erfüllt ist.',
-  },
-  {
-    id: 'LK-10',
-    gewerk: 'Allgemein',
+    id: 'LK-S6',
+    themenbereich: 'Sicherheit',
+    pruefungsteil: 'AP1',
     schwierigkeit: 'Grundlagen',
     frage: 'Was gehört laut Jugendarbeitsschutzgesetz zu den wichtigsten Regeln für Azubis unter 18?',
     antwort:
       'U. a. maximal 8 Std./Tag bzw. 40 Std./Woche, keine Arbeit vor 6 Uhr oder nach 20 Uhr, mindestens 30 Minuten Pause ab 4,5 Std. Arbeitszeit, keine gefährlichen Arbeiten ohne Aufsicht.',
   },
   {
-    id: 'LK-11',
-    gewerk: 'Allgemein',
+    id: 'LK-S7',
+    themenbereich: 'Sicherheit',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Fortgeschritten',
+    frage: 'Ab welchem Lärmpegel besteht grundsätzlich Gehörschutzpflicht?',
+    antwort: 'Ab einem Beurteilungspegel von 85 dB(A) muss Gehörschutz getragen werden, ab 80 dB(A) muss er bereitgestellt werden.',
+  },
+  {
+    id: 'LK-S8',
+    themenbereich: 'Sicherheit',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Worauf muss bei Flucht- und Rettungswegen in der Werkstatt geachtet werden?',
+    antwort: 'Sie müssen jederzeit frei von Hindernissen, eindeutig gekennzeichnet und ausreichend beleuchtet sein.',
+  },
+  {
+    id: 'LK-S9',
+    themenbereich: 'Sicherheit',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Wie hebt man schwere Lasten richtig, um den Rücken zu schonen?',
+    antwort: 'Aus den Beinen heben, Rücken gerade halten, Last nah am Körper tragen, nicht ruckartig drehen.',
+  },
+  {
+    id: 'LK-S10',
+    themenbereich: 'Sicherheit',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage: 'Was ist eine Gefährdungsbeurteilung und wer muss sie erstellen?',
+    antwort:
+      'Eine systematische Ermittlung und Bewertung von Gefahren am Arbeitsplatz mit Festlegung von Schutzmaßnahmen – Pflicht des Arbeitgebers nach Arbeitsschutzgesetz.',
+  },
+
+  // --- Metalltechnik ---
+  {
+    id: 'LK-T1',
+    themenbereich: 'Metalltechnik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Was versteht man unter „Passung" bei zwei zusammengefügten Bauteilen?',
+    antwort:
+      'Die Passung beschreibt das Verhältnis von Bohrung und Welle zueinander (Spiel-, Übergangs- oder Presspassung) und legt fest, wie fest oder locker zwei Teile ineinander sitzen.',
+  },
+  {
+    id: 'LK-T2',
+    themenbereich: 'Metalltechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Wofür steht die Abkürzung „NDT" und wozu dient sie?',
+    antwort:
+      'NDT = Non-Destructive Testing (zerstörungsfreie Prüfung), z. B. Ultraschall- oder Magnetpulverprüfung, um Risse in Bauteilen zu finden, ohne sie zu zerstören.',
+  },
+  {
+    id: 'LK-T3',
+    themenbereich: 'Metalltechnik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Fortgeschritten',
+    frage: 'Warum wird ein Drehmomentschlüssel beim Verschrauben sicherheitsrelevanter Bauteile vorgeschrieben?',
+    antwort:
+      'Er stellt sicher, dass die Schraubverbindung exakt mit dem vom Hersteller vorgegebenen Anzugsmoment angezogen wird – zu locker kann sich lösen, zu fest kann das Gewinde oder Bauteil beschädigen.',
+  },
+  {
+    id: 'LK-T4',
+    themenbereich: 'Metalltechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage: 'Was passiert beim Härten von Stahl und warum wird danach oft angelassen?',
+    antwort:
+      'Beim Härten wird Stahl erhitzt und schnell abgeschreckt, wodurch er hart, aber spröde wird. Anlassen (erneutes, moderates Erwärmen) reduziert die Sprödigkeit und baut innere Spannungen ab.',
+  },
+  {
+    id: 'LK-T5',
+    themenbereich: 'Metalltechnik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Was ist der grundlegende Unterschied zwischen Drehen und Fräsen?',
+    antwort:
+      'Beim Drehen rotiert das Werkstück, das Werkzeug steht meist fest. Beim Fräsen rotiert das Werkzeug, das Werkstück wird meist linear bewegt.',
+  },
+  {
+    id: 'LK-T6',
+    themenbereich: 'Metalltechnik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Aus welchen zwei Skalen setzt sich eine Messung mit dem Messschieber zusammen?',
+    antwort:
+      'Aus Hauptskala (ganze mm) und Nonius-Skala (Zehntel- oder Zwanzigstel-mm) – der Nonius-Strich, der am genauesten mit der Hauptskala übereinstimmt, gibt die Dezimalstelle an.',
+  },
+  {
+    id: 'LK-T7',
+    themenbereich: 'Metalltechnik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Was gibt die Gewindesteigung an?',
+    antwort:
+      'Den Abstand zwischen zwei benachbarten Gewindegängen in mm – bestimmt, wie weit sich z. B. eine Schraube pro Umdrehung vorwärtsbewegt.',
+  },
+  {
+    id: 'LK-T8',
+    themenbereich: 'Metalltechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage: 'Was ist der Hauptunterschied zwischen MIG/MAG- und WIG-Schweißen?',
+    antwort:
+      'MIG/MAG nutzt eine abschmelzende Drahtelektrode als Zusatzwerkstoff. WIG (Wolfram-Inertgas) nutzt eine nicht abschmelzende Wolframelektrode mit separatem Zusatzwerkstoff – präziser und sauberer, aber langsamer.',
+  },
+  {
+    id: 'LK-T9',
+    themenbereich: 'Metalltechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage: 'Was wird im Zugversuch an einem Werkstoff ermittelt?',
+    antwort: 'U. a. Zugfestigkeit, Streckgrenze und Bruchdehnung – wichtige Kennwerte für die Materialauswahl.',
+  },
+  {
+    id: 'LK-T10',
+    themenbereich: 'Metalltechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Welche Verfahren schützen Stahl vor Korrosion?',
+    antwort:
+      'U. a. Verzinken, Lackieren, Pulverbeschichten – sie bilden eine Schutzschicht gegen Feuchtigkeit und Sauerstoff.',
+  },
+  {
+    id: 'LK-T11',
+    themenbereich: 'Metalltechnik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Fortgeschritten',
+    frage: 'Was gibt die Toleranz bei einer Maßangabe wie Ø20 h7 an?',
+    antwort:
+      'Den zulässigen Abweichungsbereich vom Nennmaß (hier 20 mm), innerhalb dessen das gefertigte Maß liegen darf – h7 ist eine genormte ISO-Toleranzklasse für Wellen.',
+  },
+
+  // --- Steuerungstechnik ---
+  {
+    id: 'LK-C1',
+    themenbereich: 'Steuerungstechnik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Was ist der Unterschied zwischen einem Sensor und einem Aktor?',
+    antwort:
+      'Ein Sensor erfasst eine physikalische Größe (z. B. Temperatur, Position) und wandelt sie in ein elektrisches Signal um. Ein Aktor wandelt ein elektrisches Signal in eine Bewegung oder Aktion um (z. B. Motor, Ventil).',
+  },
+  {
+    id: 'LK-C2',
+    themenbereich: 'Steuerungstechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Was bedeutet SPS und welche Aufgabe hat sie in einer Steuerung?',
+    antwort:
+      'SPS = Speicherprogrammierbare Steuerung. Sie liest Eingangssignale (Sensoren), verarbeitet sie nach einem hinterlegten Programm und steuert darüber Ausgänge (Aktoren) an.',
+  },
+  {
+    id: 'LK-C3',
+    themenbereich: 'Steuerungstechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage: 'Wie unterscheiden sich eine UND- und eine ODER-Verknüpfung in der Steuerungstechnik?',
+    antwort:
+      'UND: Ausgang wird nur aktiv, wenn ALLE Eingänge erfüllt sind. ODER: Ausgang wird aktiv, wenn MINDESTENS EIN Eingang erfüllt ist.',
+  },
+  {
+    id: 'LK-C4',
+    themenbereich: 'Steuerungstechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Was ist das Arbeitsmedium der Pneumatik und was ist ihr Vorteil?',
+    antwort:
+      'Druckluft. Vorteil: sauber, ungiftig, schnell, kann bei Leckage einfach entweichen ohne Umweltschaden – im Gegensatz zu Hydrauliköl.',
+  },
+  {
+    id: 'LK-C5',
+    themenbereich: 'Steuerungstechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage: 'Warum wird Hydraulik statt Pneumatik eingesetzt, wenn hohe Kräfte nötig sind?',
+    antwort:
+      'Hydrauliköl ist nahezu inkompressibel, dadurch lassen sich mit Hydraulik viel höhere Kräfte präzise und ruckfrei übertragen als mit Druckluft.',
+  },
+  {
+    id: 'LK-C6',
+    themenbereich: 'Steuerungstechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage: 'Was unterscheidet einen Regelkreis von einer Steuerkette?',
+    antwort:
+      'Eine Steuerkette wirkt nur in eine Richtung ohne Rückmeldung. Ein Regelkreis misst den Istwert fortlaufend zurück (Rückkopplung) und gleicht ihn automatisch an den Sollwert an.',
+  },
+
+  // --- Wirtschaft & Soziales ---
+  {
+    id: 'LK-W1',
+    themenbereich: 'Wirtschaft & Soziales',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Welche Angaben muss ein Ausbildungsvertrag mindestens enthalten?',
+    antwort:
+      'U. a. Ausbildungsberuf und -ziel, Beginn und Dauer, Ausbildungsvergütung, tägliche Arbeitszeit, Dauer der Probezeit, Urlaubsdauer.',
+  },
+  {
+    id: 'LK-W2',
+    themenbereich: 'Wirtschaft & Soziales',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Wie lang ist die Probezeit in der Ausbildung mindestens und höchstens?',
+    antwort: 'Mindestens 1 Monat, höchstens 4 Monate.',
+  },
+  {
+    id: 'LK-W3',
+    themenbereich: 'Wirtschaft & Soziales',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage: 'Wie unterscheidet sich die Kündigung einer Ausbildung während und nach der Probezeit?',
+    antwort:
+      'Während der Probezeit kann jederzeit fristlos ohne Angabe von Gründen gekündigt werden. Danach nur noch fristlos aus wichtigem Grund oder mit vier Wochen Frist, wenn man die Ausbildung ganz aufgeben oder den Beruf wechseln will.',
+  },
+  {
+    id: 'LK-W4',
+    themenbereich: 'Wirtschaft & Soziales',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Was ist die Aufgabe der Jugend- und Auszubildendenvertretung (JAV)?',
+    antwort: 'Sie vertritt die Interessen der Auszubildenden und jungen Beschäftigten gegenüber Betriebsrat und Arbeitgeber.',
+  },
+  {
+    id: 'LK-W5',
+    themenbereich: 'Wirtschaft & Soziales',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Was wird vom Bruttolohn abgezogen, um den Nettolohn zu erhalten?',
+    antwort: 'Lohnsteuer und Sozialversicherungsbeiträge (Kranken-, Renten-, Arbeitslosen- und Pflegeversicherung).',
+  },
+  {
+    id: 'LK-W6',
+    themenbereich: 'Wirtschaft & Soziales',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Was regelt ein Tarifvertrag?',
+    antwort:
+      'U. a. Löhne/Gehälter, Arbeitszeiten und weitere Arbeitsbedingungen – ausgehandelt zwischen Gewerkschaft und Arbeitgeber(verband).',
+  },
+
+  // --- Ausbildung allgemein ---
+  {
+    id: 'LK-A1',
+    themenbereich: 'Ausbildung',
+    pruefungsteil: 'AP1',
     schwierigkeit: 'Grundlagen',
     frage: 'Wofür wird das Berichtsheft (Ausbildungsnachweis) benötigt und wie oft sollte es geführt werden?',
     antwort:
-      'Es dokumentiert die betrieblichen und schulischen Ausbildungsinhalte, ist Voraussetzung für die Zulassung zur Abschlussprüfung und sollte regelmäßig (i. d. R. wöchentlich) geführt und vom Ausbilder abgezeichnet werden.',
+      'Es dokumentiert die betrieblichen und schulischen Ausbildungsinhalte, ist Voraussetzung für die Zulassung zur Abschlussprüfung und sollte regelmäßig (i. d. R. wöchentlich) geführt werden.',
   },
 ]

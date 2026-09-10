@@ -1,8 +1,19 @@
 import { Check, RotateCcw, Sparkles } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { lernkarten, type Gewerk, type Lernkarte } from '../data/mock'
+import { lernkarten, type Lernkarte, type Pruefungsphase, type Themenbereich } from '../data/mock'
 
-const gewerke: (Gewerk | 'Allgemein' | 'Alle')[] = ['Alle', 'Elektrik', 'Mechanik', 'Mechatronik', 'Allgemein']
+const themenbereiche: (Themenbereich | 'Alle')[] = [
+  'Alle',
+  'Mathematik',
+  'Elektrotechnik',
+  'Sicherheit',
+  'Metalltechnik',
+  'Steuerungstechnik',
+  'Wirtschaft & Soziales',
+  'Ausbildung',
+]
+
+const pruefungsteile: (Pruefungsphase | 'Alle')[] = ['Alle', 'AP1', 'AP2']
 
 const schwierigkeitStyle: Record<string, string> = {
   Grundlagen: 'bg-db-green/10 text-db-green',
@@ -19,14 +30,19 @@ function shuffle(karten: Lernkarte[]): Lernkarte[] {
 }
 
 export default function LernkartenQuiz() {
-  const [gewerkFilter, setGewerkFilter] = useState<Gewerk | 'Allgemein' | 'Alle'>('Alle')
+  const [themaFilter, setThemaFilter] = useState<Themenbereich | 'Alle'>('Alle')
+  const [teilFilter, setTeilFilter] = useState<Pruefungsphase | 'Alle'>('Alle')
   const [deck, setDeck] = useState<Lernkarte[]>([])
   const [flipped, setFlipped] = useState(false)
   const [gewusst, setGewusst] = useState(0)
   const [wiederholen, setWiederholen] = useState(0)
 
   const gefiltert = () =>
-    gewerkFilter === 'Alle' ? lernkarten : lernkarten.filter((k) => k.gewerk === gewerkFilter)
+    lernkarten.filter(
+      (k) =>
+        (themaFilter === 'Alle' || k.themenbereich === themaFilter) &&
+        (teilFilter === 'Alle' || k.pruefungsteil === teilFilter),
+    )
 
   const starten = () => {
     setDeck(shuffle(gefiltert()))
@@ -35,7 +51,7 @@ export default function LernkartenQuiz() {
     setWiederholen(0)
   }
 
-  useEffect(starten, [gewerkFilter])
+  useEffect(starten, [themaFilter, teilFilter])
 
   const aktuell = deck[0]
   const gesamt = gefiltert().length
@@ -55,17 +71,31 @@ export default function LernkartenQuiz() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap gap-2">
-        {gewerke.map((g) => (
+        {themenbereiche.map((t) => (
           <button
-            key={g}
-            onClick={() => setGewerkFilter(g)}
+            key={t}
+            onClick={() => setThemaFilter(t)}
             className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-              gewerkFilter === g
+              themaFilter === t
                 ? 'border-db-red bg-db-red text-white'
                 : 'border-db-gray-200 bg-white text-db-navy-light hover:border-db-red/40'
             }`}
           >
-            {g}
+            {t}
+          </button>
+        ))}
+      </div>
+
+      <div className="flex gap-1 rounded-full bg-db-gray-100 p-1">
+        {pruefungsteile.map((t) => (
+          <button
+            key={t}
+            onClick={() => setTeilFilter(t)}
+            className={`flex-1 rounded-full py-1.5 text-xs font-semibold ${
+              teilFilter === t ? 'bg-white text-db-navy shadow-sm' : 'text-db-navy-light'
+            }`}
+          >
+            {t === 'Alle' ? 'Alle Prüfungsteile' : t}
           </button>
         ))}
       </div>
@@ -82,9 +112,12 @@ export default function LernkartenQuiz() {
 
       {aktuell ? (
         <div className="rounded-xl border border-db-gray-200 bg-white p-5">
-          <div className="mb-3 flex items-center gap-2">
+          <div className="mb-3 flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-db-gray-100 px-2.5 py-1 text-xs font-medium text-db-navy-light">
-              {aktuell.gewerk}
+              {aktuell.themenbereich}
+            </span>
+            <span className="rounded-full bg-db-navy/5 px-2.5 py-1 text-xs font-medium text-db-navy">
+              {aktuell.pruefungsteil}
             </span>
             <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${schwierigkeitStyle[aktuell.schwierigkeit]}`}>
               {aktuell.schwierigkeit}
