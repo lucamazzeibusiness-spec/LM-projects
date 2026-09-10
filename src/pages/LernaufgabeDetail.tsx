@@ -1,21 +1,21 @@
-import { Camera, Check, ChevronLeft, PenLine, Save } from 'lucide-react'
+import { Camera, Check, ChevronLeft, MessageSquare, Save, Send, Target } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { GewerkBadge, PrioBadge, StatusBadge } from '../components/Badges'
-import { auftraege } from '../data/mock'
+import { lernaufgaben } from '../data/mock'
 
 interface Draft {
   checked: Record<string, boolean>
   notiz: string
-  signiert: boolean
+  eingereicht: boolean
 }
 
-export default function AuftragDetail() {
+export default function LernaufgabeDetail() {
   const { id } = useParams()
-  const auftrag = auftraege.find((a) => a.id === id)
-  const storageKey = `wartungsprotokoll:${id}`
+  const aufgabe = lernaufgaben.find((a) => a.id === id)
+  const storageKey = `lernaufgabe:${id}`
 
-  const [draft, setDraft] = useState<Draft>({ checked: {}, notiz: '', signiert: false })
+  const [draft, setDraft] = useState<Draft>({ checked: {}, notiz: '', eingereicht: false })
   const [savedHint, setSavedHint] = useState(false)
 
   useEffect(() => {
@@ -30,19 +30,19 @@ export default function AuftragDetail() {
     return () => clearTimeout(t)
   }, [draft, storageKey])
 
-  if (!auftrag) {
+  if (!aufgabe) {
     return (
       <div className="space-y-4">
-        <p className="text-sm text-db-navy-light">Auftrag nicht gefunden.</p>
-        <Link to="/auftraege" className="text-sm font-medium text-db-red hover:underline">
+        <p className="text-sm text-db-navy-light">Lernaufgabe nicht gefunden.</p>
+        <Link to="/lernaufgaben" className="text-sm font-medium text-db-red hover:underline">
           Zurück zur Übersicht
         </Link>
       </div>
     )
   }
 
-  const total = auftrag.checklist.length
-  const done = auftrag.checklist.filter((c) => draft.checked[c.id]).length
+  const total = aufgabe.checklist.length
+  const done = aufgabe.checklist.filter((c) => draft.checked[c.id]).length
   const progress = Math.round((done / total) * 100)
 
   const toggle = (itemId: string) =>
@@ -50,32 +50,51 @@ export default function AuftragDetail() {
 
   return (
     <div className="space-y-5">
-      <Link to="/auftraege" className="flex items-center gap-1 text-sm text-db-navy-light hover:text-db-navy">
-        <ChevronLeft size={16} /> Aufträge
+      <Link to="/lernaufgaben" className="flex items-center gap-1 text-sm text-db-navy-light hover:text-db-navy">
+        <ChevronLeft size={16} /> Lernaufgaben
       </Link>
 
       <div className="rounded-xl border border-db-gray-200 bg-white p-4">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-xs font-medium text-db-navy-light">{auftrag.id}</p>
-            <h1 className="text-lg font-semibold text-db-navy">{auftrag.titel}</h1>
+            <p className="text-xs font-medium text-db-navy-light">{aufgabe.id}</p>
+            <h1 className="text-lg font-semibold text-db-navy">{aufgabe.titel}</h1>
           </div>
-          <StatusBadge status={auftrag.status} />
+          <StatusBadge status={aufgabe.status} />
         </div>
         <p className="mt-1 text-sm text-db-navy-light">
-          {auftrag.anlage} {auftrag.baureihe ? `(${auftrag.baureihe})` : ''} · {auftrag.ort}
+          {aufgabe.anlage} {aufgabe.baureihe ? `(${aufgabe.baureihe})` : ''} · {aufgabe.ort}
         </p>
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <GewerkBadge gewerk={auftrag.gewerk} />
-          <PrioBadge prioritaet={auftrag.prioritaet} />
-          <span className="text-xs text-db-navy-light">Fällig: {auftrag.faelligkeit}</span>
+          <GewerkBadge gewerk={aufgabe.gewerk} />
+          <PrioBadge prioritaet={aufgabe.prioritaet} />
+          <span className="text-xs text-db-navy-light">Fällig: {aufgabe.faelligkeit}</span>
         </div>
-        <p className="mt-3 text-sm text-db-navy">{auftrag.beschreibung}</p>
+
+        <div className="mt-4 flex items-start gap-2 rounded-lg bg-db-red/5 p-3">
+          <Target size={16} className="mt-0.5 shrink-0 text-db-red" />
+          <div>
+            <p className="text-xs font-semibold text-db-red">Lernziel</p>
+            <p className="text-sm text-db-navy">{aufgabe.lernziel}</p>
+          </div>
+        </div>
+
+        <p className="mt-3 text-sm text-db-navy">{aufgabe.beschreibung}</p>
+
+        {aufgabe.ausbilderHinweis && (
+          <div className="mt-3 flex items-start gap-2 rounded-lg border border-db-gray-200 bg-db-gray-50 p-3">
+            <MessageSquare size={15} className="mt-0.5 shrink-0 text-db-navy-light" />
+            <div>
+              <p className="text-xs font-semibold text-db-navy-light">Hinweis von deinem Ausbilder</p>
+              <p className="text-sm text-db-navy">{aufgabe.ausbilderHinweis}</p>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="rounded-xl border border-db-gray-200 bg-white p-4">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-db-navy">Digitales Wartungsprotokoll</h2>
+          <h2 className="text-sm font-semibold text-db-navy">Arbeitsschritte</h2>
           <span className="text-xs font-medium text-db-navy-light">
             {done}/{total} erledigt
           </span>
@@ -88,7 +107,7 @@ export default function AuftragDetail() {
         </div>
 
         <ul className="space-y-2">
-          {auftrag.checklist.map((item) => (
+          {aufgabe.checklist.map((item) => (
             <li key={item.id}>
               <button
                 onClick={() => toggle(item.id)}
@@ -116,26 +135,26 @@ export default function AuftragDetail() {
         </button>
 
         <div className="mt-4">
-          <label className="mb-1 block text-xs font-medium text-db-navy-light">Notiz / Befund</label>
+          <label className="mb-1 block text-xs font-medium text-db-navy-light">Was hast du gelernt / verstanden?</label>
           <textarea
             value={draft.notiz}
             onChange={(e) => setDraft((d) => ({ ...d, notiz: e.target.value }))}
             rows={3}
-            placeholder="z. B. Abweichungen, verbaute Teile, Nacharbeit erforderlich..."
+            placeholder="z. B. Was war neu für dich, wo brauchst du noch Übung..."
             className="w-full rounded-lg border border-db-gray-200 px-3 py-2 text-sm text-db-navy outline-none focus:border-db-red"
           />
         </div>
 
         <button
-          onClick={() => setDraft((d) => ({ ...d, signiert: !d.signiert }))}
+          onClick={() => setDraft((d) => ({ ...d, eingereicht: !d.eingereicht }))}
           className={`mt-4 flex w-full items-center justify-center gap-2 rounded-full border px-3 py-3 text-sm font-semibold transition-colors ${
-            draft.signiert
+            draft.eingereicht
               ? 'border-db-green bg-db-green/10 text-db-green'
               : 'border-db-red bg-db-red text-white hover:bg-db-red-dark'
           }`}
         >
-          <PenLine size={16} />
-          {draft.signiert ? 'Protokoll digital signiert' : 'Protokoll signieren & abschließen'}
+          <Send size={16} />
+          {draft.eingereicht ? 'Zur Kontrolle eingereicht' : 'Zur Kontrolle beim Ausbilder einreichen'}
         </button>
 
         <p className="mt-2 flex items-center justify-center gap-1 text-xs text-db-navy-light">

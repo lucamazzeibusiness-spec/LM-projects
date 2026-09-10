@@ -1,23 +1,23 @@
 import {
   AlertTriangle,
+  BookOpen,
+  CalendarDays,
   ClipboardList,
+  GraduationCap,
   LayoutGrid,
-  Package,
-  Search,
-  Train,
-  Users,
   Wifi,
   WifiOff,
 } from 'lucide-react'
 import { useEffect, useState, type ReactNode } from 'react'
 import { NavLink } from 'react-router-dom'
+import { azubiProfil } from '../data/mock'
 
 const navItems = [
   { to: '/', label: 'Start', icon: LayoutGrid, end: true },
-  { to: '/auftraege', label: 'Aufträge', icon: ClipboardList },
-  { to: '/fehlerdiagnose', label: 'Fehlerdiagnose', icon: Search },
-  { to: '/ersatzteile', label: 'Ersatzteile', icon: Package },
-  { to: '/schichtplan', label: 'Schichtplan', icon: Users },
+  { to: '/lernaufgaben', label: 'Lernaufgaben', icon: ClipboardList },
+  { to: '/berichtsheft', label: 'Berichtsheft', icon: BookOpen },
+  { to: '/wissen', label: 'Wissen', icon: GraduationCap },
+  { to: '/ausbildungsplan', label: 'Ausbildung', icon: CalendarDays },
 ]
 
 function OnlineBadge() {
@@ -47,21 +47,25 @@ function OnlineBadge() {
 }
 
 export default function Layout({ children }: { children: ReactNode }) {
+  const initialen = azubiProfil.name.slice(0, 2).toUpperCase()
+
   return (
     <div className="min-h-screen bg-db-gray-50">
       <header className="sticky top-0 z-20 border-b border-db-gray-200 bg-white">
         <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-db-red text-white">
-            <Train size={20} />
+            <GraduationCap size={20} />
           </div>
           <div className="flex flex-col leading-tight">
-            <span className="text-sm font-bold tracking-tight text-db-navy">DB Technik</span>
-            <span className="text-xs text-db-navy-light">Werkzeug für Elektrik · Mechanik · Mechatronik</span>
+            <span className="text-sm font-bold tracking-tight text-db-navy">DB Azubi</span>
+            <span className="text-xs text-db-navy-light">
+              {azubiProfil.ausbildungsberuf} · {azubiProfil.lehrjahr}. Lehrjahr
+            </span>
           </div>
           <div className="ml-auto flex items-center gap-3">
             <OnlineBadge />
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-db-gray-100 text-xs font-semibold text-db-navy">
-              MT
+              {initialen}
             </div>
           </div>
         </div>

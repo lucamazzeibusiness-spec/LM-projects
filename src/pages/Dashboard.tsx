@@ -1,27 +1,26 @@
-import { AlertTriangle, ArrowRight, ClipboardCheck, Clock, PackageX } from 'lucide-react'
+import { AlertTriangle, ArrowRight, BookOpen, ClipboardCheck, GraduationCap } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { GewerkBadge, PrioBadge, StatusBadge } from '../components/Badges'
-import { auftraege, ersatzteile, sicherheitshinweise } from '../data/mock'
+import { azubiProfil, berichtsheft, lernaufgaben, naechstePruefung, sicherheitshinweise } from '../data/mock'
 
 export default function Dashboard() {
-  const offen = auftraege.filter((a) => a.status !== 'Erledigt')
+  const offen = lernaufgaben.filter((a) => a.status !== 'Erledigt')
   const heute = offen.filter((a) => a.faelligkeit.startsWith('Heute'))
-  const erledigtHeute = auftraege.filter((a) => a.status === 'Erledigt').length
-  const knapp = ersatzteile.filter((e) => e.bestand < e.mindestbestand)
+  const entwuerfe = berichtsheft.filter((b) => b.status === 'Entwurf').length
 
   const stats = [
-    { label: 'Offene Aufträge', value: offen.length, icon: ClipboardCheck, tone: 'text-db-red' },
-    { label: 'Heute fällig', value: heute.length, icon: Clock, tone: 'text-db-amber' },
-    { label: 'Erledigt', value: erledigtHeute, icon: ClipboardCheck, tone: 'text-db-green' },
-    { label: 'Ersatzteile knapp', value: knapp.length, icon: PackageX, tone: 'text-db-red' },
+    { label: 'Offene Lernaufgaben', value: offen.length, icon: ClipboardCheck, tone: 'text-db-red' },
+    { label: 'Heute fällig', value: heute.length, icon: ClipboardCheck, tone: 'text-db-amber' },
+    { label: 'Berichtsheft offen', value: entwuerfe, icon: BookOpen, tone: entwuerfe > 0 ? 'text-db-red' : 'text-db-green' },
+    { label: `Tage bis ${naechstePruefung.titel}`, value: naechstePruefung.tageVerbleibend, icon: GraduationCap, tone: 'text-db-navy' },
   ]
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-db-navy">Guten Tag, Max</h1>
+        <h1 className="text-xl font-semibold text-db-navy">Guten Tag, {azubiProfil.name}</h1>
         <p className="text-sm text-db-navy-light">
-          Frühschicht · Werk Rummelsburg · Team Elektrik 2
+          {azubiProfil.lehrjahr}. Lehrjahr · {azubiProfil.abteilung} · Ausbilder: {azubiProfil.ausbilder}
         </p>
       </div>
 
@@ -52,10 +51,22 @@ export default function Dashboard() {
         ))}
       </div>
 
+      {entwuerfe > 0 && (
+        <Link
+          to="/berichtsheft"
+          className="flex items-center justify-between rounded-xl border border-db-amber/30 bg-db-amber/5 px-4 py-3 text-sm font-medium text-db-amber"
+        >
+          <span>
+            {entwuerfe} Berichtsheft-Eintrag {entwuerfe === 1 ? 'wartet' : 'warten'} noch auf Fertigstellung
+          </span>
+          <ArrowRight size={16} />
+        </Link>
+      )}
+
       <div className="rounded-xl border border-db-gray-200 bg-white">
         <div className="flex items-center justify-between border-b border-db-gray-200 px-4 py-3">
-          <h2 className="text-sm font-semibold text-db-navy">Nächste Aufträge</h2>
-          <Link to="/auftraege" className="flex items-center gap-1 text-xs font-medium text-db-red hover:underline">
+          <h2 className="text-sm font-semibold text-db-navy">Nächste Lernaufgaben</h2>
+          <Link to="/lernaufgaben" className="flex items-center gap-1 text-xs font-medium text-db-red hover:underline">
             Alle ansehen <ArrowRight size={14} />
           </Link>
         </div>
@@ -63,7 +74,7 @@ export default function Dashboard() {
           {offen.slice(0, 4).map((a) => (
             <li key={a.id}>
               <Link
-                to={`/auftraege/${a.id}`}
+                to={`/lernaufgaben/${a.id}`}
                 className="flex flex-col gap-2 px-4 py-3 hover:bg-db-gray-50 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div>

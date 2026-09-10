@@ -1,19 +1,19 @@
-import { MapPin } from 'lucide-react'
+import { MapPin, Target } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { GewerkBadge, PrioBadge, StatusBadge } from '../components/Badges'
-import { auftraege, type AuftragStatus, type Gewerk } from '../data/mock'
+import { lernaufgaben, type Gewerk, type LernaufgabeStatus } from '../data/mock'
 
 const gewerke: (Gewerk | 'Alle')[] = ['Alle', 'Elektrik', 'Mechanik', 'Mechatronik']
-const stati: (AuftragStatus | 'Alle')[] = ['Alle', 'Offen', 'In Arbeit', 'Erledigt']
+const stati: (LernaufgabeStatus | 'Alle')[] = ['Alle', 'Offen', 'In Arbeit', 'Zur Kontrolle', 'Erledigt']
 
-export default function Auftraege() {
+export default function Lernaufgaben() {
   const [gewerk, setGewerk] = useState<Gewerk | 'Alle'>('Alle')
-  const [status, setStatus] = useState<AuftragStatus | 'Alle'>('Alle')
+  const [status, setStatus] = useState<LernaufgabeStatus | 'Alle'>('Alle')
 
   const gefiltert = useMemo(
     () =>
-      auftraege.filter(
+      lernaufgaben.filter(
         (a) => (gewerk === 'Alle' || a.gewerk === gewerk) && (status === 'Alle' || a.status === status),
       ),
     [gewerk, status],
@@ -21,7 +21,10 @@ export default function Auftraege() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold text-db-navy">Aufträge</h1>
+      <div>
+        <h1 className="text-xl font-semibold text-db-navy">Lernaufgaben</h1>
+        <p className="text-sm text-db-navy-light">Von deinem Ausbilder zugewiesen, mit Lernziel</p>
+      </div>
 
       <div className="space-y-2">
         <div className="flex flex-wrap gap-2">
@@ -60,7 +63,7 @@ export default function Auftraege() {
         {gefiltert.map((a) => (
           <Link
             key={a.id}
-            to={`/auftraege/${a.id}`}
+            to={`/lernaufgaben/${a.id}`}
             className="block rounded-xl border border-db-gray-200 bg-white p-4 transition-shadow hover:shadow-sm"
           >
             <div className="flex items-start justify-between gap-3">
@@ -74,6 +77,10 @@ export default function Auftraege() {
               <MapPin size={12} />
               {a.anlage} {a.baureihe ? `(${a.baureihe})` : ''} · {a.ort}
             </p>
+            <p className="mt-2 flex items-start gap-1.5 text-xs text-db-navy">
+              <Target size={13} className="mt-0.5 shrink-0 text-db-red" />
+              {a.lernziel}
+            </p>
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <GewerkBadge gewerk={a.gewerk} />
               <PrioBadge prioritaet={a.prioritaet} />
@@ -83,7 +90,7 @@ export default function Auftraege() {
         ))}
         {gefiltert.length === 0 && (
           <p className="rounded-xl border border-dashed border-db-gray-200 p-6 text-center text-sm text-db-navy-light">
-            Keine Aufträge für diese Filter.
+            Keine Lernaufgaben für diese Filter.
           </p>
         )}
       </div>

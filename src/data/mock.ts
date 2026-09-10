@@ -1,13 +1,33 @@
 export type Gewerk = 'Elektrik' | 'Mechanik' | 'Mechatronik'
 export type Prioritaet = 'Hoch' | 'Mittel' | 'Niedrig'
-export type AuftragStatus = 'Offen' | 'In Arbeit' | 'Erledigt'
+export type LernaufgabeStatus = 'Offen' | 'In Arbeit' | 'Zur Kontrolle' | 'Erledigt'
+
+export interface AzubiProfil {
+  name: string
+  ausbildungsberuf: string
+  lehrjahr: number
+  lehrjahreGesamt: number
+  abteilung: string
+  standort: string
+  ausbilder: string
+}
+
+export const azubiProfil: AzubiProfil = {
+  name: 'Max',
+  ausbildungsberuf: 'Elektroniker für Betriebstechnik',
+  lehrjahr: 2,
+  lehrjahreGesamt: 3,
+  abteilung: 'Werk Rummelsburg – Fahrzeuginstandhaltung',
+  standort: 'Werk Rummelsburg',
+  ausbilder: 'Herr Kowalski',
+}
 
 export interface ChecklistItem {
   id: string
   label: string
 }
 
-export interface Auftrag {
+export interface Lernaufgabe {
   id: string
   titel: string
   anlage: string
@@ -15,16 +35,18 @@ export interface Auftrag {
   ort: string
   gewerk: Gewerk
   prioritaet: Prioritaet
-  status: AuftragStatus
+  status: LernaufgabeStatus
   faelligkeit: string
+  lernziel: string
   beschreibung: string
+  ausbilderHinweis?: string
   checklist: ChecklistItem[]
 }
 
-export const auftraege: Auftrag[] = [
+export const lernaufgaben: Lernaufgabe[] = [
   {
-    id: 'A-24817',
-    titel: 'Bremsprobe & Drehgestell-Inspektion',
+    id: 'L-241',
+    titel: 'Bremsprobe & Drehgestell-Inspektion begleiten',
     anlage: 'Triebzug ICE 4',
     baureihe: 'BR 412',
     ort: 'Werk Rummelsburg, Gleis 7',
@@ -32,20 +54,22 @@ export const auftraege: Auftrag[] = [
     prioritaet: 'Hoch',
     status: 'In Arbeit',
     faelligkeit: 'Heute, 14:00',
+    lernziel: 'Aufbau eines Drehgestells verstehen und die Prüfschritte einer Bremsprobe nach Vorschrift durchführen können.',
     beschreibung:
-      'Planmäßige Inspektion der Drehgestelle sowie Bremsprobe nach Fahrplan-km-Intervall. Vorbefund: leichtes Spiel an Radsatzlager 3.',
+      'Du begleitest die planmäßige Inspektion der Drehgestelle sowie die Bremsprobe. Dein Ausbilder zeigt dir zunächst Schritt 1–2, danach übernimmst du unter Aufsicht.',
+    ausbilderHinweis: 'Vorher unbedingt Kapitel „Drehgestelltechnik" im Lernheft wiederholen.',
     checklist: [
       { id: 'c1', label: 'Sichtprüfung Drehgestellrahmen auf Risse' },
       { id: 'c2', label: 'Radsatzlager auf Spiel/Temperatur prüfen' },
       { id: 'c3', label: 'Bremsbeläge Stärke messen' },
-      { id: 'c4', label: 'Bremsprobe (Vollbremsung) durchführen' },
+      { id: 'c4', label: 'Bremsprobe (Vollbremsung) unter Aufsicht durchführen' },
       { id: 'c5', label: 'Federspeicher auf Dichtheit prüfen' },
-      { id: 'c6', label: 'Prüfprotokoll digital signieren' },
+      { id: 'c6', label: 'Ergebnis mit Ausbilder besprechen' },
     ],
   },
   {
-    id: 'A-24822',
-    titel: 'Störung Türsteuerung Wagen 3',
+    id: 'L-242',
+    titel: 'Störung Türsteuerung selbstständig eingrenzen',
     anlage: 'Doppelstockwagen',
     baureihe: 'DBpza',
     ort: 'Abstellgruppe Süd, Gleis 12',
@@ -53,8 +77,9 @@ export const auftraege: Auftrag[] = [
     prioritaet: 'Hoch',
     status: 'Offen',
     faelligkeit: 'Heute, 11:30',
+    lernziel: 'Systematische Fehlersuche nach Schaltplan üben – vom Symptom zur Ursache.',
     beschreibung:
-      'Fehlercode E-4471 (Türsteuergerät meldet Timeout). Tür 3 links schließt nicht vollständig, Fahrgastmeldung liegt vor.',
+      'Fehlercode E-4471 liegt vor (Türsteuergerät meldet Timeout). Versuch die Ursache selbst einzugrenzen, bevor du im Wissensbereich nachschlägst. Bei Unsicherheit: Ausbilder rufen, nicht raten.',
     checklist: [
       { id: 'c1', label: 'Fehlerspeicher Türsteuergerät auslesen' },
       { id: 'c2', label: 'Verkabelung Türantrieb auf Beschädigung prüfen' },
@@ -64,16 +89,17 @@ export const auftraege: Auftrag[] = [
     ],
   },
   {
-    id: 'A-24805',
-    titel: 'Wartung Weichenheizung',
+    id: 'L-243',
+    titel: 'Wartung Weichenheizung – Grundlagen Steuerungstechnik',
     anlage: 'Weiche 34a',
     ort: 'Bahnhof Süd, Gleis 4/5',
     gewerk: 'Mechatronik',
     prioritaet: 'Mittel',
     status: 'Offen',
     faelligkeit: 'Morgen, 08:00',
+    lernziel: 'Zusammenspiel von Sensorik (Temperaturfühler) und Aktorik (Heizstäbe) an einem realen Beispiel nachvollziehen.',
     beschreibung:
-      'Saisonale Funktionsprüfung der Weichenheizung vor Wintereinsatz inkl. Steuerungslogik und Temperaturfühler.',
+      'Saisonale Funktionsprüfung der Weichenheizung vor Wintereinsatz. Gute Gelegenheit, Steuerungslogik in der Praxis zu sehen statt nur im Simulator.',
     checklist: [
       { id: 'c1', label: 'Heizstäbe auf Durchgang prüfen' },
       { id: 'c2', label: 'Temperaturfühler kalibrieren' },
@@ -82,8 +108,8 @@ export const auftraege: Auftrag[] = [
     ],
   },
   {
-    id: 'A-24799',
-    titel: 'Klimaanlage Fahrgastraum fällt aus',
+    id: 'L-235',
+    titel: 'Klimaanlage – Kältekreislauf erklärt bekommen',
     anlage: 'Regionaltriebwagen',
     baureihe: 'BR 442',
     ort: 'Werk Rummelsburg, Halle 2',
@@ -91,18 +117,19 @@ export const auftraege: Auftrag[] = [
     prioritaet: 'Mittel',
     status: 'Erledigt',
     faelligkeit: 'Gestern, 16:00',
-    beschreibung:
-      'Klimakompressor schaltet nach ca. 5 Minuten ab. Verdacht: Druckwächter oder Kältemittelstand.',
+    lernziel: 'Grundprinzip des Kältekreislaufs (Verdichten, Kondensieren, Entspannen, Verdampfen) an der Anlage erkennen.',
+    beschreibung: 'Klimakompressor schaltete nach ca. 5 Minuten ab. Gemeinsam mit Ausbilder Ursache gesucht und gefunden.',
+    ausbilderHinweis: 'Gut mitgedacht – Druckwächter-Logik beim nächsten Mal selbst vorschlagen.',
     checklist: [
       { id: 'c1', label: 'Kältemittelstand prüfen' },
       { id: 'c2', label: 'Druckwächter testen' },
       { id: 'c3', label: 'Kondensator reinigen' },
-      { id: 'c4', label: 'Probelauf 30 Minuten' },
+      { id: 'c4', label: 'Probelauf 30 Minuten begleiten' },
     ],
   },
   {
-    id: 'A-24788',
-    titel: 'Hauptschalter tauschen',
+    id: 'L-228',
+    titel: 'Hauptschalter tauschen – erste eigenständige Aufgabe',
     anlage: 'E-Lok',
     baureihe: 'BR 185',
     ort: 'Werk Rummelsburg, Gleis 3',
@@ -110,7 +137,9 @@ export const auftraege: Auftrag[] = [
     prioritaet: 'Niedrig',
     status: 'Erledigt',
     faelligkeit: 'Gestern, 09:00',
-    beschreibung: 'Planmäßiger Austausch des Hauptschalters gemäß Instandhaltungsplan.',
+    lernziel: 'Sicherheitsregeln beim Arbeiten an Hochspannungsanlagen (Freischalten, Erden) korrekt anwenden.',
+    beschreibung: 'Planmäßiger Austausch des Hauptschalters – erste Aufgabe, die du komplett allein durchgeführt hast.',
+    ausbilderHinweis: 'Sauber gearbeitet, Freischaltreihenfolge korrekt eingehalten.',
     checklist: [
       { id: 'c1', label: 'Fahrzeug spannungsfrei schalten, erden' },
       { id: 'c2', label: 'Hauptschalter ausbauen' },
@@ -121,15 +150,19 @@ export const auftraege: Auftrag[] = [
   },
 ]
 
+export type FehlerfallSchwierigkeit = 'Grundlagen' | 'Fortgeschritten'
+
 export interface Fehlerfall {
   id: string
   code: string
   titel: string
   gewerk: Gewerk
   baureihe: string
+  schwierigkeit: FehlerfallSchwierigkeit
   symptome: string[]
   ursache: string
   loesung: string[]
+  merksatz: string
   haeufigkeit: 'Häufig' | 'Gelegentlich' | 'Selten'
 }
 
@@ -140,6 +173,7 @@ export const fehlerfaelle: Fehlerfall[] = [
     titel: 'Türsteuergerät Timeout',
     gewerk: 'Elektrik',
     baureihe: 'DBpza / Doppelstockwagen',
+    schwierigkeit: 'Grundlagen',
     symptome: ['Tür schließt nicht vollständig', 'Steuergerät zeigt Timeout-Fehler'],
     ursache: 'Meist verschmutzte oder dejustierte Lichtschranke, seltener Wackelkontakt am Türantrieb.',
     loesung: [
@@ -148,6 +182,7 @@ export const fehlerfaelle: Fehlerfall[] = [
       'Steckverbinder am Türantrieb auf Sitz prüfen',
       'Fehlerspeicher zurücksetzen und 10 Testzyklen fahren',
     ],
+    merksatz: 'Bei Sensorfehlern immer zuerst „sauber, fest, dicht" prüfen, bevor du Bauteile tauschst.',
     haeufigkeit: 'Häufig',
   },
   {
@@ -156,6 +191,7 @@ export const fehlerfaelle: Fehlerfall[] = [
     titel: 'Radsatzlager Übertemperatur',
     gewerk: 'Mechanik',
     baureihe: 'BR 412 / ICE 4',
+    schwierigkeit: 'Fortgeschritten',
     symptome: ['Heißläuferortung löst aus', 'Erhöhte Temperatur an Radsatzlager'],
     ursache: 'Schmierstoffmangel oder beginnender Lagerschaden.',
     loesung: [
@@ -164,6 +200,7 @@ export const fehlerfaelle: Fehlerfall[] = [
       'Bei Spiel > Grenzwert: Radsatz tauschen',
       'Nachkontrolle nach 200 km',
     ],
+    merksatz: 'Wärme + Geräusch = Reibung. Frag dich immer: wo reibt hier etwas, das nicht reiben soll?',
     haeufigkeit: 'Gelegentlich',
   },
   {
@@ -172,6 +209,7 @@ export const fehlerfaelle: Fehlerfall[] = [
     titel: 'Klimakompressor Kurzabschaltung',
     gewerk: 'Mechatronik',
     baureihe: 'BR 442 / Talent 2',
+    schwierigkeit: 'Grundlagen',
     symptome: ['Kompressor läuft an und schaltet nach Minuten ab', 'Fahrgastraum wird nicht gekühlt'],
     ursache: 'Kältemittelmangel löst Druckwächter (Niederdruck) aus.',
     loesung: [
@@ -180,6 +218,7 @@ export const fehlerfaelle: Fehlerfall[] = [
       'Kältemittel nach Herstellervorgabe auffüllen',
       'Probelauf mind. 30 Minuten überwachen',
     ],
+    merksatz: 'Der Druckwächter schützt den Kompressor – er ist meist der Melder, nicht die Ursache.',
     haeufigkeit: 'Gelegentlich',
   },
   {
@@ -188,6 +227,7 @@ export const fehlerfaelle: Fehlerfall[] = [
     titel: 'Hauptschalter löst spontan aus',
     gewerk: 'Elektrik',
     baureihe: 'BR 185 / E-Lok',
+    schwierigkeit: 'Fortgeschritten',
     symptome: ['Hauptschalter fällt ohne erkennbaren Grund', 'Keine Fehlermeldung im Display'],
     ursache: 'Meist Isolationsfehler im Dachstromkreis oder Überspannung bei Fahrdrahtübergängen.',
     loesung: [
@@ -196,6 +236,7 @@ export const fehlerfaelle: Fehlerfall[] = [
       'Stromabnehmer-Schleifleisten auf Verschleiß prüfen',
       'Bei Normalwert: Software-Log auswerten (Systemtechnik)',
     ],
+    merksatz: 'Ohne Fehlermeldung heißt nicht „kein Fehler" – manche Schutzfunktionen lösen stumm aus.',
     haeufigkeit: 'Selten',
   },
   {
@@ -204,6 +245,7 @@ export const fehlerfaelle: Fehlerfall[] = [
     titel: 'Weichenheizung ohne Funktion',
     gewerk: 'Mechatronik',
     baureihe: 'Weichenantrieb allgemein',
+    schwierigkeit: 'Grundlagen',
     symptome: ['Heizung startet nicht bei Frost', 'Automatikbetrieb reagiert nicht'],
     ursache: 'Defekter Temperaturfühler oder Feuchtigkeit im Steuerschrank.',
     loesung: [
@@ -212,6 +254,7 @@ export const fehlerfaelle: Fehlerfall[] = [
       'Sicherungen und Schütze prüfen',
       'Manuellen Testlauf auslösen',
     ],
+    merksatz: 'Feuchtigkeit ist einer der häufigsten Gründe für „spinnende" Elektronik im Freien.',
     haeufigkeit: 'Häufig',
   },
 ]
@@ -225,35 +268,88 @@ export interface Ersatzteil {
   mindestbestand: number
   lagerort: string
   einheit: string
+  funktion: string
 }
 
 export const ersatzteile: Ersatzteil[] = [
-  { id: 'ET-1', name: 'Bremsbelag ICE 4 (Satz)', nummer: '412-BR-3391', kategorie: 'Mechanik', bestand: 14, mindestbestand: 8, lagerort: 'Halle 2, Regal C3', einheit: 'Satz' },
-  { id: 'ET-2', name: 'Türsteuergerät DBpza', nummer: 'DB-TS-2207', kategorie: 'Elektrik', bestand: 3, mindestbestand: 4, lagerort: 'Halle 1, Regal A1', einheit: 'Stück' },
-  { id: 'ET-3', name: 'Lichtschranke Türantrieb', nummer: 'LS-4471-C', kategorie: 'Elektrik', bestand: 22, mindestbestand: 10, lagerort: 'Halle 1, Regal A2', einheit: 'Stück' },
-  { id: 'ET-4', name: 'Kältemittel R134a (Flasche)', nummer: 'KM-R134-10', kategorie: 'Mechatronik', bestand: 6, mindestbestand: 5, lagerort: 'Halle 3, Gefahrstofflager', einheit: 'Flasche' },
-  { id: 'ET-5', name: 'Hauptschalter BR 185', nummer: 'HS-185-09', kategorie: 'Elektrik', bestand: 1, mindestbestand: 2, lagerort: 'Halle 1, Regal B4', einheit: 'Stück' },
-  { id: 'ET-6', name: 'Radsatzlager komplett', nummer: 'RSL-412-11', kategorie: 'Mechanik', bestand: 5, mindestbestand: 4, lagerort: 'Halle 2, Regal D1', einheit: 'Stück' },
-  { id: 'ET-7', name: 'Temperaturfühler Weiche', nummer: 'TF-W-0912', kategorie: 'Mechatronik', bestand: 9, mindestbestand: 6, lagerort: 'Halle 3, Regal E2', einheit: 'Stück' },
+  { id: 'ET-1', name: 'Bremsbelag ICE 4 (Satz)', nummer: '412-BR-3391', kategorie: 'Mechanik', bestand: 14, mindestbestand: 8, lagerort: 'Halle 2, Regal C3', einheit: 'Satz', funktion: 'Erzeugt durch Reibung an der Bremsscheibe die Bremskraft.' },
+  { id: 'ET-2', name: 'Türsteuergerät DBpza', nummer: 'DB-TS-2207', kategorie: 'Elektrik', bestand: 3, mindestbestand: 4, lagerort: 'Halle 1, Regal A1', einheit: 'Stück', funktion: 'Steuert Öffnen/Schließen und wertet Sicherheitssensoren der Tür aus.' },
+  { id: 'ET-3', name: 'Lichtschranke Türantrieb', nummer: 'LS-4471-C', kategorie: 'Elektrik', bestand: 22, mindestbestand: 10, lagerort: 'Halle 1, Regal A2', einheit: 'Stück', funktion: 'Erkennt Hindernisse im Türspalt, verhindert Einklemmen.' },
+  { id: 'ET-4', name: 'Kältemittel R134a (Flasche)', nummer: 'KM-R134-10', kategorie: 'Mechatronik', bestand: 6, mindestbestand: 5, lagerort: 'Halle 3, Gefahrstofflager', einheit: 'Flasche', funktion: 'Arbeitsmedium des Kältekreislaufs der Klimaanlage.' },
+  { id: 'ET-5', name: 'Hauptschalter BR 185', nummer: 'HS-185-09', kategorie: 'Elektrik', bestand: 1, mindestbestand: 2, lagerort: 'Halle 1, Regal B4', einheit: 'Stück', funktion: 'Trennt das Fahrzeug im Fehlerfall komplett von der Fahrleitung.' },
+  { id: 'ET-6', name: 'Radsatzlager komplett', nummer: 'RSL-412-11', kategorie: 'Mechanik', bestand: 5, mindestbestand: 4, lagerort: 'Halle 2, Regal D1', einheit: 'Stück', funktion: 'Lagert die Achse drehbar im Drehgestellrahmen.' },
+  { id: 'ET-7', name: 'Temperaturfühler Weiche', nummer: 'TF-W-0912', kategorie: 'Mechatronik', bestand: 9, mindestbestand: 6, lagerort: 'Halle 3, Regal E2', einheit: 'Stück', funktion: 'Meldet der Steuerung die Außentemperatur zum Zuschalten der Heizung.' },
 ]
 
-export interface Schicht {
+export type AusbildungsblockTyp = 'Betrieb' | 'Berufsschule' | 'Überbetrieblich'
+
+export interface Ausbildungsblock {
   tag: string
   datum: string
-  von: string
-  bis: string
-  funktion: string
-  team: string
+  typ: AusbildungsblockTyp
+  thema: string
+  ort: string
 }
 
-export const schichtplan: Schicht[] = [
-  { tag: 'Montag', datum: '08.09.', von: '06:00', bis: '14:00', funktion: 'Frühschicht – Werk Rummelsburg', team: 'Team Elektrik 2' },
-  { tag: 'Dienstag', datum: '09.09.', von: '06:00', bis: '14:00', funktion: 'Frühschicht – Werk Rummelsburg', team: 'Team Elektrik 2' },
-  { tag: 'Mittwoch', datum: '10.09.', von: '14:00', bis: '22:00', funktion: 'Spätschicht – Bahnhof Süd', team: 'Team Mechatronik 1' },
-  { tag: 'Donnerstag', datum: '11.09.', von: '14:00', bis: '22:00', funktion: 'Spätschicht – Bahnhof Süd', team: 'Team Mechatronik 1' },
-  { tag: 'Freitag', datum: '12.09.', von: '06:00', bis: '14:00', funktion: 'Frühschicht – Werk Rummelsburg', team: 'Team Elektrik 2' },
-  { tag: 'Samstag', datum: '13.09.', von: '-', bis: '-', funktion: 'Frei', team: '-' },
-  { tag: 'Sonntag', datum: '14.09.', von: '-', bis: '-', funktion: 'Frei', team: '-' },
+export const ausbildungsplan: Ausbildungsblock[] = [
+  { tag: 'Montag', datum: '08.09.', typ: 'Betrieb', thema: 'Fahrzeuginstandhaltung – Elektrik', ort: 'Werk Rummelsburg' },
+  { tag: 'Dienstag', datum: '09.09.', typ: 'Betrieb', thema: 'Fahrzeuginstandhaltung – Elektrik', ort: 'Werk Rummelsburg' },
+  { tag: 'Mittwoch', datum: '10.09.', typ: 'Berufsschule', thema: 'Steuerungstechnik, Lernfeld 6', ort: 'OSZ Gustav-Meyer' },
+  { tag: 'Donnerstag', datum: '11.09.', typ: 'Berufsschule', thema: 'Steuerungstechnik, Lernfeld 6', ort: 'OSZ Gustav-Meyer' },
+  { tag: 'Freitag', datum: '12.09.', typ: 'Betrieb', thema: 'Fahrzeuginstandhaltung – Elektrik', ort: 'Werk Rummelsburg' },
+  { tag: 'Samstag', datum: '13.09.', typ: 'Betrieb', thema: 'Frei', ort: '-' },
+  { tag: 'Sonntag', datum: '14.09.', typ: 'Betrieb', thema: 'Frei', ort: '-' },
+]
+
+export type BerichtsheftStatus = 'Entwurf' | 'Eingereicht' | 'Freigegeben'
+export type BerichtsheftKategorie = 'Betrieblich' | 'Berufsschule' | 'Überbetrieblich'
+
+export interface BerichtsheftEintrag {
+  id: string
+  datum: string
+  kategorie: BerichtsheftKategorie
+  taetigkeiten: string
+  stunden: number
+  status: BerichtsheftStatus
+  ausbilderKommentar?: string
+}
+
+export const berichtsheft: BerichtsheftEintrag[] = [
+  {
+    id: 'B-1',
+    datum: 'Montag, 08.09.',
+    kategorie: 'Betrieblich',
+    taetigkeiten:
+      'Bremsprobe an ICE 4 unter Anleitung durchgeführt. Aufbau des Drehgestells kennengelernt, Radsatzlager auf Spiel geprüft.',
+    stunden: 8,
+    status: 'Freigegeben',
+    ausbilderKommentar: 'Gut dokumentiert, weiter so.',
+  },
+  {
+    id: 'B-2',
+    datum: 'Dienstag, 09.09.',
+    kategorie: 'Betrieblich',
+    taetigkeiten:
+      'Fehlersuche an Türsteuerung DBpza begonnen. Fehlerspeicher ausgelesen, Lichtschranke gereinigt und justiert.',
+    stunden: 7.5,
+    status: 'Eingereicht',
+  },
+  {
+    id: 'B-3',
+    datum: 'Mittwoch, 10.09.',
+    kategorie: 'Berufsschule',
+    taetigkeiten: 'Lernfeld 6: Grundlagen speicherprogrammierbarer Steuerungen (SPS), Übungen zu UND/ODER-Verknüpfungen.',
+    stunden: 8,
+    status: 'Freigegeben',
+  },
+  {
+    id: 'B-4',
+    datum: 'Donnerstag, 11.09.',
+    kategorie: 'Betrieblich',
+    taetigkeiten: 'Entwurf – noch nicht abgeschlossen.',
+    stunden: 0,
+    status: 'Entwurf',
+  },
 ]
 
 export interface Sicherheitshinweis {
@@ -268,3 +364,15 @@ export const sicherheitshinweise: Sicherheitshinweis[] = [
   { id: 'S-1', titel: 'Gleissperrung Gleis 7 wegen Oberleitungsarbeiten', ort: 'Werk Rummelsburg', gueltigBis: 'Heute, 18:00', stufe: 'Kritisch' },
   { id: 'S-2', titel: 'Rutschgefahr Halle 2 (Ölaustritt beseitigt, Nachreinigung läuft)', ort: 'Halle 2', gueltigBis: 'Morgen, 10:00', stufe: 'Hinweis' },
 ]
+
+export interface Pruefung {
+  titel: string
+  datum: string
+  tageVerbleibend: number
+}
+
+export const naechstePruefung: Pruefung = {
+  titel: 'Zwischenprüfung',
+  datum: '12. November',
+  tageVerbleibend: 63,
+}
