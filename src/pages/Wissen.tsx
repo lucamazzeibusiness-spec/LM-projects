@@ -160,31 +160,23 @@ export default function Wissen() {
 
       {tab === 'ersatzteile' && (
         <div className="space-y-3">
-          {teile.map((e) => {
-            const knapp = e.bestand < e.mindestbestand
-            return (
-              <div key={e.id} className="rounded-xl border border-db-gray-200 bg-white p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-semibold text-db-navy">{e.name}</p>
-                    <p className="font-mono text-xs text-db-navy-light">{e.nummer}</p>
-                  </div>
-                  <span
-                    className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${
-                      knapp ? 'bg-db-red/10 text-db-red' : 'bg-db-green/10 text-db-green'
-                    }`}
-                  >
-                    {e.bestand} {e.einheit}
-                    {knapp ? ' · knapp' : ''}
-                  </span>
+          {teile.map((e) => (
+            <div key={e.id} className="rounded-xl border border-db-gray-200 bg-white p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-sm font-semibold text-db-navy">{e.name}</p>
+                  <p className="font-mono text-xs text-db-navy-light">{e.nummer}</p>
                 </div>
-                <p className="mt-2 text-sm text-db-navy">{e.funktion}</p>
-                <p className="mt-2 flex items-center gap-1 text-xs text-db-navy-light">
-                  <MapPin size={12} /> {e.lagerort} · Kategorie: {e.kategorie}
-                </p>
+                <span className="shrink-0 rounded-full bg-db-gray-100 px-2.5 py-1 text-xs font-medium text-db-navy-light">
+                  {e.kategorie}
+                </span>
               </div>
-            )
-          })}
+              <p className="mt-2 text-sm text-db-navy">{e.funktion}</p>
+              <p className="mt-2 flex items-center gap-1 text-xs text-db-navy-light">
+                <MapPin size={12} /> {e.lagerort}
+              </p>
+            </div>
+          ))}
           {teile.length === 0 && (
             <p className="rounded-xl border border-dashed border-db-gray-200 p-6 text-center text-sm text-db-navy-light">
               Keine Treffer. Suchbegriff oder Filter anpassen.

@@ -267,21 +267,18 @@ export interface Ersatzteil {
   name: string
   nummer: string
   kategorie: Gewerk | 'Allgemein'
-  bestand: number
-  mindestbestand: number
   lagerort: string
-  einheit: string
   funktion: string
 }
 
 export const ersatzteile: Ersatzteil[] = [
-  { id: 'ET-1', name: 'Bremsbelag ICE 4 (Satz)', nummer: '412-BR-3391', kategorie: 'Mechanik', bestand: 14, mindestbestand: 8, lagerort: 'Halle 2, Regal C3', einheit: 'Satz', funktion: 'Erzeugt durch Reibung an der Bremsscheibe die Bremskraft.' },
-  { id: 'ET-2', name: 'Türsteuergerät DBpza', nummer: 'DB-TS-2207', kategorie: 'Elektrik', bestand: 3, mindestbestand: 4, lagerort: 'Halle 1, Regal A1', einheit: 'Stück', funktion: 'Steuert Öffnen/Schließen und wertet Sicherheitssensoren der Tür aus.' },
-  { id: 'ET-3', name: 'Lichtschranke Türantrieb', nummer: 'LS-4471-C', kategorie: 'Elektrik', bestand: 22, mindestbestand: 10, lagerort: 'Halle 1, Regal A2', einheit: 'Stück', funktion: 'Erkennt Hindernisse im Türspalt, verhindert Einklemmen.' },
-  { id: 'ET-4', name: 'Kältemittel R134a (Flasche)', nummer: 'KM-R134-10', kategorie: 'Mechatronik', bestand: 6, mindestbestand: 5, lagerort: 'Halle 3, Gefahrstofflager', einheit: 'Flasche', funktion: 'Arbeitsmedium des Kältekreislaufs der Klimaanlage.' },
-  { id: 'ET-5', name: 'Hauptschalter BR 185', nummer: 'HS-185-09', kategorie: 'Elektrik', bestand: 1, mindestbestand: 2, lagerort: 'Halle 1, Regal B4', einheit: 'Stück', funktion: 'Trennt das Fahrzeug im Fehlerfall komplett von der Fahrleitung.' },
-  { id: 'ET-6', name: 'Radsatzlager komplett', nummer: 'RSL-412-11', kategorie: 'Mechanik', bestand: 5, mindestbestand: 4, lagerort: 'Halle 2, Regal D1', einheit: 'Stück', funktion: 'Lagert die Achse drehbar im Drehgestellrahmen.' },
-  { id: 'ET-7', name: 'Temperaturfühler Weiche', nummer: 'TF-W-0912', kategorie: 'Mechatronik', bestand: 9, mindestbestand: 6, lagerort: 'Halle 3, Regal E2', einheit: 'Stück', funktion: 'Meldet der Steuerung die Außentemperatur zum Zuschalten der Heizung.' },
+  { id: 'ET-1', name: 'Bremsbelag ICE 4 (Satz)', nummer: '412-BR-3391', kategorie: 'Mechanik', lagerort: 'Halle 2, Regal C3', funktion: 'Erzeugt durch Reibung an der Bremsscheibe die Bremskraft.' },
+  { id: 'ET-2', name: 'Türsteuergerät DBpza', nummer: 'DB-TS-2207', kategorie: 'Elektrik', lagerort: 'Halle 1, Regal A1', funktion: 'Steuert Öffnen/Schließen und wertet Sicherheitssensoren der Tür aus.' },
+  { id: 'ET-3', name: 'Lichtschranke Türantrieb', nummer: 'LS-4471-C', kategorie: 'Elektrik', lagerort: 'Halle 1, Regal A2', funktion: 'Erkennt Hindernisse im Türspalt, verhindert Einklemmen.' },
+  { id: 'ET-4', name: 'Kältemittel R134a (Flasche)', nummer: 'KM-R134-10', kategorie: 'Mechatronik', lagerort: 'Halle 3, Gefahrstofflager', funktion: 'Arbeitsmedium des Kältekreislaufs der Klimaanlage.' },
+  { id: 'ET-5', name: 'Hauptschalter BR 185', nummer: 'HS-185-09', kategorie: 'Elektrik', lagerort: 'Halle 1, Regal B4', funktion: 'Trennt das Fahrzeug im Fehlerfall komplett von der Fahrleitung.' },
+  { id: 'ET-6', name: 'Radsatzlager komplett', nummer: 'RSL-412-11', kategorie: 'Mechanik', lagerort: 'Halle 2, Regal D1', funktion: 'Lagert die Achse drehbar im Drehgestellrahmen.' },
+  { id: 'ET-7', name: 'Temperaturfühler Weiche', nummer: 'TF-W-0912', kategorie: 'Mechatronik', lagerort: 'Halle 3, Regal E2', funktion: 'Meldet der Steuerung die Außentemperatur zum Zuschalten der Heizung.' },
 ]
 
 export type AusbildungsblockTyp = 'Betrieb' | 'Berufsschule' | 'DB Training'
