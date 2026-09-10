@@ -306,6 +306,7 @@ export type BerichtsheftKategorie = 'Betrieblich' | 'Berufsschule' | 'Überbetri
 
 export interface BerichtsheftEintrag {
   id: string
+  datumISO: string
   datum: string
   kategorie: BerichtsheftKategorie
   taetigkeiten: string
@@ -317,6 +318,7 @@ export interface BerichtsheftEintrag {
 export const berichtsheft: BerichtsheftEintrag[] = [
   {
     id: 'B-1',
+    datumISO: '2026-09-08',
     datum: 'Montag, 08.09.',
     kategorie: 'Betrieblich',
     taetigkeiten:
@@ -327,6 +329,7 @@ export const berichtsheft: BerichtsheftEintrag[] = [
   },
   {
     id: 'B-2',
+    datumISO: '2026-09-09',
     datum: 'Dienstag, 09.09.',
     kategorie: 'Betrieblich',
     taetigkeiten:
@@ -336,6 +339,7 @@ export const berichtsheft: BerichtsheftEintrag[] = [
   },
   {
     id: 'B-3',
+    datumISO: '2026-09-10',
     datum: 'Mittwoch, 10.09.',
     kategorie: 'Berufsschule',
     taetigkeiten: 'Lernfeld 6: Grundlagen speicherprogrammierbarer Steuerungen (SPS), Übungen zu UND/ODER-Verknüpfungen.',
@@ -344,25 +348,13 @@ export const berichtsheft: BerichtsheftEintrag[] = [
   },
   {
     id: 'B-4',
+    datumISO: '2026-09-11',
     datum: 'Donnerstag, 11.09.',
     kategorie: 'Betrieblich',
-    taetigkeiten: 'Entwurf – noch nicht abgeschlossen.',
+    taetigkeiten: '',
     stunden: 0,
     status: 'Entwurf',
   },
-]
-
-export interface Sicherheitshinweis {
-  id: string
-  titel: string
-  ort: string
-  gueltigBis: string
-  stufe: 'Kritisch' | 'Hinweis'
-}
-
-export const sicherheitshinweise: Sicherheitshinweis[] = [
-  { id: 'S-1', titel: 'Gleissperrung Gleis 7 wegen Oberleitungsarbeiten', ort: 'Werk Rummelsburg', gueltigBis: 'Heute, 18:00', stufe: 'Kritisch' },
-  { id: 'S-2', titel: 'Rutschgefahr Halle 2 (Ölaustritt beseitigt, Nachreinigung läuft)', ort: 'Halle 2', gueltigBis: 'Morgen, 10:00', stufe: 'Hinweis' },
 ]
 
 export interface Pruefung {

@@ -2,34 +2,40 @@ import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { azubiProfil, type BerichtsheftEintrag } from '../data/mock'
 
-export function exportBerichtsheftPdf(eintraege: BerichtsheftEintrag[]) {
+interface ExportOptions {
+  titel?: string
+  zeitraum?: string
+  dateiSuffix?: string
+}
+
+export function exportBerichtsheftPdf(eintraege: BerichtsheftEintrag[], optionen: ExportOptions = {}) {
+  const { titel = 'Ausbildungsnachweis', zeitraum, dateiSuffix } = optionen
+
   const doc = new jsPDF({ unit: 'mm', format: 'a4' })
   const seitenbreite = doc.internal.pageSize.getWidth()
   const linksRechts = 14
 
   doc.setFontSize(16)
   doc.setFont('helvetica', 'bold')
-  doc.text('Ausbildungsnachweis', linksRechts, 18)
+  doc.text(titel, linksRechts, 18)
 
   doc.setFontSize(10)
   doc.setFont('helvetica', 'normal')
-  doc.text(
-    [
-      `Name: ${azubiProfil.name}`,
-      `Ausbildungsberuf: ${azubiProfil.ausbildungsberuf}`,
-      `Lehrjahr: ${azubiProfil.lehrjahr}. von ${azubiProfil.lehrjahreGesamt}`,
-      `Ausbildungsbetrieb: ${azubiProfil.abteilung}`,
-      `Ausbilder/-in: ${azubiProfil.ausbilder}`,
-    ],
-    linksRechts,
-    26,
-  )
+  const kopfzeilen = [
+    `Name: ${azubiProfil.name}`,
+    `Ausbildungsberuf: ${azubiProfil.ausbildungsberuf}`,
+    `Lehrjahr: ${azubiProfil.lehrjahr}. von ${azubiProfil.lehrjahreGesamt}`,
+    `Ausbildungsbetrieb: ${azubiProfil.abteilung}`,
+    `Ausbilder/-in: ${azubiProfil.ausbilder}`,
+  ]
+  if (zeitraum) kopfzeilen.splice(1, 0, `Zeitraum: ${zeitraum}`)
+  doc.text(kopfzeilen, linksRechts, 26)
 
   const sortiert = [...eintraege].reverse()
   const gesamtStunden = sortiert.reduce((sum, e) => sum + e.stunden, 0)
 
   autoTable(doc, {
-    startY: 52,
+    startY: zeitraum ? 56 : 52,
     head: [['Datum', 'Kategorie', 'Tätigkeiten', 'Std.', 'Status']],
     body: sortiert.map((e) => [e.datum, e.kategorie, e.taetigkeiten || '–', String(e.stunden), e.status]),
     foot: [['', '', 'Gesamtstunden', String(gesamtStunden), '']],
@@ -57,6 +63,7 @@ export function exportBerichtsheftPdf(eintraege: BerichtsheftEintrag[]) {
   doc.text('Datum, Unterschrift Auszubildende/-r', linksRechts, unterschriftY + 5)
   doc.text('Datum, Unterschrift Ausbilder/-in', seitenbreite - linksRechts - 70, unterschriftY + 5)
 
-  const dateiname = `Ausbildungsnachweis_${azubiProfil.name}_${new Date().toISOString().slice(0, 10)}.pdf`
+  const suffix = dateiSuffix ?? new Date().toISOString().slice(0, 10)
+  const dateiname = `Ausbildungsnachweis_${azubiProfil.name}_${suffix}.pdf`
   doc.save(dateiname)
 }

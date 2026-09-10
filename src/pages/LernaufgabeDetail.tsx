@@ -1,5 +1,5 @@
 import { Camera, Check, ChevronLeft, MessageSquare, Save, Send, Target } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { GewerkBadge, PrioBadge, StatusBadge } from '../components/Badges'
 import { lernaufgaben } from '../data/mock'
@@ -10,25 +10,46 @@ interface Draft {
   eingereicht: boolean
 }
 
+const leererDraft: Draft = { checked: {}, notiz: '', eingereicht: false }
+
+function ladeDraft(storageKey: string): Draft {
+  try {
+    const raw = localStorage.getItem(storageKey)
+    return raw ? JSON.parse(raw) : leererDraft
+  } catch {
+    return leererDraft
+  }
+}
+
 export default function LernaufgabeDetail() {
   const { id } = useParams()
   const aufgabe = lernaufgaben.find((a) => a.id === id)
   const storageKey = `lernaufgabe:${id}`
 
-  const [draft, setDraft] = useState<Draft>({ checked: {}, notiz: '', eingereicht: false })
+  const [draft, setDraft] = useState<Draft>(() => ladeDraft(storageKey))
   const [savedHint, setSavedHint] = useState(false)
+  const savedHintTimeout = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   useEffect(() => {
-    const raw = localStorage.getItem(storageKey)
-    if (raw) setDraft(JSON.parse(raw))
+    setDraft(ladeDraft(storageKey))
   }, [storageKey])
 
   useEffect(() => {
-    localStorage.setItem(storageKey, JSON.stringify(draft))
+    return () => {
+      if (savedHintTimeout.current) clearTimeout(savedHintTimeout.current)
+    }
+  }, [])
+
+  const aktualisieren = (updater: (d: Draft) => Draft) => {
+    setDraft((d) => {
+      const naechster = updater(d)
+      localStorage.setItem(storageKey, JSON.stringify(naechster))
+      return naechster
+    })
     setSavedHint(true)
-    const t = setTimeout(() => setSavedHint(false), 1200)
-    return () => clearTimeout(t)
-  }, [draft, storageKey])
+    if (savedHintTimeout.current) clearTimeout(savedHintTimeout.current)
+    savedHintTimeout.current = setTimeout(() => setSavedHint(false), 1200)
+  }
 
   if (!aufgabe) {
     return (
@@ -46,7 +67,7 @@ export default function LernaufgabeDetail() {
   const progress = Math.round((done / total) * 100)
 
   const toggle = (itemId: string) =>
-    setDraft((d) => ({ ...d, checked: { ...d.checked, [itemId]: !d.checked[itemId] } }))
+    aktualisieren((d) => ({ ...d, checked: { ...d.checked, [itemId]: !d.checked[itemId] } }))
 
   return (
     <div className="space-y-5">
@@ -138,7 +159,7 @@ export default function LernaufgabeDetail() {
           <label className="mb-1 block text-xs font-medium text-db-navy-light">Was hast du gelernt / verstanden?</label>
           <textarea
             value={draft.notiz}
-            onChange={(e) => setDraft((d) => ({ ...d, notiz: e.target.value }))}
+            onChange={(e) => aktualisieren((d) => ({ ...d, notiz: e.target.value }))}
             rows={3}
             placeholder="z. B. Was war neu für dich, wo brauchst du noch Übung..."
             className="w-full rounded-lg border border-db-gray-200 px-3 py-2 text-sm text-db-navy outline-none focus:border-db-red"
@@ -146,7 +167,7 @@ export default function LernaufgabeDetail() {
         </div>
 
         <button
-          onClick={() => setDraft((d) => ({ ...d, eingereicht: !d.eingereicht }))}
+          onClick={() => aktualisieren((d) => ({ ...d, eingereicht: !d.eingereicht }))}
           className={`mt-4 flex w-full items-center justify-center gap-2 rounded-full border px-3 py-3 text-sm font-semibold transition-colors ${
             draft.eingereicht
               ? 'border-db-green bg-db-green/10 text-db-green'

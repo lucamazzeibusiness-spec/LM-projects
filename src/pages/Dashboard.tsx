@@ -1,17 +1,24 @@
-import { AlertTriangle, ArrowRight, BookOpen, ClipboardCheck, GraduationCap } from 'lucide-react'
+import { ArrowRight, BookOpen, CalendarCheck, ClipboardCheck, GraduationCap } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { GewerkBadge, PrioBadge, StatusBadge } from '../components/Badges'
-import { azubiProfil, berichtsheft, lernaufgaben, naechstePruefung, sicherheitshinweise } from '../data/mock'
+import { useBerichtsheft } from '../hooks/useBerichtsheft'
+import { heuteISO, heutigesDatumLabel } from '../lib/wochen'
+import { azubiProfil, lernaufgaben, naechstePruefung } from '../data/mock'
 
 export default function Dashboard() {
+  const { eintraege } = useBerichtsheft()
   const offen = lernaufgaben.filter((a) => a.status !== 'Erledigt')
   const heute = offen.filter((a) => a.faelligkeit.startsWith('Heute'))
-  const entwuerfe = berichtsheft.filter((b) => b.status === 'Entwurf').length
+
+  const heutigerEintrag = eintraege.find((e) => e.datumISO === heuteISO())
+  const andereOffeneEntwuerfe = eintraege.filter(
+    (e) => e.status === 'Entwurf' && e.taetigkeiten.trim() && e.datumISO !== heuteISO(),
+  ).length
 
   const stats = [
     { label: 'Offene Lernaufgaben', value: offen.length, icon: ClipboardCheck, tone: 'text-db-red' },
     { label: 'Heute fällig', value: heute.length, icon: ClipboardCheck, tone: 'text-db-amber' },
-    { label: 'Berichtsheft offen', value: entwuerfe, icon: BookOpen, tone: entwuerfe > 0 ? 'text-db-red' : 'text-db-green' },
+    { label: 'Berichtsheft', value: heutigerEintrag ? '✓' : '–', icon: BookOpen, tone: heutigerEintrag ? 'text-db-green' : 'text-db-red' },
     { label: `Tage bis ${naechstePruefung.titel}`, value: naechstePruefung.tageVerbleibend, icon: GraduationCap, tone: 'text-db-navy' },
   ]
 
@@ -24,22 +31,18 @@ export default function Dashboard() {
         </p>
       </div>
 
-      {sicherheitshinweise.map((s) => (
-        <div
-          key={s.id}
-          className={`flex items-start gap-3 rounded-lg border px-4 py-3 text-sm ${
-            s.stufe === 'Kritisch'
-              ? 'border-db-red/30 bg-db-red/5 text-db-red-dark'
-              : 'border-db-amber/30 bg-db-amber/5 text-db-amber'
-          }`}
+      {!heutigerEintrag && (
+        <Link
+          to="/berichtsheft"
+          className="flex items-center justify-between gap-3 rounded-xl border border-db-red/30 bg-db-red/5 px-4 py-3.5"
         >
-          <AlertTriangle size={18} className="mt-0.5 shrink-0" />
-          <div>
-            <p className="font-medium">{s.titel}</p>
-            <p className="text-xs opacity-80">{s.ort} · gültig bis {s.gueltigBis}</p>
-          </div>
-        </div>
-      ))}
+          <span className="flex items-center gap-2 text-sm font-semibold text-db-red-dark">
+            <CalendarCheck size={18} className="shrink-0" />
+            Dein Eintrag für heute ({heutigesDatumLabel()}) fehlt noch
+          </span>
+          <ArrowRight size={16} className="shrink-0 text-db-red-dark" />
+        </Link>
+      )}
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {stats.map(({ label, value, icon: Icon, tone }) => (
@@ -51,13 +54,14 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {entwuerfe > 0 && (
+      {heutigerEintrag && andereOffeneEntwuerfe > 0 && (
         <Link
           to="/berichtsheft"
           className="flex items-center justify-between rounded-xl border border-db-amber/30 bg-db-amber/5 px-4 py-3 text-sm font-medium text-db-amber"
         >
           <span>
-            {entwuerfe} Berichtsheft-Eintrag {entwuerfe === 1 ? 'wartet' : 'warten'} noch auf Fertigstellung
+            {andereOffeneEntwuerfe} älterer Berichtsheft-Eintrag {andereOffeneEntwuerfe === 1 ? 'wartet' : 'warten'}{' '}
+            noch auf Einreichung
           </span>
           <ArrowRight size={16} />
         </Link>
