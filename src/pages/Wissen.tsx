@@ -1,10 +1,11 @@
 import { AlertCircle, MapPin, Search, Wrench } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { GewerkBadge } from '../components/Badges'
+import LernkartenQuiz from '../components/LernkartenQuiz'
 import { ersatzteile, fehlerfaelle, type Gewerk } from '../data/mock'
 
 const gewerke: (Gewerk | 'Alle')[] = ['Alle', 'Elektrik', 'Mechanik', 'Mechatronik']
-type Tab = 'fehlerdiagnose' | 'ersatzteile'
+type Tab = 'fehlerdiagnose' | 'ersatzteile' | 'pruefung'
 
 const schwierigkeitStyle: Record<string, string> = {
   Grundlagen: 'bg-db-green/10 text-db-green',
@@ -63,35 +64,49 @@ export default function Wissen() {
         >
           Ersatzteile-Lexikon
         </button>
+        <button
+          onClick={() => setTab('pruefung')}
+          className={`flex-1 rounded-full py-2 text-sm font-semibold transition-colors ${
+            tab === 'pruefung' ? 'bg-white text-db-navy shadow-sm' : 'text-db-navy-light'
+          }`}
+        >
+          Prüfungstraining
+        </button>
       </div>
 
-      <div className="relative">
-        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-db-navy-light" />
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder={tab === 'fehlerdiagnose' ? 'z. B. E-4471, Türsteuerung, BR 412...' : 'Teilename oder Teilenummer...'}
-          className="w-full rounded-lg border border-db-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-db-navy outline-none focus:border-db-red"
-        />
-      </div>
+      {tab === 'pruefung' && <LernkartenQuiz />}
 
-      <div className="flex flex-wrap gap-2">
-        {gewerke.map((g) => (
-          <button
-            key={g}
-            onClick={() => setGewerk(g)}
-            className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-              gewerk === g
-                ? 'border-db-red bg-db-red text-white'
-                : 'border-db-gray-200 bg-white text-db-navy-light hover:border-db-red/40'
-            }`}
-          >
-            {g}
-          </button>
-        ))}
-      </div>
+      {tab !== 'pruefung' && (
+        <>
+          <div className="relative">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-db-navy-light" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={tab === 'fehlerdiagnose' ? 'z. B. E-4471, Türsteuerung, BR 412...' : 'Teilename oder Teilenummer...'}
+              className="w-full rounded-lg border border-db-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-db-navy outline-none focus:border-db-red"
+            />
+          </div>
 
-      {tab === 'fehlerdiagnose' ? (
+          <div className="flex flex-wrap gap-2">
+            {gewerke.map((g) => (
+              <button
+                key={g}
+                onClick={() => setGewerk(g)}
+                className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                  gewerk === g
+                    ? 'border-db-red bg-db-red text-white'
+                    : 'border-db-gray-200 bg-white text-db-navy-light hover:border-db-red/40'
+                }`}
+              >
+                {g}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+
+      {tab === 'fehlerdiagnose' && (
         <div className="space-y-3">
           {fehler.map((f) => (
             <div key={f.id} className="rounded-xl border border-db-gray-200 bg-white p-4">
@@ -141,7 +156,9 @@ export default function Wissen() {
             </p>
           )}
         </div>
-      ) : (
+      )}
+
+      {tab === 'ersatzteile' && (
         <div className="space-y-3">
           {teile.map((e) => {
             const knapp = e.bestand < e.mindestbestand

@@ -376,3 +376,101 @@ export const naechstePruefung: Pruefung = {
   datum: '12. November',
   tageVerbleibend: 63,
 }
+
+export interface Lernkarte {
+  id: string
+  gewerk: Gewerk | 'Allgemein'
+  schwierigkeit: FehlerfallSchwierigkeit
+  frage: string
+  antwort: string
+}
+
+export const lernkarten: Lernkarte[] = [
+  {
+    id: 'LK-1',
+    gewerk: 'Elektrik',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Wie lautet das Ohmsche Gesetz und wonach löst du bei gegebener Spannung und Widerstand auf?',
+    antwort: 'U = R · I. Nach dem Strom aufgelöst: I = U / R.',
+  },
+  {
+    id: 'LK-2',
+    gewerk: 'Elektrik',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Was ist der Unterschied zwischen Reihen- und Parallelschaltung beim Gesamtwiderstand?',
+    antwort:
+      'Reihenschaltung: Widerstände addieren sich (R_ges = R1 + R2 + ...). Parallelschaltung: der Kehrwert des Gesamtwiderstands ist die Summe der Kehrwerte (1/R_ges = 1/R1 + 1/R2 + ...), R_ges wird kleiner als der kleinste Einzelwiderstand.',
+  },
+  {
+    id: 'LK-3',
+    gewerk: 'Elektrik',
+    schwierigkeit: 'Fortgeschritten',
+    frage: 'Welche 5 Sicherheitsregeln gelten beim Freischalten elektrischer Anlagen?',
+    antwort:
+      '1. Freischalten, 2. Gegen Wiedereinschalten sichern, 3. Spannungsfreiheit feststellen, 4. Erden und Kurzschließen, 5. Benachbarte, unter Spannung stehende Teile abdecken oder abschranken.',
+  },
+  {
+    id: 'LK-4',
+    gewerk: 'Mechanik',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Was versteht man unter „Passung" bei zwei zusammengefügten Bauteilen?',
+    antwort:
+      'Die Passung beschreibt das Verhältnis von Bohrung und Welle zueinander (Spiel-, Übergangs- oder Presspassung) und legt fest, wie fest oder locker zwei Teile ineinander sitzen.',
+  },
+  {
+    id: 'LK-5',
+    gewerk: 'Mechanik',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Wofür steht die Abkürzung „NDT" in der Fahrzeuginstandhaltung und wozu dient sie?',
+    antwort:
+      'NDT = Non-Destructive Testing (zerstörungsfreie Prüfung), z. B. Ultraschall- oder Magnetpulverprüfung, um Risse in Bauteilen wie Radsätzen zu finden, ohne sie zu zerstören.',
+  },
+  {
+    id: 'LK-6',
+    gewerk: 'Mechanik',
+    schwierigkeit: 'Fortgeschritten',
+    frage: 'Warum wird ein Drehmomentschlüssel beim Verschrauben sicherheitsrelevanter Bauteile vorgeschrieben?',
+    antwort:
+      'Er stellt sicher, dass die Schraubverbindung exakt mit dem vom Hersteller vorgegebenen Anzugsmoment angezogen wird – zu locker kann sich lösen, zu fest kann das Gewinde oder Bauteil beschädigen.',
+  },
+  {
+    id: 'LK-7',
+    gewerk: 'Mechatronik',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Was ist der Unterschied zwischen einem Sensor und einem Aktor?',
+    antwort:
+      'Ein Sensor erfasst eine physikalische Größe (z. B. Temperatur, Position) und wandelt sie in ein elektrisches Signal um. Ein Aktor wandelt ein elektrisches Signal in eine Bewegung oder Aktion um (z. B. Motor, Ventil).',
+  },
+  {
+    id: 'LK-8',
+    gewerk: 'Mechatronik',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Was bedeutet SPS und welche Aufgabe hat sie in einer Steuerung?',
+    antwort:
+      'SPS = Speicherprogrammierbare Steuerung. Sie liest Eingangssignale (Sensoren), verarbeitet sie nach einem hinterlegten Programm und steuert darüber Ausgänge (Aktoren) an.',
+  },
+  {
+    id: 'LK-9',
+    gewerk: 'Mechatronik',
+    schwierigkeit: 'Fortgeschritten',
+    frage: 'Wie unterscheiden sich eine UND- und eine ODER-Verknüpfung in der Steuerungstechnik?',
+    antwort:
+      'UND: Ausgang wird nur aktiv, wenn ALLE Eingänge erfüllt sind. ODER: Ausgang wird aktiv, wenn MINDESTENS EIN Eingang erfüllt ist.',
+  },
+  {
+    id: 'LK-10',
+    gewerk: 'Allgemein',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Was gehört laut Jugendarbeitsschutzgesetz zu den wichtigsten Regeln für Azubis unter 18?',
+    antwort:
+      'U. a. maximal 8 Std./Tag bzw. 40 Std./Woche, keine Arbeit vor 6 Uhr oder nach 20 Uhr, mindestens 30 Minuten Pause ab 4,5 Std. Arbeitszeit, keine gefährlichen Arbeiten ohne Aufsicht.',
+  },
+  {
+    id: 'LK-11',
+    gewerk: 'Allgemein',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Wofür wird das Berichtsheft (Ausbildungsnachweis) benötigt und wie oft sollte es geführt werden?',
+    antwort:
+      'Es dokumentiert die betrieblichen und schulischen Ausbildungsinhalte, ist Voraussetzung für die Zulassung zur Abschlussprüfung und sollte regelmäßig (i. d. R. wöchentlich) geführt und vom Ausbilder abgezeichnet werden.',
+  },
+]
