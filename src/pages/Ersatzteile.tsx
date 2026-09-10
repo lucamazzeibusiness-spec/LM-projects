@@ -56,10 +56,10 @@ export default function Ersatzteile() {
               <button
                 onClick={() => setBestellt((b) => ({ ...b, [e.id]: true }))}
                 disabled={bestellt[e.id]}
-                className={`mt-3 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+                className={`mt-3 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
                   bestellt[e.id]
                     ? 'bg-db-green/10 text-db-green'
-                    : 'bg-db-navy text-white hover:bg-db-navy-light'
+                    : 'bg-db-red text-white hover:bg-db-red-dark'
                 }`}
               >
                 {bestellt[e.id] ? 'Nachbestellung ausgelöst' : 'Nachbestellen'}

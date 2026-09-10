@@ -128,10 +128,10 @@ export default function AuftragDetail() {
 
         <button
           onClick={() => setDraft((d) => ({ ...d, signiert: !d.signiert }))}
-          className={`mt-4 flex w-full items-center justify-center gap-2 rounded-lg border px-3 py-3 text-sm font-medium transition-colors ${
+          className={`mt-4 flex w-full items-center justify-center gap-2 rounded-full border px-3 py-3 text-sm font-semibold transition-colors ${
             draft.signiert
               ? 'border-db-green bg-db-green/10 text-db-green'
-              : 'border-db-navy bg-db-navy text-white hover:bg-db-navy-light'
+              : 'border-db-red bg-db-red text-white hover:bg-db-red-dark'
           }`}
         >
           <PenLine size={16} />

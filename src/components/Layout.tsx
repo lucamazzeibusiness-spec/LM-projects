@@ -49,31 +49,33 @@ function OnlineBadge() {
 export default function Layout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-db-gray-50">
-      <header className="sticky top-0 z-20 border-b border-db-gray-200 bg-db-navy text-white">
+      <header className="sticky top-0 z-20 border-b border-db-gray-200 bg-white">
         <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded bg-db-red">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-db-red text-white">
             <Train size={20} />
           </div>
           <div className="flex flex-col leading-tight">
-            <span className="text-sm font-semibold tracking-wide">DB Technik</span>
-            <span className="text-xs text-white/60">Werkzeug für Elektrik · Mechanik · Mechatronik</span>
+            <span className="text-sm font-bold tracking-tight text-db-navy">DB Technik</span>
+            <span className="text-xs text-db-navy-light">Werkzeug für Elektrik · Mechanik · Mechatronik</span>
           </div>
           <div className="ml-auto flex items-center gap-3">
             <OnlineBadge />
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-xs font-semibold">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-db-gray-100 text-xs font-semibold text-db-navy">
               MT
             </div>
           </div>
         </div>
-        <nav className="hidden max-w-6xl gap-1 px-4 pb-2 md:mx-auto md:flex">
+        <nav className="hidden max-w-6xl gap-1 px-4 md:mx-auto md:flex">
           {navItems.map(({ to, label, icon: Icon, end }) => (
             <NavLink
               key={to}
               to={to}
               end={end}
               className={({ isActive }) =>
-                `flex items-center gap-2 rounded-t-md px-3 py-2 text-sm font-medium transition-colors ${
-                  isActive ? 'bg-db-gray-50 text-db-navy' : 'text-white/80 hover:bg-white/10'
+                `flex items-center gap-2 border-b-2 px-3 py-2.5 text-sm font-semibold transition-colors ${
+                  isActive
+                    ? 'border-db-red text-db-red'
+                    : 'border-transparent text-db-navy-light hover:text-db-navy'
                 }`
               }
             >
@@ -86,7 +88,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 
       <main className="mx-auto max-w-6xl px-4 pb-24 pt-4 md:pb-8">{children}</main>
 
-      <nav className="fixed inset-x-0 bottom-0 z-20 flex border-t border-db-gray-200 bg-white md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-20 flex border-t border-db-gray-200 bg-white pb-[env(safe-area-inset-bottom)] md:hidden">
         {navItems.map(({ to, label, icon: Icon, end }) => (
           <NavLink
             key={to}
