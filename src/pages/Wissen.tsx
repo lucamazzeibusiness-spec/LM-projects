@@ -50,7 +50,7 @@ export default function Wissen() {
       <div className="flex gap-1 rounded-full bg-db-gray-100 p-1">
         <button
           onClick={() => setTab('fehlerdiagnose')}
-          className={`flex-1 rounded-full py-2 text-sm font-semibold transition-colors ${
+          className={`flex-1 rounded-full py-2 text-sm font-semibold ${
             tab === 'fehlerdiagnose' ? 'bg-white text-db-navy shadow-sm' : 'text-db-navy-light'
           }`}
         >
@@ -58,7 +58,7 @@ export default function Wissen() {
         </button>
         <button
           onClick={() => setTab('ersatzteile')}
-          className={`flex-1 rounded-full py-2 text-sm font-semibold transition-colors ${
+          className={`flex-1 rounded-full py-2 text-sm font-semibold ${
             tab === 'ersatzteile' ? 'bg-white text-db-navy shadow-sm' : 'text-db-navy-light'
           }`}
         >
@@ -66,7 +66,7 @@ export default function Wissen() {
         </button>
         <button
           onClick={() => setTab('pruefung')}
-          className={`flex-1 rounded-full py-2 text-sm font-semibold transition-colors ${
+          className={`flex-1 rounded-full py-2 text-sm font-semibold ${
             tab === 'pruefung' ? 'bg-white text-db-navy shadow-sm' : 'text-db-navy-light'
           }`}
         >
