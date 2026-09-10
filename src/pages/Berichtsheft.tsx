@@ -5,7 +5,7 @@ import { useBerichtsheft } from '../hooks/useBerichtsheft'
 import type { BerichtsheftEintrag, BerichtsheftKategorie } from '../data/mock'
 import { heuteISO, heutigesDatumLabel, wochenLabel, wochenSchluessel } from '../lib/wochen'
 
-const kategorien: BerichtsheftKategorie[] = ['Betrieblich', 'Berufsschule', 'Überbetrieblich']
+const kategorien: BerichtsheftKategorie[] = ['Betrieblich', 'Berufsschule', 'DB Training']
 
 function neuerTageseintrag(): BerichtsheftEintrag {
   return {

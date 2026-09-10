@@ -11,7 +11,7 @@ import {
 const typStyle: Record<AusbildungsblockTyp, string> = {
   Betrieb: 'bg-blue-50 text-blue-700',
   Berufsschule: 'bg-purple-50 text-purple-700',
-  Überbetrieblich: 'bg-orange-50 text-orange-700',
+  'DB Training': 'bg-orange-50 text-orange-700',
 }
 
 const lernfeldStyle: Record<LernfeldStatus, string> = {
@@ -28,7 +28,7 @@ export default function Ausbildungsplan() {
     <div className="space-y-4">
       <div>
         <h1 className="text-xl font-semibold text-db-navy">Ausbildungsplan</h1>
-        <p className="text-sm text-db-navy-light">Diese Woche · Betrieb, Berufsschule und überbetriebliche Ausbildung</p>
+        <p className="text-sm text-db-navy-light">Diese Woche · Betrieb, Berufsschule und DB Training</p>
       </div>
 
       <div className="rounded-xl border border-db-navy/10 bg-db-navy p-4 text-white">

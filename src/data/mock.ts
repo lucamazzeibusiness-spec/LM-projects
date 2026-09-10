@@ -281,7 +281,7 @@ export const ersatzteile: Ersatzteil[] = [
   { id: 'ET-7', name: 'Temperaturfühler Weiche', nummer: 'TF-W-0912', kategorie: 'Mechatronik', bestand: 9, mindestbestand: 6, lagerort: 'Halle 3, Regal E2', einheit: 'Stück', funktion: 'Meldet der Steuerung die Außentemperatur zum Zuschalten der Heizung.' },
 ]
 
-export type AusbildungsblockTyp = 'Betrieb' | 'Berufsschule' | 'Überbetrieblich'
+export type AusbildungsblockTyp = 'Betrieb' | 'Berufsschule' | 'DB Training'
 
 export interface Ausbildungsblock {
   tag: string
@@ -302,7 +302,7 @@ export const ausbildungsplan: Ausbildungsblock[] = [
 ]
 
 export type BerichtsheftStatus = 'Entwurf' | 'Eingereicht' | 'Freigegeben'
-export type BerichtsheftKategorie = 'Betrieblich' | 'Berufsschule' | 'Überbetrieblich'
+export type BerichtsheftKategorie = 'Betrieblich' | 'Berufsschule' | 'DB Training'
 
 export interface BerichtsheftEintrag {
   id: string
