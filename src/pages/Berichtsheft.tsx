@@ -1,4 +1,4 @@
-import { Plus, X } from 'lucide-react'
+import { Download, Loader2, Plus, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { BerichtStatusBadge } from '../components/Badges'
 import { berichtsheft as initialEintraege, type BerichtsheftEintrag, type BerichtsheftKategorie } from '../data/mock'
@@ -35,9 +35,20 @@ function leererEntwurf(): BerichtsheftEintrag {
 export default function Berichtsheft() {
   const { eintraege, setEintraege } = useEintraege()
   const [neu, setNeu] = useState<BerichtsheftEintrag | null>(null)
+  const [exportiert, setExportiert] = useState(false)
 
   const wocheStunden = eintraege.reduce((sum, e) => sum + e.stunden, 0)
   const offeneEntwuerfe = eintraege.filter((e) => e.status === 'Entwurf').length
+
+  const exportieren = async () => {
+    setExportiert(true)
+    try {
+      const { exportBerichtsheftPdf } = await import('../lib/exportBerichtsheft')
+      exportBerichtsheftPdf(eintraege)
+    } finally {
+      setExportiert(false)
+    }
+  }
 
   const speichern = () => {
     if (!neu || !neu.taetigkeiten.trim()) return
@@ -58,12 +69,23 @@ export default function Berichtsheft() {
           <h1 className="text-xl font-semibold text-db-navy">Berichtsheft</h1>
           <p className="text-sm text-db-navy-light">Dein digitaler Ausbildungsnachweis</p>
         </div>
-        <button
-          onClick={() => setNeu(leererEntwurf())}
-          className="flex shrink-0 items-center gap-1.5 rounded-full bg-db-red px-4 py-2 text-sm font-semibold text-white hover:bg-db-red-dark"
-        >
-          <Plus size={16} /> Eintrag
-        </button>
+        <div className="flex shrink-0 gap-2">
+          <button
+            onClick={exportieren}
+            disabled={exportiert}
+            title="Als PDF exportieren"
+            className="flex items-center gap-1.5 rounded-full border border-db-gray-200 bg-white px-3.5 py-2 text-sm font-semibold text-db-navy hover:border-db-navy/30 disabled:opacity-60"
+          >
+            {exportiert ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
+            <span className="hidden sm:inline">PDF</span>
+          </button>
+          <button
+            onClick={() => setNeu(leererEntwurf())}
+            className="flex items-center gap-1.5 rounded-full bg-db-red px-4 py-2 text-sm font-semibold text-white hover:bg-db-red-dark"
+          >
+            <Plus size={16} /> Eintrag
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
