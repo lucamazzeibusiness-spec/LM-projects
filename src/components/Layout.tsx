@@ -14,7 +14,7 @@ import { useAzubiProfil } from '../context/AzubiProfilContext'
 
 const navItems = [
   { to: '/', label: 'Start', icon: LayoutGrid, end: true },
-  { to: '/lernaufgaben', label: 'Lernaufgaben', icon: ClipboardList },
+  { to: '/lernaufgaben', label: 'Aufgaben', icon: ClipboardList },
   { to: '/berichtsheft', label: 'Berichtsheft', icon: BookOpen },
   { to: '/wissen', label: 'Wissen', icon: GraduationCap },
   { to: '/ausbildungsplan', label: 'Ausbildung', icon: CalendarDays },

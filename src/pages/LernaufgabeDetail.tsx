@@ -54,7 +54,7 @@ export default function LernaufgabeDetail() {
   if (!aufgabe) {
     return (
       <div className="space-y-4">
-        <p className="text-sm text-db-navy-light">Lernaufgabe nicht gefunden.</p>
+        <p className="text-sm text-db-navy-light">Aufgabe nicht gefunden.</p>
         <Link to="/lernaufgaben" className="text-sm font-medium text-db-red hover:underline">
           Zurück zur Übersicht
         </Link>
@@ -72,7 +72,7 @@ export default function LernaufgabeDetail() {
   return (
     <div className="space-y-5">
       <Link to="/lernaufgaben" className="flex items-center gap-1 text-sm text-db-navy-light hover:text-db-navy">
-        <ChevronLeft size={16} /> Lernaufgaben
+        <ChevronLeft size={16} /> Aufgaben
       </Link>
 
       <div className="rounded-xl border border-db-gray-200 bg-white p-4">

@@ -19,7 +19,7 @@ export default function Dashboard() {
   ).length
 
   const stats = [
-    { label: 'Offene Lernaufgaben', value: offen.length, icon: ClipboardCheck, tone: 'text-db-red' },
+    { label: 'Offene Aufgaben', value: offen.length, icon: ClipboardCheck, tone: 'text-db-red' },
     { label: 'Heute fällig', value: heute.length, icon: ClipboardCheck, tone: 'text-db-amber' },
     { label: 'Berichtsheft', value: heutigerEintrag ? '✓' : '–', icon: BookOpen, tone: heutigerEintrag ? 'text-db-green' : 'text-db-red' },
     { label: `Tage bis ${naechstePruefung.titel}`, value: naechstePruefung.tageVerbleibend, icon: GraduationCap, tone: 'text-db-navy' },
@@ -73,7 +73,7 @@ export default function Dashboard() {
 
       <div className="rounded-xl border border-db-gray-200 bg-white">
         <div className="flex items-center justify-between border-b border-db-gray-200 px-4 py-3">
-          <h2 className="text-sm font-semibold text-db-navy">Nächste Lernaufgaben</h2>
+          <h2 className="text-sm font-semibold text-db-navy">Nächste Aufgaben</h2>
           <Link to="/lernaufgaben" className="flex items-center gap-1 text-xs font-medium text-db-red hover:underline">
             Alle ansehen <ArrowRight size={14} />
           </Link>

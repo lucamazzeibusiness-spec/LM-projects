@@ -22,7 +22,7 @@ export default function Lernaufgaben() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-xl font-semibold text-db-navy">Lernaufgaben</h1>
+        <h1 className="text-xl font-semibold text-db-navy">Aufgaben</h1>
         <p className="text-sm text-db-navy-light">Von deinem Ausbilder zugewiesen, mit Lernziel</p>
       </div>
 
@@ -90,7 +90,7 @@ export default function Lernaufgaben() {
         ))}
         {gefiltert.length === 0 && (
           <p className="rounded-xl border border-dashed border-db-gray-200 p-6 text-center text-sm text-db-navy-light">
-            Keine Lernaufgaben für diese Filter.
+            Keine Aufgaben für diese Filter.
           </p>
         )}
       </div>
