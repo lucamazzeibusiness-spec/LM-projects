@@ -1,14 +1,5 @@
-import {
-  AlertTriangle,
-  BookOpen,
-  CalendarDays,
-  ClipboardList,
-  GraduationCap,
-  LayoutGrid,
-  Wifi,
-  WifiOff,
-} from 'lucide-react'
-import { useEffect, useState, type ReactNode } from 'react'
+import { AlertTriangle, BookOpen, CalendarDays, ClipboardList, GraduationCap, LayoutGrid } from 'lucide-react'
+import { type ReactNode } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useAzubiProfil } from '../context/AzubiProfilContext'
 
@@ -19,32 +10,6 @@ const navItems = [
   { to: '/wissen', label: 'Wissen', icon: GraduationCap },
   { to: '/ausbildungsplan', label: 'Ausbildung', icon: CalendarDays },
 ]
-
-function OnlineBadge() {
-  const [online, setOnline] = useState(navigator.onLine)
-
-  useEffect(() => {
-    const on = () => setOnline(true)
-    const off = () => setOnline(false)
-    window.addEventListener('online', on)
-    window.addEventListener('offline', off)
-    return () => {
-      window.removeEventListener('online', on)
-      window.removeEventListener('offline', off)
-    }
-  }, [])
-
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${
-        online ? 'bg-db-green/10 text-db-green' : 'bg-db-amber/10 text-db-amber'
-      }`}
-    >
-      {online ? <Wifi size={14} /> : <WifiOff size={14} />}
-      {online ? 'Online' : 'Offline-Modus'}
-    </span>
-  )
-}
 
 export default function Layout({ children }: { children: ReactNode }) {
   const { profil } = useAzubiProfil()
@@ -65,7 +30,6 @@ export default function Layout({ children }: { children: ReactNode }) {
             </span>
           </div>
           <div className="ml-auto flex items-center gap-3">
-            <OnlineBadge />
             <NavLink
               to="/profil"
               title="Profil bearbeiten"
