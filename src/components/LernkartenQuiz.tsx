@@ -124,7 +124,7 @@ export default function LernkartenQuiz() {
             </span>
           </div>
 
-          <p className="min-h-24 text-base font-medium text-db-navy">
+          <p className="min-h-24 whitespace-pre-line text-sm font-medium leading-relaxed text-db-navy md:text-base">
             {flipped ? aktuell.antwort : aktuell.frage}
           </p>
 

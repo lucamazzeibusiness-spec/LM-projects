@@ -1006,4 +1006,175 @@ export const lernkarten: Lernkarte[] = [
     antwort:
       'Es dokumentiert die betrieblichen und schulischen Ausbildungsinhalte, ist Voraussetzung für die Zulassung zur Abschlussprüfung und sollte regelmäßig (i. d. R. wöchentlich) geführt werden.',
   },
+
+  // --- Echte AP2-Prüfungsaufgaben (IHK, Elektroniker für Betriebstechnik) ---
+  {
+    id: 'LK-R11',
+    themenbereich: 'Elektrotechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage:
+      'Der Stromlaufplan zeigt die Temperaturüberwachung einer Motorwicklung. Was geschieht, wenn der Schalter -S3 betätigt wird und die Temperatur des Motors niedrig ist?\n1) Im Auslösegerät -B1 wird der Kontakt 11/12 geschlossen.\n2) Das im Auslösegerät -B1 eingebaute Relais zieht an.\n3) Durch den Temperaturfühler im Motor fließt ein Wechselstrom.\n4) Das im Auslösegerät -B1 eingebaute Relais kehrt in die Ruhestellung zurück.\n5) Die Meldeleuchte -P1 beginnt zu leuchten.',
+    antwort:
+      '4) Das Relais im Auslösegerät kehrt in die Ruhestellung zurück. -S3 ist eine Prüf-/Testtaste, die unabhängig von der tatsächlichen Motortemperatur eine Störung simuliert (z. B. durch Unterbrechen/Kurzschließen des Kaltleiterkreises) – das Gerät reagiert wie im Fehlerfall, obwohl der Motor kalt ist.',
+  },
+  {
+    id: 'LK-R12',
+    themenbereich: 'Steuerungstechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage:
+      'Im dargestellten GRAFCET-Plan werden zwischen zwei waagerechten Doppellinien Abläufe dargestellt. Welche Aussage ist hierzu richtig?\n1) Die Abläufe werden parallel bearbeitet.\n2) Entweder wird der linke oder der rechte Ablauf bearbeitet.\n3) Beide Abläufe werden zweimal wiederholt.\n4) Zuerst wird der linke, dann der rechte Ablauf bearbeitet.\n5) Die bearbeiteten Abläufe müssen die gleiche Anzahl an Schritten haben.',
+    antwort:
+      '1) Die Abläufe werden parallel bearbeitet. Eine doppelte waagerechte Linie im GRAFCET steht für eine UND-Verzweigung (simultane Sequenzen) – alle Zweige darunter laufen gleichzeitig. Eine einfache Linie stünde für eine ODER-Verzweigung (nur ein Zweig wird gewählt).',
+  },
+  {
+    id: 'LK-R13',
+    themenbereich: 'Metalltechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage:
+      'Welche Instandhaltungsstrategie ist im Diagramm dargestellt (der Abnutzungsvorrat sinkt unregelmäßig über die Zeit, die Instandsetzung erfolgt kurz bevor er aufgebraucht ist)?\n1) Vorbeugende Instandhaltung\n2) Zustandsbedingte Instandhaltung\n3) Ausfallbedingte Instandhaltung\n4) Routinemäßige Instandhaltung\n5) Planmäßige Instandhaltung',
+    antwort:
+      '2) Zustandsbedingte Instandhaltung. Der tatsächliche Verlauf des Abnutzungsvorrats wird laufend überwacht, die Instandsetzung erfolgt anhand des gemessenen Zustands – nicht nach festem Zeitplan (vorbeugend/planmäßig) und nicht erst nach dem tatsächlichen Ausfall (ausfallbedingt).',
+  },
+  {
+    id: 'LK-R14',
+    themenbereich: 'Steuerungstechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage:
+      'Was kann bei der grafischen Simulation eines CNC-Programms nicht erkannt werden?\n1) Das Anfahren zum Werkzeugwechselpunkt\n2) Eine falsche Werkstückkontur\n3) Eine Kollision des Werkzeugs mit dem Werkstück im Eilgang\n4) Eine falsche Werkzeugauswahl (z. B. Einstichmeißel statt Längsdrehmeißel)\n5) Ein ungenügender Spanbruch',
+    antwort:
+      '5) Ein ungenügender Spanbruch. Die grafische Simulation prüft nur die geometrische Bahn von Werkzeug und Werkstück – Spanbruch ist ein realer Zerspanungsvorgang, der sich geometrisch nicht simulieren lässt.',
+  },
+  {
+    id: 'LK-R15',
+    themenbereich: 'Steuerungstechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage:
+      'Bei digitalen Sensoren zur Weg- bzw. Winkelerfassung unterscheidet man zwischen inkrementaler und absoluter Messung. Welche Aussage ist richtig?\n1) Bei der inkrementalen Wegmessung wird jeder Position auf dem Maßstab ein eindeutiger Zahlenwert zugeordnet.\n2) Bei der inkrementalen Wegmessung werden elektrische Impulse gezählt; die Anzahl der Impulse definiert den zurückgelegten Weg.\n3) Bei der absoluten Wegmessung wird eine Nullmarkierung benötigt.\n4) Bei der absoluten Wegmessung muss zu Beginn der Messung ein Zähler auf 0 gesetzt werden.\n5) Bei der absoluten Wegmessung wird die Anzahl der Impulse eines regelmäßigen Strichrasters ausgewertet.',
+    antwort:
+      '2) Inkremental = Impulse zählen, ihre Anzahl ergibt den Weg. Absolute Systeme brauchen dagegen keine Nullmarkierung oder Referenzfahrt, da jede Position direkt einen eindeutigen Codewert liefert.',
+  },
+  {
+    id: 'LK-R16',
+    themenbereich: 'Steuerungstechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage:
+      'Was versteht man unter Redundanz bei einer speicherprogrammierbaren Steuerung (SPS)?\n1) Alle Systeme einer SPS sind in Reihe angeordnet.\n2) Alle Systeme einer SPS sind mehrfach ausgelegt.\n3) Alle Systeme der SPS sind nur einmal vorhanden.\n4) Die SPS darf nicht ausgeschaltet werden.\n5) Dies ist ein Programmierbefehl der SPS.',
+    antwort:
+      '2) Mehrfach ausgelegt. Redundanz bedeutet, dass wichtige Komponenten doppelt oder mehrfach vorhanden sind, damit bei Ausfall einer Komponente ein Ersatzsystem sofort übernehmen kann.',
+  },
+  {
+    id: 'LK-R17',
+    themenbereich: 'Steuerungstechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage:
+      'Am Frequenzumrichter lässt sich eine Vielzahl von Betriebswerten über das Bedienfeld eingeben. Welcher der aufgeführten Werte gehört nicht dazu?\n1) Motorstrom\n2) Motorbemessungsfrequenz\n3) Rampenzeit\n4) Betriebsart des Motors\n5) Mindestausgangsfrequenz',
+    antwort:
+      '1) Motorstrom. Der Motorstrom ist ein gemessener Istwert, den der Frequenzumrichter während des Betriebs erfasst und anzeigt – kein Parameter, den man als Sollwert eingibt.',
+  },
+  {
+    id: 'LK-R18',
+    themenbereich: 'Elektrotechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage:
+      'Welche Aussage zur prinzipiellen Arbeitsweise eines Halbleiterrelais ist richtig? (Eingang E1/E2 über eine Gleichrichterbrücke auf eine LED -P1, die optisch den Fototransistor -K1 ansteuert, der den Ausgangstransistor -Q1 schaltet)\n1) Die Ansteuerung erfolgt mit DC, die mit AC betriebene Diode -P1 schaltet den Fototransistor -K1, -Q1 schaltet 0V durch.\n2) Die Ansteuerung erfolgt mit DC, der mit DC betriebene Fototransistor beleuchtet die Diode -P1, der Ausgang schaltet AC.\n3) Die Ansteuerung erfolgt nur mit AC, am Ausgang wird +Ub durchgeschaltet.\n4) Die Ansteuerung kann mit AC oder mit DC erfolgen.\n5) Der Verbraucher am Anschluss A wird zwischen dem Kollektor von -Q1 und 0V angeschlossen.',
+    antwort:
+      '4) AC oder DC möglich. Die Gleichrichterbrücke am Eingang sorgt dafür, dass die LED -P1 unabhängig von der Polung bzw. Stromart des Ansteuersignals leuchtet – deshalb funktioniert die Ansteuerung mit Wechsel- oder Gleichspannung. Genau das ist der Zweck der Eingangsbrücke bei Halbleiterrelais.',
+  },
+  {
+    id: 'LK-R19',
+    themenbereich: 'Elektrotechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage:
+      'Wie groß ist der Wirkungsgrad η (in %) des symbolisierten Netzgeräts zur Ansteuerung einer Werkzeugmaschine? (U1 = 230V, I1 = 0,47A; U2 = 24V, I2 = 1,65A)\n1) η = 0,037 %\n2) η = 0,73 %\n3) η = 3,7 %\n4) η = 29,7 %\n5) η = 37 %',
+    antwort:
+      '5) η ≈ 37 %. η = Pab/Pauf = (U2·I2)/(U1·I1) = (24V·1,65A)/(230V·0,47A) = 39,6W/108,1W ≈ 0,366 = 37 %.',
+  },
+  {
+    id: 'LK-R20',
+    themenbereich: 'Steuerungstechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage:
+      'Ein 20mm dickes Stahlblech soll nach der Werkstückzeichnung auf einer CNC-Bohrmaschine gebohrt werden. Welche Aussage über den Werkstücknullpunkt ist richtig?\n1) Er ist der Referenzpunkt im Arbeitsraum der CNC-Maschine.\n2) Er ist der Ursprungspunkt des Werkstück-Koordinatensystems.\n3) Er ist der Bezugspunkt des Werkzeugträgers.\n4) Er ist der Ursprungspunkt des Maschinen-Koordinatensystems.\n5) Er ist der Werkzeugbezugspunkt.',
+    antwort:
+      '2) Ursprungspunkt des Werkstück-Koordinatensystems. Nicht zu verwechseln mit dem Maschinennullpunkt (Ursprung des Maschinenkoordinatensystems, Option 4) oder dem Werkzeugbezugspunkt (Option 5).',
+  },
+  {
+    id: 'LK-R22',
+    themenbereich: 'Elektrotechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage:
+      'Bei der Messung der Schleifenimpedanz in RCD-geschützten Stromkreisen löst die Schutzeinrichtung immer aus, sodass eine Messung des Werts nicht möglich ist. Welche der genannten Ursachen ist richtig?\n1) Es fließt ein Prüfstrom mit erhöhter Frequenz, der im Summenstromwandler erhöhte Induktionsspannungen erzeugt und die RCD somit ungewollt auslöst.\n2) Es fließt ein Prüfwechselstrom von L1 über den PE, der von der RCD als Fehlerstrom erkannt wird.\n3) Es fließt ein Prüfgleichstrom von L1 über den PE, der von der RCD als Fehlerstrom erkannt wird.\n4) Es fließt ein Prüfwechselstrom vom N-Leiter zum PE, der von der RCD als Fehlerstrom erkannt wird.\n5) Es fließt ein Prüfgleichstrom vom N-Leiter zum PE, der von der RCD als Fehlerstrom erkannt wird.',
+    antwort:
+      '2) Ein Prüfwechselstrom fließt von L1 über PE. Das ist für die Schleifenimpedanzmessung notwendig – die RCD erkennt diesen Strom korrekt als Differenzstrom (Fehlerstrom) und löst deshalb planmäßig aus. Für eine RCD-unempfindliche Messung braucht es spezielle Messverfahren/-geräte.',
+  },
+  {
+    id: 'LK-R23',
+    themenbereich: 'Steuerungstechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage:
+      'Was heißt Teach-in-Programmierung bei einem Industrieroboter?\n1) Die gewünschten Raumpunkte werden über eine Schnittstelle eingegeben.\n2) Die gewünschten Punkte werden mittels CAD-Datentransfer übertragen.\n3) Der Industrieroboter holt sich die Daten selbstständig vom Rechner.\n4) Der Bediener gibt die Daten mittels Datenträger ein.\n5) Die gewünschten Raumpunkte werden angefahren und gespeichert.',
+    antwort:
+      '5) Punkte anfahren und speichern. Teach-in ist die klassische Online-Programmierung: der Roboter wird von Hand zu den gewünschten Positionen bewegt, die dann gespeichert werden – im Gegensatz zur Offline-Programmierung per CAD-Daten.',
+  },
+  {
+    id: 'LK-R24',
+    themenbereich: 'Elektrotechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage:
+      'Für welche Spitzensperrspannung muss jede der Dioden V1 bis V6 in der dargestellten Drehstrom-Brückenschaltung (400V zwischen den Wicklungen) mindestens bemessen sein?\n1) Für 400V · √2 ≈ 566V\n2) Für 400V · 2 · √2 ≈ 1132V\n3) Für 400V : √3 ≈ 230V\n4) Für 400V : 2 ≈ 200V\n5) Für 400V : 3 ≈ 133V',
+    antwort:
+      '1) 400V · √2 ≈ 566V. In einer Drehstrom-Brückenschaltung (6-Puls-Gleichrichter) muss jede Diode den Scheitelwert der verketteten Spannung sperren können: Û = 400V · √2 ≈ 566V.',
+  },
+  {
+    id: 'LK-R25',
+    themenbereich: 'Metalltechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage:
+      'Bei der Mittenlage der Nut 20H7 (Toleranz +0,021/0) eines gefertigten Werkstücks soll geprüft werden, ob sie innerhalb der zulässigen Toleranz liegt. Welches Prüfmittel ist hierzu am besten geeignet?\n1) Bügelmessschraube 0 bis 25mm\n2) Stahlmaßstab\n3) Messschieber Form A\n4) Parallelendmaße\n5) Grenzlehre (Grenzrachenlehre)',
+    antwort:
+      '5) Grenzlehre. Für eine schnelle, zuverlässige Gut-/Schlecht-Prüfung einer engen ISO-Toleranz (hier nur 21µm Toleranzfeld) in der Serienfertigung ist eine Grenzlehre das geeignete Prüfmittel – ein Messschieber oder Stahlmaßstab ist dafür nicht präzise genug.',
+  },
+  {
+    id: 'LK-R26',
+    themenbereich: 'Mathematik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage:
+      'Wie groß ist bei dem skizzierten Zahnradtrieb der Achsabstand a (in mm)? (z1 = 30, z2 = 72, Modul m = 4,0mm)\n1) a = 84mm\n2) a = 204mm\n3) a = 216mm\n4) a = 408mm\n5) a = 816mm',
+    antwort: '2) a = 204mm. Achsabstand a = m · (z1 + z2) / 2 = 4,0mm · (30 + 72) / 2 = 4,0mm · 51 = 204mm.',
+  },
+  {
+    id: 'LK-R27',
+    themenbereich: 'Elektrotechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage:
+      'Ein Relais für 24V AC wird versehentlich an 24V DC angeschlossen. Welche Aussage trifft zu?\n1) Das Relais zieht nicht an, da der Effektivwert der Spannung zu gering ist.\n2) Das Relais kann ordnungsgemäß betrieben werden, da 24V AC den Effektivwert beschreibt.\n3) Das Relais wird von einem zu niedrigen Strom durchflossen; es zieht deshalb eventuell nicht an.\n4) Das Relais wird von einem zu hohen Strom durchflossen; es brennt deshalb eventuell durch.\n5) Das Relais wechselt ständig zwischen angezogenem und abgefallenem Zustand hin und her.',
+    antwort:
+      '4) Zu hoher Strom, das Relais kann durchbrennen. Eine AC-Spule ist auf ihre Wechselstromimpedanz (mit induktivem Blindwiderstand) ausgelegt. Bei Gleichspannung fehlt dieser Blindwiderstand, es wirkt nur der viel kleinere Ohmsche Wicklungswiderstand – bei gleicher Spannung fließt ein deutlich höherer Strom als vorgesehen, die Spule überhitzt.',
+  },
+  {
+    id: 'LK-R28',
+    themenbereich: 'Metalltechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage:
+      'Wovon ist die Umdrehungsfrequenz beim Bohren hauptsächlich abhängig?\n1) Stabilität der Bohrmaschine, Durchmesser der Bohrspindel, Tiefe der Bohrung\n2) Durchmesser des Bohrers, Werkstoff des Werkstücks, Schneidstoff des Bohrers\n3) Tiefe der Bohrung, Dicke des Werkstücks\n4) Länge des Bohrers, Kühlschmierstoff\n5) Einspannmöglichkeit des Bohrers und des Werkstücks',
+    antwort:
+      '2) Bohrerdurchmesser, Werkstoff, Schneidstoff. Die Drehzahl ergibt sich aus n = vc / (π · d) – die zulässige Schnittgeschwindigkeit vc hängt von der Werkstoff-Schneidstoff-Paarung ab, d ist der Bohrerdurchmesser.',
+  },
 ]
