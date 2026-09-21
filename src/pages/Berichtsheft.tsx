@@ -143,57 +143,65 @@ export default function Berichtsheft() {
       </div>
 
       {bearbeitung && (
-        <div className="space-y-3 rounded-xl border border-db-red/30 bg-white p-4">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-semibold text-db-navy">Eintrag · {bearbeitung.datum}</p>
-            <button onClick={() => setBearbeitung(null)} className="text-db-navy-light hover:text-db-navy">
-              <X size={18} />
+        <div
+          className="fixed inset-0 z-30 flex items-end justify-center bg-black/40 p-4 sm:items-center"
+          onClick={() => setBearbeitung(null)}
+        >
+          <div
+            className="w-full max-w-md space-y-3 rounded-2xl bg-white p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-semibold text-db-navy">Eintrag · {bearbeitung.datum}</p>
+              <button onClick={() => setBearbeitung(null)} className="text-db-navy-light hover:text-db-navy">
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {kategorien.map((k) => (
+                <button
+                  key={k}
+                  onClick={() => setBearbeitung((d) => d && { ...d, kategorie: k })}
+                  className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                    bearbeitung.kategorie === k
+                      ? 'border-db-navy bg-db-navy text-white'
+                      : 'border-db-gray-200 bg-white text-db-navy-light'
+                  }`}
+                >
+                  {k}
+                </button>
+              ))}
+            </div>
+
+            <textarea
+              value={bearbeitung.taetigkeiten}
+              onChange={(e) => setBearbeitung((d) => d && { ...d, taetigkeiten: e.target.value })}
+              rows={4}
+              placeholder="Welche Tätigkeiten hast du heute ausgeführt oder welche Lerninhalte hattest du?"
+              className="w-full rounded-lg border border-db-gray-200 px-3 py-2 text-sm text-db-navy outline-none focus:border-db-red"
+            />
+
+            <div className="flex items-center gap-2">
+              <label className="text-xs font-medium text-db-navy-light">Stunden</label>
+              <input
+                type="number"
+                min={0}
+                max={12}
+                step={0.5}
+                value={bearbeitung.stunden}
+                onChange={(e) => setBearbeitung((d) => d && { ...d, stunden: Number(e.target.value) })}
+                className="w-20 rounded-lg border border-db-gray-200 px-2 py-1.5 text-sm text-db-navy outline-none focus:border-db-red"
+              />
+            </div>
+
+            <button
+              onClick={speichern}
+              className="w-full rounded-full bg-db-navy px-4 py-2.5 text-sm font-semibold text-white hover:bg-db-navy-light"
+            >
+              Speichern
             </button>
           </div>
-
-          <div className="flex flex-wrap gap-2">
-            {kategorien.map((k) => (
-              <button
-                key={k}
-                onClick={() => setBearbeitung((d) => d && { ...d, kategorie: k })}
-                className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-                  bearbeitung.kategorie === k
-                    ? 'border-db-navy bg-db-navy text-white'
-                    : 'border-db-gray-200 bg-white text-db-navy-light'
-                }`}
-              >
-                {k}
-              </button>
-            ))}
-          </div>
-
-          <textarea
-            value={bearbeitung.taetigkeiten}
-            onChange={(e) => setBearbeitung((d) => d && { ...d, taetigkeiten: e.target.value })}
-            rows={4}
-            placeholder="Welche Tätigkeiten hast du heute ausgeführt oder welche Lerninhalte hattest du?"
-            className="w-full rounded-lg border border-db-gray-200 px-3 py-2 text-sm text-db-navy outline-none focus:border-db-red"
-          />
-
-          <div className="flex items-center gap-2">
-            <label className="text-xs font-medium text-db-navy-light">Stunden</label>
-            <input
-              type="number"
-              min={0}
-              max={12}
-              step={0.5}
-              value={bearbeitung.stunden}
-              onChange={(e) => setBearbeitung((d) => d && { ...d, stunden: Number(e.target.value) })}
-              className="w-20 rounded-lg border border-db-gray-200 px-2 py-1.5 text-sm text-db-navy outline-none focus:border-db-red"
-            />
-          </div>
-
-          <button
-            onClick={speichern}
-            className="w-full rounded-full bg-db-navy px-4 py-2.5 text-sm font-semibold text-white hover:bg-db-navy-light"
-          >
-            Speichern
-          </button>
         </div>
       )}
 
@@ -240,7 +248,16 @@ export default function Berichtsheft() {
                           {e.kategorie} · {e.stunden} Std.
                         </p>
                       </div>
-                      <BerichtStatusBadge status={e.status} />
+                      <div className="flex items-center gap-2">
+                        <BerichtStatusBadge status={e.status} />
+                        <button
+                          onClick={() => setBearbeitung(e)}
+                          title="Eintrag bearbeiten"
+                          className="text-db-navy-light hover:text-db-red"
+                        >
+                          <Pencil size={14} />
+                        </button>
+                      </div>
                     </div>
                     <p className="mt-2 text-sm text-db-navy">
                       {e.taetigkeiten || <span className="italic text-db-navy-light">Noch keine Angaben</span>}
