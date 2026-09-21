@@ -12,9 +12,9 @@ import {
 } from '../data/mock'
 
 const typStyle: Record<AusbildungsblockTyp, string> = {
-  Betrieb: 'bg-blue-50 text-blue-700',
-  Berufsschule: 'bg-purple-50 text-purple-700',
-  'DB Training': 'bg-orange-50 text-orange-700',
+  Betrieb: 'bg-blue-50 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300',
+  Berufsschule: 'bg-purple-50 text-purple-700 dark:bg-purple-500/15 dark:text-purple-300',
+  'DB Training': 'bg-orange-50 text-orange-700 dark:bg-orange-500/15 dark:text-orange-300',
 }
 
 const typen: AusbildungsblockTyp[] = ['Betrieb', 'Berufsschule', 'DB Training']
@@ -71,7 +71,7 @@ export default function Ausbildungsplan() {
         </p>
       </div>
 
-      <div className="rounded-xl border border-db-navy/10 bg-db-navy p-4 text-white">
+      <div className="rounded-xl border border-white/10 bg-db-ink p-4 text-white">
         <p className="text-xs font-medium text-white/60">Nächster Prüfungstermin</p>
         <p className="mt-1 text-lg font-semibold">{naechstePruefung.titel}</p>
         <p className="text-sm text-white/70">
@@ -79,7 +79,7 @@ export default function Ausbildungsplan() {
         </p>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-db-gray-200 bg-white">
+      <div className="overflow-hidden rounded-xl border border-db-gray-200 bg-db-surface">
         <ul className="divide-y divide-db-gray-100">
           {wochentage.map(({ tag, datum }, i) => {
             const eintrag = vorlage[i]
@@ -104,8 +104,8 @@ export default function Ausbildungsplan() {
                           onClick={() => setEntwurf((d) => ({ ...d, typ: t }))}
                           className={`rounded-full border px-2.5 py-1 text-xs font-medium transition-colors ${
                             entwurf.typ === t
-                              ? 'border-db-navy bg-db-navy text-white'
-                              : 'border-db-gray-200 bg-white text-db-navy-light'
+                              ? 'border-db-ink bg-db-ink text-white'
+                              : 'border-db-gray-200 bg-db-surface text-db-navy-light'
                           }`}
                         >
                           {t}
@@ -174,7 +174,7 @@ export default function Ausbildungsplan() {
 
       {curriculum && (
         <>
-          <div className="rounded-xl border border-db-gray-200 bg-white p-4">
+          <div className="rounded-xl border border-db-gray-200 bg-db-surface p-4">
             <h2 className="text-sm font-semibold text-db-navy">Lernfelder · {curriculum.beruf}</h2>
             <p className="mt-1 text-xs text-db-navy-light">
               Rahmenlehrplan der Berufsschule – zeigt, wo du im Vergleich zum Lehrplan stehst.
@@ -203,7 +203,7 @@ export default function Ausbildungsplan() {
             </ul>
           </div>
 
-          <div className="rounded-xl border border-db-gray-200 bg-white p-4">
+          <div className="rounded-xl border border-db-gray-200 bg-db-surface p-4">
             <h2 className="text-sm font-semibold text-db-navy">Abschlussprüfung (gestreckt)</h2>
             <div className="mt-3 space-y-3">
               {[curriculum.teil1, curriculum.teil2].map((teil) => (

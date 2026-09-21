@@ -38,8 +38,8 @@ export default function AufgabeDetail() {
 
   if (!aufgabe) {
     return (
-      <View className="flex-1 items-center justify-center gap-2 bg-db-gray-50 p-4">
-        <Text className="text-sm text-db-navy-light">Aufgabe nicht gefunden.</Text>
+      <View className="flex-1 items-center justify-center gap-2 bg-db-gray-50 dark:bg-[#10141B] p-4">
+        <Text className="text-sm text-db-navy-light dark:text-[#9AA4B0]">Aufgabe nicht gefunden.</Text>
       </View>
     )
   }
@@ -52,53 +52,53 @@ export default function AufgabeDetail() {
     aktualisieren((d) => ({ ...d, checked: { ...d.checked, [itemId]: !d.checked[itemId] } }))
 
   return (
-    <ScrollView className="flex-1 bg-db-gray-50" contentContainerClassName="gap-5 p-4">
-      <View className="rounded-xl border border-db-gray-200 bg-white p-4">
+    <ScrollView className="flex-1 bg-db-gray-50 dark:bg-[#10141B]" contentContainerClassName="gap-5 p-4">
+      <View className="rounded-xl border border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24] p-4">
         <View className="flex-row items-start justify-between gap-3">
           <View>
-            <Text className="text-xs font-medium text-db-navy-light">{aufgabe.id}</Text>
-            <Text className="text-lg font-semibold text-db-navy">{aufgabe.titel}</Text>
+            <Text className="text-xs font-medium text-db-navy-light dark:text-[#9AA4B0]">{aufgabe.id}</Text>
+            <Text className="text-lg font-semibold text-db-navy dark:text-[#EEF1F4]">{aufgabe.titel}</Text>
           </View>
           <StatusBadge status={aufgabe.status} />
         </View>
-        <Text className="mt-1 text-sm text-db-navy-light">
+        <Text className="mt-1 text-sm text-db-navy-light dark:text-[#9AA4B0]">
           {aufgabe.anlage} {aufgabe.baureihe ? `(${aufgabe.baureihe})` : ''} · {aufgabe.ort}
         </Text>
         <View className="mt-3 flex-row flex-wrap items-center gap-2">
           <GewerkBadge gewerk={aufgabe.gewerk} />
           <PrioBadge prioritaet={aufgabe.prioritaet} />
-          <Text className="text-xs text-db-navy-light">Fällig: {aufgabe.faelligkeit}</Text>
+          <Text className="text-xs text-db-navy-light dark:text-[#9AA4B0]">Fällig: {aufgabe.faelligkeit}</Text>
         </View>
 
         <View className="mt-4 flex-row items-start gap-2 rounded-lg bg-db-red/5 p-3">
           <Target size={16} color="#EC0016" style={{ marginTop: 2 }} />
           <View className="flex-1">
             <Text className="text-xs font-semibold text-db-red">Lernziel</Text>
-            <Text className="text-sm text-db-navy">{aufgabe.lernziel}</Text>
+            <Text className="text-sm text-db-navy dark:text-[#EEF1F4]">{aufgabe.lernziel}</Text>
           </View>
         </View>
 
-        <Text className="mt-3 text-sm text-db-navy">{aufgabe.beschreibung}</Text>
+        <Text className="mt-3 text-sm text-db-navy dark:text-[#EEF1F4]">{aufgabe.beschreibung}</Text>
 
         {aufgabe.ausbilderHinweis && (
-          <View className="mt-3 flex-row items-start gap-2 rounded-lg border border-db-gray-200 bg-db-gray-50 p-3">
+          <View className="mt-3 flex-row items-start gap-2 rounded-lg border border-db-gray-200 dark:border-[#2A323D] bg-db-gray-50 dark:bg-[#10141B] p-3">
             <MessageSquare size={15} color="#5C6670" style={{ marginTop: 2 }} />
             <View className="flex-1">
-              <Text className="text-xs font-semibold text-db-navy-light">Hinweis von deinem Ausbilder</Text>
-              <Text className="text-sm text-db-navy">{aufgabe.ausbilderHinweis}</Text>
+              <Text className="text-xs font-semibold text-db-navy-light dark:text-[#9AA4B0]">Hinweis von deinem Ausbilder</Text>
+              <Text className="text-sm text-db-navy dark:text-[#EEF1F4]">{aufgabe.ausbilderHinweis}</Text>
             </View>
           </View>
         )}
       </View>
 
-      <View className="rounded-xl border border-db-gray-200 bg-white p-4">
+      <View className="rounded-xl border border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24] p-4">
         <View className="mb-3 flex-row items-center justify-between">
-          <Text className="text-sm font-semibold text-db-navy">Arbeitsschritte</Text>
-          <Text className="text-xs font-medium text-db-navy-light">
+          <Text className="text-sm font-semibold text-db-navy dark:text-[#EEF1F4]">Arbeitsschritte</Text>
+          <Text className="text-xs font-medium text-db-navy-light dark:text-[#9AA4B0]">
             {done}/{total} erledigt
           </Text>
         </View>
-        <View className="mb-4 h-2 w-full overflow-hidden rounded-full bg-db-gray-100">
+        <View className="mb-4 h-2 w-full overflow-hidden rounded-full bg-db-gray-100 dark:bg-[#1A2029]">
           <View className="h-full rounded-full bg-db-green" style={{ width: `${progress}%` }} />
         </View>
 
@@ -108,7 +108,7 @@ export default function AufgabeDetail() {
               key={item.id}
               onPress={() => toggle(item.id)}
               className={`flex-row items-center gap-3 rounded-lg border px-3 py-2.5 ${
-                draft.checked[item.id] ? 'border-db-green/30 bg-db-green/5' : 'border-db-gray-200'
+                draft.checked[item.id] ? 'border-db-green/30 bg-db-green/5' : 'border-db-gray-200 dark:border-[#2A323D]'
               }`}
             >
               <View
@@ -118,25 +118,25 @@ export default function AufgabeDetail() {
               >
                 {draft.checked[item.id] && <Check size={13} color="#fff" />}
               </View>
-              <Text className="flex-1 text-sm text-db-navy">{item.label}</Text>
+              <Text className="flex-1 text-sm text-db-navy dark:text-[#EEF1F4]">{item.label}</Text>
             </Pressable>
           ))}
         </View>
 
-        <Pressable className="mt-4 flex-row items-center gap-2 rounded-lg border border-dashed border-db-gray-200 px-3 py-2.5">
+        <Pressable className="mt-4 flex-row items-center gap-2 rounded-lg border border-dashed border-db-gray-200 dark:border-[#2A323D] px-3 py-2.5">
           <Camera size={16} color="#5C6670" />
-          <Text className="text-sm text-db-navy-light">Foto hinzufügen</Text>
+          <Text className="text-sm text-db-navy-light dark:text-[#9AA4B0]">Foto hinzufügen</Text>
         </Pressable>
 
         <View className="mt-4">
-          <Text className="mb-1 text-xs font-medium text-db-navy-light">Was hast du gelernt / verstanden?</Text>
+          <Text className="mb-1 text-xs font-medium text-db-navy-light dark:text-[#9AA4B0]">Was hast du gelernt / verstanden?</Text>
           <TextInput
             value={draft.notiz}
             onChangeText={(t) => aktualisieren((d) => ({ ...d, notiz: t }))}
             multiline
             numberOfLines={3}
             placeholder="z. B. Was war neu für dich, wo brauchst du noch Übung..."
-            className="w-full rounded-lg border border-db-gray-200 px-3 py-2 text-sm text-db-navy"
+            className="w-full rounded-lg border border-db-gray-200 dark:border-[#2A323D] px-3 py-2 text-sm text-db-navy dark:text-[#EEF1F4]"
             style={{ minHeight: 72, textAlignVertical: 'top' }}
           />
         </View>
@@ -155,7 +155,7 @@ export default function AufgabeDetail() {
 
         <View className="mt-2 flex-row items-center justify-center gap-1">
           <Save size={12} color={savedHint ? '#1E8A3C' : '#5C6670'} />
-          <Text className="text-xs text-db-navy-light">Entwurf wird lokal gespeichert – auch ohne Netzverbindung</Text>
+          <Text className="text-xs text-db-navy-light dark:text-[#9AA4B0]">Entwurf wird lokal gespeichert – auch ohne Netzverbindung</Text>
         </View>
       </View>
     </ScrollView>

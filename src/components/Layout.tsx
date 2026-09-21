@@ -1,8 +1,9 @@
-import { AlertTriangle, BookOpen, CalendarDays, ClipboardList, GraduationCap, LayoutGrid } from 'lucide-react'
-import { type ReactNode } from 'react'
+import { AlertTriangle, BookOpen, CalendarDays, ClipboardList, GraduationCap, LayoutGrid, Moon, Sun } from 'lucide-react'
+import { type ReactNode, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useAzubiProfil } from '../context/AzubiProfilContext'
 import { DB_LOGO_PNG } from '../lib/dbLogo'
+import { aktuellesTheme, themeSetzen, type Theme } from '../lib/theme'
 
 const navItems = [
   { to: '/', label: 'Start', icon: LayoutGrid, end: true },
@@ -14,12 +15,18 @@ const navItems = [
 
 export default function Layout({ children }: { children: ReactNode }) {
   const { profil } = useAzubiProfil()
+  const [theme, setTheme] = useState<Theme>(aktuellesTheme)
+
+  useEffect(() => {
+    themeSetzen(theme)
+  }, [theme])
+
   if (!profil) return null
   const initialen = profil.name.slice(0, 2).toUpperCase() || '?'
 
   return (
     <div className="min-h-screen bg-db-gray-50">
-      <header className="sticky top-0 z-20 border-b border-db-gray-200 bg-white">
+      <header className="sticky top-0 z-20 border-b border-db-gray-200 bg-db-surface">
         <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
           <img src={DB_LOGO_PNG} alt="DB" className="h-8 w-auto" />
           <div className="flex flex-col leading-tight">
@@ -28,7 +35,14 @@ export default function Layout({ children }: { children: ReactNode }) {
               {profil.ausbildungsberuf} · {profil.lehrjahr}. Lehrjahr
             </span>
           </div>
-          <div className="ml-auto flex items-center gap-3">
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              onClick={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
+              title={theme === 'dark' ? 'Helles Design' : 'Dunkles Design'}
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-db-gray-100 text-db-navy hover:bg-db-gray-200"
+            >
+              {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
+            </button>
             <NavLink
               to="/profil"
               title="Profil bearbeiten"
@@ -61,7 +75,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 
       <main className="mx-auto max-w-6xl px-4 pb-24 pt-4 md:pb-8">{children}</main>
 
-      <nav className="fixed inset-x-0 bottom-0 z-20 flex border-t border-db-gray-200 bg-white pb-[env(safe-area-inset-bottom)] md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-20 flex border-t border-db-gray-200 bg-db-surface pb-[env(safe-area-inset-bottom)] md:hidden">
         {navItems.map(({ to, label, icon: Icon, end }) => (
           <NavLink
             key={to}

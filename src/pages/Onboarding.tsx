@@ -194,7 +194,7 @@ export default function Onboarding() {
           {schritt > 1 && (
             <button
               onClick={zurueck}
-              className="flex items-center gap-1 rounded-full border border-db-gray-200 bg-white px-4 py-3 text-sm font-semibold text-db-navy hover:border-db-navy/30"
+              className="flex items-center gap-1 rounded-full border border-db-gray-200 bg-db-surface px-4 py-3 text-sm font-semibold text-db-navy hover:border-db-navy/30"
             >
               <ChevronLeft size={16} />
             </button>

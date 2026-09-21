@@ -16,9 +16,9 @@ import { aktuelleWochentage, heuteISO, heutigerWochentagIndex } from '../lib/woc
 import { lernaufgaben, naechstePruefung, type AusbildungsblockTyp } from '../data/mock'
 
 const typStyle: Record<AusbildungsblockTyp, string> = {
-  Betrieb: 'bg-blue-50 text-blue-700',
-  Berufsschule: 'bg-purple-50 text-purple-700',
-  'DB Training': 'bg-orange-50 text-orange-700',
+  Betrieb: 'bg-blue-50 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300',
+  Berufsschule: 'bg-purple-50 text-purple-700 dark:bg-purple-500/15 dark:text-purple-300',
+  'DB Training': 'bg-orange-50 text-orange-700 dark:bg-orange-500/15 dark:text-orange-300',
 }
 
 export default function Dashboard() {
@@ -71,7 +71,7 @@ export default function Dashboard() {
         </p>
       </div>
 
-      <div className="rounded-xl border border-db-gray-200 bg-white p-4">
+      <div className="rounded-xl border border-db-gray-200 bg-db-surface p-4">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-db-navy">Dein Tag heute</h2>
           <span className="text-xs text-db-navy-light">
@@ -117,7 +117,7 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-2 gap-3">
         {stats.map(({ label, value, icon: Icon, tone }) => (
-          <div key={label} className="rounded-xl border border-db-gray-200 bg-white p-4">
+          <div key={label} className="rounded-xl border border-db-gray-200 bg-db-surface p-4">
             <Icon size={18} className={tone} />
             <p className="mt-2 text-2xl font-semibold text-db-navy">{value}</p>
             <p className="text-xs text-db-navy-light">{label}</p>
@@ -128,7 +128,7 @@ export default function Dashboard() {
       {erinnerungWirdUnterstuetzt() && (
         <button
           onClick={erinnerungUmschalten}
-          className="flex w-full items-center justify-between rounded-xl border border-db-gray-200 bg-white px-4 py-3 text-left"
+          className="flex w-full items-center justify-between rounded-xl border border-db-gray-200 bg-db-surface px-4 py-3 text-left"
         >
           <span className="flex items-center gap-2 text-sm text-db-navy">
             {erinnerungAn ? <Bell size={16} className="text-db-green" /> : <BellOff size={16} className="text-db-navy-light" />}
@@ -151,7 +151,7 @@ export default function Dashboard() {
         </Link>
       )}
 
-      <div className="rounded-xl border border-db-gray-200 bg-white">
+      <div className="rounded-xl border border-db-gray-200 bg-db-surface">
         <div className="flex items-center justify-between border-b border-db-gray-200 px-4 py-3">
           <h2 className="text-sm font-semibold text-db-navy">Nächste Aufgaben</h2>
           <Link to="/lernaufgaben" className="flex items-center gap-1 text-xs font-medium text-db-red hover:underline">

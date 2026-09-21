@@ -1,29 +1,38 @@
 import { Redirect, router, Tabs } from 'expo-router'
-import { BookOpen, CalendarDays, ClipboardList, GraduationCap, LayoutGrid } from 'lucide-react-native'
+import { BookOpen, CalendarDays, ClipboardList, GraduationCap, LayoutGrid, Moon, Sun } from 'lucide-react-native'
+import { useColorScheme } from 'nativewind'
 import { Image, Pressable, Text, View } from 'react-native'
 import { useAzubiProfil } from '../../context/AzubiProfilContext'
 import { DB_LOGO_PNG } from '../../lib/dbLogo'
+import { themeSetzen } from '../../lib/theme'
 
 function Header() {
   const { profil } = useAzubiProfil()
+  const { colorScheme } = useColorScheme()
   const initialen = profil ? profil.name.slice(0, 2).toUpperCase() || '?' : '?'
 
   return (
-    <View className="flex-row items-center gap-3 border-b border-db-gray-200 bg-white px-4 pb-3 pt-14">
+    <View className="flex-row items-center gap-3 border-b border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24] px-4 pb-3 pt-14">
       <Image source={{ uri: DB_LOGO_PNG }} style={{ width: 38, height: 26 }} resizeMode="contain" />
       <View className="flex-1">
-        <Text className="text-sm font-bold text-db-navy">Azubi</Text>
+        <Text className="text-sm font-bold text-db-navy dark:text-[#EEF1F4]">Azubi</Text>
         {profil && (
-          <Text className="text-xs text-db-navy-light">
+          <Text className="text-xs text-db-navy-light dark:text-[#9AA4B0]">
             {profil.ausbildungsberuf} · {profil.lehrjahr}. Lehrjahr
           </Text>
         )}
       </View>
       <Pressable
-        onPress={() => router.push('/profil')}
-        className="h-8 w-8 items-center justify-center rounded-full bg-db-gray-100"
+        onPress={() => themeSetzen(colorScheme === 'dark' ? 'light' : 'dark')}
+        className="h-8 w-8 items-center justify-center rounded-full bg-db-gray-100 dark:bg-[#1A2029]"
       >
-        <Text className="text-xs font-semibold text-db-navy">{initialen}</Text>
+        {colorScheme === 'dark' ? <Sun size={15} color="#9AA4B0" /> : <Moon size={15} color="#5C6670" />}
+      </Pressable>
+      <Pressable
+        onPress={() => router.push('/profil')}
+        className="h-8 w-8 items-center justify-center rounded-full bg-db-gray-100 dark:bg-[#1A2029]"
+      >
+        <Text className="text-xs font-semibold text-db-navy dark:text-[#EEF1F4]">{initialen}</Text>
       </Pressable>
     </View>
   )

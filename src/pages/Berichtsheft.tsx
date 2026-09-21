@@ -177,7 +177,7 @@ export default function Berichtsheft() {
           className="fixed inset-0 z-30 flex items-end justify-center bg-black/40 p-4 sm:items-center"
           onClick={() => setBearbeitung(null)}
         >
-          <div className="w-full max-w-md space-y-3 rounded-2xl bg-white p-4" onClick={(e) => e.stopPropagation()}>
+          <div className="w-full max-w-md space-y-3 rounded-2xl bg-db-surface p-4" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between">
               <p className="text-sm font-semibold text-db-navy">Eintrag · {bearbeitung.datum}</p>
               <button onClick={() => setBearbeitung(null)} className="text-db-navy-light hover:text-db-navy">
@@ -192,8 +192,8 @@ export default function Berichtsheft() {
                   onClick={() => setBearbeitung((d) => d && { ...d, kategorie: k })}
                   className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                     bearbeitung.kategorie === k
-                      ? 'border-db-navy bg-db-navy text-white'
-                      : 'border-db-gray-200 bg-white text-db-navy-light'
+                      ? 'border-db-ink bg-db-ink text-white'
+                      : 'border-db-gray-200 bg-db-surface text-db-navy-light'
                   }`}
                 >
                   {k}
@@ -224,7 +224,7 @@ export default function Berichtsheft() {
 
             <button
               onClick={speichern}
-              className="w-full rounded-full bg-db-navy px-4 py-2.5 text-sm font-semibold text-white hover:bg-db-navy-light"
+              className="w-full rounded-full bg-db-ink px-4 py-2.5 text-sm font-semibold text-white hover:bg-db-ink-light"
             >
               Speichern
             </button>
@@ -237,7 +237,7 @@ export default function Berichtsheft() {
           <button
             onClick={vorherigeWoche}
             disabled={!kannZurueck}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-db-gray-200 bg-white text-db-navy-light hover:border-db-navy/30 disabled:opacity-30"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-db-gray-200 bg-db-surface text-db-navy-light hover:border-db-navy/30 disabled:opacity-30"
           >
             <ChevronLeft size={16} />
           </button>
@@ -257,7 +257,7 @@ export default function Berichtsheft() {
 
           <button
             onClick={naechsteWoche}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-db-gray-200 bg-white text-db-navy-light hover:border-db-navy/30"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-db-gray-200 bg-db-surface text-db-navy-light hover:border-db-navy/30"
           >
             <ChevronRight size={16} />
           </button>
@@ -267,7 +267,7 @@ export default function Berichtsheft() {
           {!istAktuelleWoche && (
             <button
               onClick={zurAktuellenWoche}
-              className="rounded-full border border-db-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-db-navy hover:border-db-navy/30"
+              className="rounded-full border border-db-gray-200 bg-db-surface px-3 py-1.5 text-xs font-semibold text-db-navy hover:border-db-navy/30"
             >
               Zur aktuellen Woche
             </button>
@@ -278,7 +278,7 @@ export default function Berichtsheft() {
               setSignaturOffen(true)
             }}
             disabled={exportiert}
-            className="ml-auto flex shrink-0 items-center gap-1.5 rounded-full border border-db-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-db-navy hover:border-db-navy/30 disabled:opacity-60"
+            className="ml-auto flex shrink-0 items-center gap-1.5 rounded-full border border-db-gray-200 bg-db-surface px-3 py-1.5 text-xs font-semibold text-db-navy hover:border-db-navy/30 disabled:opacity-60"
           >
             {exportiert ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
             Ausbildungsnachweis
@@ -293,7 +293,7 @@ export default function Berichtsheft() {
                 <button
                   key={datumISO}
                   onClick={() => setBearbeitung(neuerTageseintragFuer(datumISO))}
-                  className="flex w-full items-center justify-between rounded-xl border border-dashed border-db-gray-200 bg-white p-4 text-left hover:border-db-red/40"
+                  className="flex w-full items-center justify-between rounded-xl border border-dashed border-db-gray-200 bg-db-surface p-4 text-left hover:border-db-red/40"
                 >
                   <span className="text-sm font-medium text-db-navy-light">{datumLabelFuer(datumISO)}</span>
                   <span className="flex items-center gap-1 text-xs font-medium text-db-red">
@@ -303,7 +303,7 @@ export default function Berichtsheft() {
               )
             }
             return (
-              <div key={e.id} className="rounded-xl border border-db-gray-200 bg-white p-4">
+              <div key={e.id} className="rounded-xl border border-db-gray-200 bg-db-surface p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-sm font-semibold text-db-navy">{e.datum}</p>
@@ -341,7 +341,7 @@ export default function Berichtsheft() {
           className="fixed inset-0 z-30 flex items-end justify-center bg-black/40 p-4 sm:items-center"
           onClick={() => setSignaturOffen(false)}
         >
-          <div className="w-full max-w-md space-y-4 rounded-2xl bg-white p-5" onClick={(e) => e.stopPropagation()}>
+          <div className="w-full max-w-md space-y-4 rounded-2xl bg-db-surface p-5" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-semibold text-db-navy">Unterschrift bestätigen</p>

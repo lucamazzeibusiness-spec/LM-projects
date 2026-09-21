@@ -29,9 +29,9 @@ export function PrioBadge({ prioritaet }: { prioritaet: Prioritaet }) {
 }
 
 const gewerkStyles: Record<Gewerk, string> = {
-  Elektrik: 'bg-blue-50 text-blue-700',
-  Mechanik: 'bg-orange-50 text-orange-700',
-  Mechatronik: 'bg-purple-50 text-purple-700',
+  Elektrik: 'bg-blue-50 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300',
+  Mechanik: 'bg-orange-50 text-orange-700 dark:bg-orange-500/15 dark:text-orange-300',
+  Mechatronik: 'bg-purple-50 text-purple-700 dark:bg-purple-500/15 dark:text-purple-300',
 }
 
 export function GewerkBadge({ gewerk }: { gewerk: Gewerk }) {

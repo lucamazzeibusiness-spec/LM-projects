@@ -78,7 +78,7 @@ export default function LernkartenQuiz() {
             className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
               themaFilter === t
                 ? 'border-db-red bg-db-red text-white'
-                : 'border-db-gray-200 bg-white text-db-navy-light hover:border-db-red/40'
+                : 'border-db-gray-200 bg-db-surface text-db-navy-light hover:border-db-red/40'
             }`}
           >
             {t}
@@ -92,7 +92,7 @@ export default function LernkartenQuiz() {
             key={t}
             onClick={() => setTeilFilter(t)}
             className={`flex-1 rounded-full py-1.5 text-xs font-semibold ${
-              teilFilter === t ? 'bg-white text-db-navy shadow-sm' : 'text-db-navy-light'
+              teilFilter === t ? 'bg-db-surface text-db-navy shadow-sm' : 'text-db-navy-light'
             }`}
           >
             {t === 'Alle' ? 'Alle Prüfungsteile' : t}
@@ -111,7 +111,7 @@ export default function LernkartenQuiz() {
       </div>
 
       {aktuell ? (
-        <div className="rounded-xl border border-db-gray-200 bg-white p-5">
+        <div className="rounded-xl border border-db-gray-200 bg-db-surface p-5">
           <div className="mb-3 flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-db-gray-100 px-2.5 py-1 text-xs font-medium text-db-navy-light">
               {aktuell.themenbereich}
@@ -131,7 +131,7 @@ export default function LernkartenQuiz() {
           {!flipped ? (
             <button
               onClick={() => setFlipped(true)}
-              className="mt-5 w-full rounded-full bg-db-navy px-4 py-3 text-sm font-semibold text-white hover:bg-db-navy-light"
+              className="mt-5 w-full rounded-full bg-db-ink px-4 py-3 text-sm font-semibold text-white hover:bg-db-ink-light"
             >
               Antwort zeigen
             </button>
@@ -153,7 +153,7 @@ export default function LernkartenQuiz() {
           )}
         </div>
       ) : (
-        <div className="rounded-xl border border-db-gray-200 bg-white p-6 text-center">
+        <div className="rounded-xl border border-db-gray-200 bg-db-surface p-6 text-center">
           <Sparkles size={24} className="mx-auto text-db-red" />
           <p className="mt-2 text-sm font-semibold text-db-navy">
             {gesamt === 0 ? 'Keine Karten für diesen Filter.' : 'Runde geschafft!'}

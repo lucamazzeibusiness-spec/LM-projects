@@ -51,7 +51,7 @@ export default function Wissen() {
         <button
           onClick={() => setTab('fehlerdiagnose')}
           className={`flex-1 rounded-full py-2 text-sm font-semibold ${
-            tab === 'fehlerdiagnose' ? 'bg-white text-db-navy shadow-sm' : 'text-db-navy-light'
+            tab === 'fehlerdiagnose' ? 'bg-db-surface text-db-navy shadow-sm' : 'text-db-navy-light'
           }`}
         >
           Fehlerdiagnose
@@ -59,7 +59,7 @@ export default function Wissen() {
         <button
           onClick={() => setTab('ersatzteile')}
           className={`flex-1 rounded-full py-2 text-sm font-semibold ${
-            tab === 'ersatzteile' ? 'bg-white text-db-navy shadow-sm' : 'text-db-navy-light'
+            tab === 'ersatzteile' ? 'bg-db-surface text-db-navy shadow-sm' : 'text-db-navy-light'
           }`}
         >
           Ersatzteile-Lexikon
@@ -67,7 +67,7 @@ export default function Wissen() {
         <button
           onClick={() => setTab('pruefung')}
           className={`flex-1 rounded-full py-2 text-sm font-semibold ${
-            tab === 'pruefung' ? 'bg-white text-db-navy shadow-sm' : 'text-db-navy-light'
+            tab === 'pruefung' ? 'bg-db-surface text-db-navy shadow-sm' : 'text-db-navy-light'
           }`}
         >
           Prüfungstraining
@@ -84,7 +84,7 @@ export default function Wissen() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={tab === 'fehlerdiagnose' ? 'z. B. E-4471, Türsteuerung, BR 412...' : 'Teilename oder Teilenummer...'}
-              className="w-full rounded-lg border border-db-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-db-navy outline-none focus:border-db-red"
+              className="w-full rounded-lg border border-db-gray-200 bg-db-surface py-2.5 pl-9 pr-3 text-sm text-db-navy outline-none focus:border-db-red"
             />
           </div>
 
@@ -96,7 +96,7 @@ export default function Wissen() {
                 className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                   gewerk === g
                     ? 'border-db-red bg-db-red text-white'
-                    : 'border-db-gray-200 bg-white text-db-navy-light hover:border-db-red/40'
+                    : 'border-db-gray-200 bg-db-surface text-db-navy-light hover:border-db-red/40'
                 }`}
               >
                 {g}
@@ -109,7 +109,7 @@ export default function Wissen() {
       {tab === 'fehlerdiagnose' && (
         <div className="space-y-3">
           {fehler.map((f) => (
-            <div key={f.id} className="rounded-xl border border-db-gray-200 bg-white p-4">
+            <div key={f.id} className="rounded-xl border border-db-gray-200 bg-db-surface p-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-2">
                   <AlertCircle size={16} className="text-db-red" />
@@ -161,7 +161,7 @@ export default function Wissen() {
       {tab === 'ersatzteile' && (
         <div className="space-y-3">
           {teile.map((e) => (
-            <div key={e.id} className="rounded-xl border border-db-gray-200 bg-white p-4">
+            <div key={e.id} className="rounded-xl border border-db-gray-200 bg-db-surface p-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="text-sm font-semibold text-db-navy">{e.name}</p>

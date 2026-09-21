@@ -11,6 +11,13 @@
       rel="stylesheet"
     />
     <title>DB Azubi</title>
+    <script>
+      try {
+        var gespeichert = localStorage.getItem('theme:modus')
+        var dunkel = gespeichert === 'dark' || (gespeichert !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+        document.documentElement.setAttribute('data-theme', dunkel ? 'dark' : 'light')
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

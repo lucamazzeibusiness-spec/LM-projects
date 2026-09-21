@@ -11,7 +11,7 @@ export default function SignaturePad({ onChange }: Props) {
 
   return (
     <View className="space-y-2">
-      <View className="h-40 overflow-hidden rounded-lg border border-db-gray-200 bg-white">
+      <View className="h-40 overflow-hidden rounded-lg border border-db-gray-200 dark:border-[#2A323D] bg-white">
         <SignatureScreen
           ref={ref}
           onEnd={() => ref.current?.readSignature()}
@@ -26,7 +26,7 @@ export default function SignaturePad({ onChange }: Props) {
         />
       </View>
       <Pressable onPress={() => ref.current?.clearSignature()}>
-        <Text className="text-xs font-medium text-db-navy-light">Löschen</Text>
+        <Text className="text-xs font-medium text-db-navy-light dark:text-[#9AA4B0]">Löschen</Text>
       </Pressable>
     </View>
   )

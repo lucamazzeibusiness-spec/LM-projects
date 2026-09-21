@@ -75,22 +75,22 @@ export default function LernkartenQuiz() {
             key={t}
             onPress={() => setThemaFilter(t)}
             className={`rounded-full border px-3 py-1.5 ${
-              themaFilter === t ? 'border-db-red bg-db-red' : 'border-db-gray-200 bg-white'
+              themaFilter === t ? 'border-db-red bg-db-red' : 'border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24]'
             }`}
           >
-            <Text className={`text-xs font-medium ${themaFilter === t ? 'text-white' : 'text-db-navy-light'}`}>{t}</Text>
+            <Text className={`text-xs font-medium ${themaFilter === t ? 'text-white' : 'text-db-navy-light dark:text-[#9AA4B0]'}`}>{t}</Text>
           </Pressable>
         ))}
       </ScrollView>
 
-      <View className="flex-row gap-1 rounded-full bg-db-gray-100 p-1">
+      <View className="flex-row gap-1 rounded-full bg-db-gray-100 dark:bg-[#1A2029] p-1">
         {pruefungsteile.map((t) => (
           <Pressable
             key={t}
             onPress={() => setTeilFilter(t)}
-            className={`flex-1 items-center rounded-full py-1.5 ${teilFilter === t ? 'bg-white' : ''}`}
+            className={`flex-1 items-center rounded-full py-1.5 ${teilFilter === t ? 'bg-white dark:bg-[#171C24]' : ''}`}
           >
-            <Text className={`text-xs font-semibold ${teilFilter === t ? 'text-db-navy' : 'text-db-navy-light'}`}>
+            <Text className={`text-xs font-semibold ${teilFilter === t ? 'text-db-navy dark:text-[#EEF1F4]' : 'text-db-navy-light dark:text-[#9AA4B0]'}`}>
               {t === 'Alle' ? 'Alle Prüfungsteile' : t}
             </Text>
           </Pressable>
@@ -98,7 +98,7 @@ export default function LernkartenQuiz() {
       </View>
 
       <View className="flex-row items-center justify-between">
-        <Text className="text-xs text-db-navy-light">
+        <Text className="text-xs text-db-navy-light dark:text-[#9AA4B0]">
           Noch {deck.length} von {gesamt} Karten
         </Text>
         <View className="flex-row gap-3">
@@ -108,12 +108,12 @@ export default function LernkartenQuiz() {
       </View>
 
       {aktuell ? (
-        <View className="rounded-xl border border-db-gray-200 bg-white p-5">
+        <View className="rounded-xl border border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24] p-5">
           <View className="mb-3 flex-row flex-wrap items-center gap-2">
-            <Text className="overflow-hidden rounded-full bg-db-gray-100 px-2.5 py-1 text-xs font-medium text-db-navy-light">
+            <Text className="overflow-hidden rounded-full bg-db-gray-100 dark:bg-[#1A2029] px-2.5 py-1 text-xs font-medium text-db-navy-light dark:text-[#9AA4B0]">
               {aktuell.themenbereich}
             </Text>
-            <Text className="overflow-hidden rounded-full bg-db-navy/5 px-2.5 py-1 text-xs font-medium text-db-navy">
+            <Text className="overflow-hidden rounded-full bg-db-navy/5 px-2.5 py-1 text-xs font-medium text-db-navy dark:text-[#EEF1F4]">
               {aktuell.pruefungsteil}
             </Text>
             <Text className={`overflow-hidden rounded-full px-2.5 py-1 text-xs font-medium ${schwierigkeitStyle[aktuell.schwierigkeit]}`}>
@@ -121,12 +121,12 @@ export default function LernkartenQuiz() {
             </Text>
           </View>
 
-          <Text className="min-h-24 text-sm font-medium leading-relaxed text-db-navy">
+          <Text className="min-h-24 text-sm font-medium leading-relaxed text-db-navy dark:text-[#EEF1F4]">
             {flipped ? aktuell.antwort : aktuell.frage}
           </Text>
 
           {!flipped ? (
-            <Pressable onPress={() => setFlipped(true)} className="mt-5 items-center rounded-full bg-db-navy px-4 py-3">
+            <Pressable onPress={() => setFlipped(true)} className="mt-5 items-center rounded-full bg-db-navy px-4 py-3 dark:bg-[#3A4453]">
               <Text className="text-sm font-semibold text-white">Antwort zeigen</Text>
             </Pressable>
           ) : (
@@ -149,13 +149,13 @@ export default function LernkartenQuiz() {
           )}
         </View>
       ) : (
-        <View className="items-center rounded-xl border border-db-gray-200 bg-white p-6">
+        <View className="items-center rounded-xl border border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24] p-6">
           <Sparkles size={24} color="#EC0016" />
-          <Text className="mt-2 text-sm font-semibold text-db-navy">
+          <Text className="mt-2 text-sm font-semibold text-db-navy dark:text-[#EEF1F4]">
             {gesamt === 0 ? 'Keine Karten für diesen Filter.' : 'Runde geschafft!'}
           </Text>
           {gesamt > 0 && (
-            <Text className="mt-1 text-xs text-db-navy-light">
+            <Text className="mt-1 text-xs text-db-navy-light dark:text-[#9AA4B0]">
               {gewusst} direkt gewusst · {wiederholen}× wiederholt
             </Text>
           )}

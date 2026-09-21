@@ -11,9 +11,9 @@ import { aktuelleWochentage, heuteISO, heutigerWochentagIndex } from '../../lib/
 import { lernaufgaben, naechstePruefung, type AusbildungsblockTyp } from '../../data/mock'
 
 const typStyle: Record<AusbildungsblockTyp, string> = {
-  Betrieb: 'bg-blue-50 text-blue-700',
-  Berufsschule: 'bg-purple-50 text-purple-700',
-  'DB Training': 'bg-orange-50 text-orange-700',
+  Betrieb: 'bg-blue-50 dark:bg-blue-500/15 text-blue-700 dark:text-blue-300',
+  Berufsschule: 'bg-purple-50 dark:bg-purple-500/15 text-purple-700 dark:text-purple-300',
+  'DB Training': 'bg-orange-50 dark:bg-orange-500/15 text-orange-700 dark:text-orange-300',
 }
 
 export default function Dashboard() {
@@ -46,7 +46,7 @@ export default function Dashboard() {
 
   const stats = [
     { label: 'Offene Aufgaben', value: offen.length, Icon: ClipboardCheck, tone: 'text-db-red' },
-    { label: `Tage bis ${naechstePruefung.titel}`, value: naechstePruefung.tageVerbleibend, Icon: GraduationCap, tone: 'text-db-navy' },
+    { label: `Tage bis ${naechstePruefung.titel}`, value: naechstePruefung.tageVerbleibend, Icon: GraduationCap, tone: 'text-db-navy dark:text-[#EEF1F4]' },
   ]
 
   const erinnerungUmschalten = async () => {
@@ -61,19 +61,19 @@ export default function Dashboard() {
   }
 
   return (
-    <ScrollView className="flex-1 bg-db-gray-50" contentContainerClassName="gap-6 p-4">
+    <ScrollView className="flex-1 bg-db-gray-50 dark:bg-[#10141B]" contentContainerClassName="gap-6 p-4">
       <View>
-        <Text className="text-xl font-semibold text-db-navy">Guten Tag, {profil.name}</Text>
-        <Text className="text-sm text-db-navy-light">
+        <Text className="text-xl font-semibold text-db-navy dark:text-[#EEF1F4]">Guten Tag, {profil.name}</Text>
+        <Text className="text-sm text-db-navy-light dark:text-[#9AA4B0]">
           {profil.lehrjahr}. Lehrjahr · {profil.abteilung}
           {profil.ausbilder ? ` · Ausbilder: ${profil.ausbilder}` : ''}
         </Text>
       </View>
 
-      <View className="rounded-xl border border-db-gray-200 bg-white p-4">
+      <View className="rounded-xl border border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24] p-4">
         <View className="flex-row items-center justify-between">
-          <Text className="text-sm font-semibold text-db-navy">Dein Tag heute</Text>
-          <Text className="text-xs text-db-navy-light">
+          <Text className="text-sm font-semibold text-db-navy dark:text-[#EEF1F4]">Dein Tag heute</Text>
+          <Text className="text-xs text-db-navy-light dark:text-[#9AA4B0]">
             {heutigerTag.tag}, {heutigerTag.datum}
           </Text>
         </View>
@@ -84,12 +84,12 @@ export default function Dashboard() {
               <Text className={`shrink-0 overflow-hidden rounded-full px-2.5 py-1 text-xs font-medium ${typStyle[heutigerBlock.typ]}`}>
                 {heutigerBlock.typ}
               </Text>
-              <Text className="flex-1 text-sm text-db-navy" numberOfLines={1}>
+              <Text className="flex-1 text-sm text-db-navy dark:text-[#EEF1F4]" numberOfLines={1}>
                 {heutigerBlock.thema}
               </Text>
             </>
           ) : (
-            <Text className="text-sm italic text-db-navy-light">Kein Ausbildungsplan-Eintrag für heute</Text>
+            <Text className="text-sm italic text-db-navy-light dark:text-[#9AA4B0]">Kein Ausbildungsplan-Eintrag für heute</Text>
           )}
         </View>
 
@@ -107,7 +107,7 @@ export default function Dashboard() {
             <Pressable onPress={() => router.push('/aufgaben')} className="flex-row items-center justify-between">
               <View className="flex-row items-center gap-1.5">
                 <ClipboardCheck size={15} color="#D98600" />
-                <Text className="text-sm text-db-navy">
+                <Text className="text-sm text-db-navy dark:text-[#EEF1F4]">
                   {heute.length} {heute.length === 1 ? 'Aufgabe' : 'Aufgaben'} heute fällig
                 </Text>
               </View>
@@ -119,21 +119,21 @@ export default function Dashboard() {
 
       <View className="flex-row gap-3">
         {stats.map(({ label, value, Icon, tone }) => (
-          <View key={label} className="flex-1 rounded-xl border border-db-gray-200 bg-white p-4">
+          <View key={label} className="flex-1 rounded-xl border border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24] p-4">
             <Icon size={18} color={tone === 'text-db-red' ? '#EC0016' : '#14181F'} />
-            <Text className="mt-2 text-2xl font-semibold text-db-navy">{value}</Text>
-            <Text className="text-xs text-db-navy-light">{label}</Text>
+            <Text className="mt-2 text-2xl font-semibold text-db-navy dark:text-[#EEF1F4]">{value}</Text>
+            <Text className="text-xs text-db-navy-light dark:text-[#9AA4B0]">{label}</Text>
           </View>
         ))}
       </View>
 
       <Pressable
         onPress={erinnerungUmschalten}
-        className="flex-row items-center justify-between rounded-xl border border-db-gray-200 bg-white px-4 py-3"
+        className="flex-row items-center justify-between rounded-xl border border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24] px-4 py-3"
       >
         <View className="flex-row items-center gap-2">
           {erinnerungAn ? <Bell size={16} color="#1E8A3C" /> : <BellOff size={16} color="#5C6670" />}
-          <Text className="text-sm text-db-navy">
+          <Text className="text-sm text-db-navy dark:text-[#EEF1F4]">
             {erinnerungAn ? 'Tägliche Erinnerung aktiv' : 'Tägliche Erinnerung aktivieren'}
           </Text>
         </View>
@@ -153,9 +153,9 @@ export default function Dashboard() {
         </Pressable>
       )}
 
-      <View className="rounded-xl border border-db-gray-200 bg-white">
-        <View className="flex-row items-center justify-between border-b border-db-gray-200 px-4 py-3">
-          <Text className="text-sm font-semibold text-db-navy">Nächste Aufgaben</Text>
+      <View className="rounded-xl border border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24]">
+        <View className="flex-row items-center justify-between border-b border-db-gray-200 dark:border-[#2A323D] px-4 py-3">
+          <Text className="text-sm font-semibold text-db-navy dark:text-[#EEF1F4]">Nächste Aufgaben</Text>
           <Pressable onPress={() => router.push('/aufgaben')} className="flex-row items-center gap-1">
             <Text className="text-xs font-medium text-db-red">Alle ansehen</Text>
             <ArrowRight size={14} color="#EC0016" />
@@ -169,8 +169,8 @@ export default function Dashboard() {
               className="gap-2 px-4 py-3"
             >
               <View>
-                <Text className="text-sm font-medium text-db-navy">{a.titel}</Text>
-                <Text className="text-xs text-db-navy-light">
+                <Text className="text-sm font-medium text-db-navy dark:text-[#EEF1F4]">{a.titel}</Text>
+                <Text className="text-xs text-db-navy-light dark:text-[#9AA4B0]">
                   {a.anlage} · {a.ort} · fällig {a.faelligkeit}
                 </Text>
               </View>

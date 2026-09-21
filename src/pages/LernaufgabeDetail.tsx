@@ -75,7 +75,7 @@ export default function LernaufgabeDetail() {
         <ChevronLeft size={16} /> Aufgaben
       </Link>
 
-      <div className="rounded-xl border border-db-gray-200 bg-white p-4">
+      <div className="rounded-xl border border-db-gray-200 bg-db-surface p-4">
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-xs font-medium text-db-navy-light">{aufgabe.id}</p>
@@ -113,7 +113,7 @@ export default function LernaufgabeDetail() {
         )}
       </div>
 
-      <div className="rounded-xl border border-db-gray-200 bg-white p-4">
+      <div className="rounded-xl border border-db-gray-200 bg-db-surface p-4">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-sm font-semibold text-db-navy">Arbeitsschritte</h2>
           <span className="text-xs font-medium text-db-navy-light">

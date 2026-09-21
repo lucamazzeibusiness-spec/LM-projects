@@ -35,7 +35,7 @@ export default function Lernaufgaben() {
               className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                 gewerk === g
                   ? 'border-db-red bg-db-red text-white'
-                  : 'border-db-gray-200 bg-white text-db-navy-light hover:border-db-red/40'
+                  : 'border-db-gray-200 bg-db-surface text-db-navy-light hover:border-db-red/40'
               }`}
             >
               {g}
@@ -49,8 +49,8 @@ export default function Lernaufgaben() {
               onClick={() => setStatus(s)}
               className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                 status === s
-                  ? 'border-db-navy bg-db-navy text-white'
-                  : 'border-db-gray-200 bg-white text-db-navy-light hover:border-db-navy/40'
+                  ? 'border-db-ink bg-db-ink text-white'
+                  : 'border-db-gray-200 bg-db-surface text-db-navy-light hover:border-db-navy/40'
               }`}
             >
               {s}
@@ -64,7 +64,7 @@ export default function Lernaufgaben() {
           <Link
             key={a.id}
             to={`/lernaufgaben/${a.id}`}
-            className="block rounded-xl border border-db-gray-200 bg-white p-4 transition-shadow hover:shadow-sm"
+            className="block rounded-xl border border-db-gray-200 bg-db-surface p-4 transition-shadow hover:shadow-sm"
           >
             <div className="flex items-start justify-between gap-3">
               <div>

@@ -1,14 +1,27 @@
 @import 'tailwindcss';
 
+/* dark: reacts to a data-theme="dark" attribute (set by lib/theme.ts) instead of the OS-level
+   prefers-color-scheme media query, so the in-app toggle can override the system setting. */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
 @theme {
   --color-db-red: #ec0016;
   --color-db-red-dark: #c40012;
+  /* Primary/secondary text – flips in dark mode (see :root[data-theme="dark"] below). */
   --color-db-navy: #14181f;
   --color-db-navy-light: #5c6670;
+  /* Dark-navy accent for filled buttons/badges (e.g. "Speichern"). Does flip in dark mode
+     (see below) – not for contrast against page text like db-navy, but because the fixed
+     light-mode value is nearly invisible against an equally-dark surface in dark mode. */
+  --color-db-ink: #14181f;
+  --color-db-ink-light: #232a35;
+  /* Neutral scale – flips in dark mode. */
   --color-db-gray-50: #f7f7f8;
   --color-db-gray-100: #eef0f2;
   --color-db-gray-200: #e0e3e7;
   --color-db-gray-400: #9aa2ab;
+  /* Card/surface background – flips in dark mode. */
+  --color-db-surface: #ffffff;
   --color-db-green: #1e8a3c;
   --color-db-amber: #d98600;
   --font-sans:
@@ -17,6 +30,19 @@
 
 :root {
   color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --color-db-navy: #eef1f4;
+  --color-db-navy-light: #9aa4b0;
+  --color-db-gray-50: #10141b;
+  --color-db-gray-100: #1a2029;
+  --color-db-gray-200: #2a323d;
+  --color-db-gray-400: #71798a;
+  --color-db-surface: #171c24;
+  --color-db-ink: #3a4453;
+  --color-db-ink-light: #4a5565;
 }
 
 html,

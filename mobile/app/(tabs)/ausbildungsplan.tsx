@@ -7,9 +7,9 @@ import { aktuelleWochentage, heutigerWochentagIndex } from '../../lib/wochen'
 import { curricula, naechstePruefung, type Ausbildungsblock, type AusbildungsblockTyp, type LernfeldStatus } from '../../data/mock'
 
 const typStyle: Record<AusbildungsblockTyp, string> = {
-  Betrieb: 'bg-blue-50 text-blue-700',
-  Berufsschule: 'bg-purple-50 text-purple-700',
-  'DB Training': 'bg-orange-50 text-orange-700',
+  Betrieb: 'bg-blue-50 dark:bg-blue-500/15 text-blue-700 dark:text-blue-300',
+  Berufsschule: 'bg-purple-50 dark:bg-purple-500/15 text-purple-700 dark:text-purple-300',
+  'DB Training': 'bg-orange-50 dark:bg-orange-500/15 text-orange-700 dark:text-orange-300',
 }
 
 const typIconColor: Record<AusbildungsblockTyp, string> = {
@@ -23,7 +23,7 @@ const typen: AusbildungsblockTyp[] = ['Betrieb', 'Berufsschule', 'DB Training']
 const lernfeldStyle: Record<LernfeldStatus, string> = {
   Abgeschlossen: 'bg-db-green/10 text-db-green',
   Aktuell: 'bg-db-red/10 text-db-red',
-  Geplant: 'bg-db-gray-100 text-db-navy-light',
+  Geplant: 'bg-db-gray-100 dark:bg-[#1A2029] text-db-navy-light dark:text-[#9AA4B0]',
 }
 
 interface Entwurf {
@@ -64,15 +64,15 @@ export default function Ausbildungsplan() {
   }
 
   return (
-    <ScrollView className="flex-1 bg-db-gray-50" contentContainerClassName="gap-4 p-4">
+    <ScrollView className="flex-1 bg-db-gray-50 dark:bg-[#10141B]" contentContainerClassName="gap-4 p-4">
       <View>
-        <Text className="text-xl font-semibold text-db-navy">Ausbildungsplan</Text>
-        <Text className="text-sm text-db-navy-light">
+        <Text className="text-xl font-semibold text-db-navy dark:text-[#EEF1F4]">Ausbildungsplan</Text>
+        <Text className="text-sm text-db-navy-light dark:text-[#9AA4B0]">
           Dein eigener Rhythmus · trag hier ein, wann Betrieb, Berufsschule oder DB Training ist
         </Text>
       </View>
 
-      <View className="rounded-xl border border-db-navy/10 bg-db-navy p-4">
+      <View className="rounded-xl border border-white/10 bg-db-navy p-4 dark:bg-[#3A4453]">
         <Text className="text-xs font-medium text-white/60">Nächster Prüfungstermin</Text>
         <Text className="mt-1 text-lg font-semibold text-white">{naechstePruefung.titel}</Text>
         <Text className="text-sm text-white/70">
@@ -80,7 +80,7 @@ export default function Ausbildungsplan() {
         </Text>
       </View>
 
-      <View className="overflow-hidden rounded-xl border border-db-gray-200 bg-white">
+      <View className="overflow-hidden rounded-xl border border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24]">
         <View className="divide-y divide-db-gray-100">
           {wochentage.map(({ tag, datum }, i) => {
             const eintrag = vorlage[i]
@@ -91,7 +91,7 @@ export default function Ausbildungsplan() {
                 {wirdBearbeitet ? (
                   <View className="gap-2.5 px-4 py-3">
                     <View className="flex-row items-center justify-between">
-                      <Text className={`text-sm font-semibold ${i === heuteIndex ? 'text-db-red' : 'text-db-navy'}`}>
+                      <Text className={`text-sm font-semibold ${i === heuteIndex ? 'text-db-red' : 'text-db-navy dark:text-[#EEF1F4]'}`}>
                         {tag}, {datum}
                       </Text>
                       <Pressable onPress={() => setBearbeitungsIndex(null)}>
@@ -104,10 +104,12 @@ export default function Ausbildungsplan() {
                           key={t}
                           onPress={() => setEntwurf((d) => ({ ...d, typ: t }))}
                           className={`rounded-full border px-2.5 py-1 ${
-                            entwurf.typ === t ? 'border-db-navy bg-db-navy' : 'border-db-gray-200 bg-white'
+                            entwurf.typ === t
+                              ? 'border-db-navy bg-db-navy dark:border-[#3A4453] dark:bg-[#3A4453]'
+                              : 'border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24]'
                           }`}
                         >
-                          <Text className={`text-xs font-medium ${entwurf.typ === t ? 'text-white' : 'text-db-navy-light'}`}>
+                          <Text className={`text-xs font-medium ${entwurf.typ === t ? 'text-white' : 'text-db-navy-light dark:text-[#9AA4B0]'}`}>
                             {t}
                           </Text>
                         </Pressable>
@@ -119,13 +121,13 @@ export default function Ausbildungsplan() {
                           value={entwurf.thema}
                           onChangeText={(t) => setEntwurf((d) => ({ ...d, thema: t }))}
                           placeholder="z. B. Fahrzeuginstandhaltung – Elektrik / Lernfeld 6"
-                          className="w-full rounded-lg border border-db-gray-200 px-3 py-2 text-sm text-db-navy"
+                          className="w-full rounded-lg border border-db-gray-200 dark:border-[#2A323D] px-3 py-2 text-sm text-db-navy dark:text-[#EEF1F4]"
                         />
                         <TextInput
                           value={entwurf.ort}
                           onChangeText={(t) => setEntwurf((d) => ({ ...d, ort: t }))}
                           placeholder="Ort, z. B. Werk Rummelsburg"
-                          className="w-full rounded-lg border border-db-gray-200 px-3 py-2 text-sm text-db-navy"
+                          className="w-full rounded-lg border border-db-gray-200 dark:border-[#2A323D] px-3 py-2 text-sm text-db-navy dark:text-[#EEF1F4]"
                         />
                       </>
                     )}
@@ -136,19 +138,19 @@ export default function Ausbildungsplan() {
                 ) : (
                   <Pressable onPress={() => bearbeiten(i)} className="flex-row items-center gap-3 px-4 py-3">
                     <View className="w-20 shrink-0">
-                      <Text className={`text-sm font-semibold ${i === heuteIndex ? 'text-db-red' : 'text-db-navy'}`}>{tag}</Text>
-                      <Text className="text-xs text-db-navy-light">{datum}</Text>
+                      <Text className={`text-sm font-semibold ${i === heuteIndex ? 'text-db-red' : 'text-db-navy dark:text-[#EEF1F4]'}`}>{tag}</Text>
+                      <Text className="text-xs text-db-navy-light dark:text-[#9AA4B0]">{datum}</Text>
                     </View>
                     <View className="min-w-0 flex-1">
                       {eintrag ? (
                         <>
-                          <Text className="text-sm text-db-navy" numberOfLines={1}>
+                          <Text className="text-sm text-db-navy dark:text-[#EEF1F4]" numberOfLines={1}>
                             {eintrag.thema || eintrag.typ}
                           </Text>
-                          {eintrag.ort && <Text className="text-xs text-db-navy-light">{eintrag.ort}</Text>}
+                          {eintrag.ort && <Text className="text-xs text-db-navy-light dark:text-[#9AA4B0]">{eintrag.ort}</Text>}
                         </>
                       ) : (
-                        <Text className="text-sm italic text-db-navy-light">Frei / kein Eintrag</Text>
+                        <Text className="text-sm italic text-db-navy-light dark:text-[#9AA4B0]">Frei / kein Eintrag</Text>
                       )}
                     </View>
                     {eintrag ? (
@@ -157,9 +159,9 @@ export default function Ausbildungsplan() {
                         <Text className={`text-xs font-medium ${typStyle[eintrag.typ]}`}>{eintrag.typ}</Text>
                       </View>
                     ) : (
-                      <View className="shrink-0 flex-row items-center gap-1 rounded-full border border-dashed border-db-gray-200 px-2.5 py-1">
+                      <View className="shrink-0 flex-row items-center gap-1 rounded-full border border-dashed border-db-gray-200 dark:border-[#2A323D] px-2.5 py-1">
                         <Plus size={11} color="#5C6670" />
-                        <Text className="text-xs font-medium text-db-navy-light">Eintragen</Text>
+                        <Text className="text-xs font-medium text-db-navy-light dark:text-[#9AA4B0]">Eintragen</Text>
                       </View>
                     )}
                   </Pressable>
@@ -172,23 +174,23 @@ export default function Ausbildungsplan() {
 
       {curriculum && (
         <>
-          <View className="rounded-xl border border-db-gray-200 bg-white p-4">
-            <Text className="text-sm font-semibold text-db-navy">Lernfelder · {curriculum.beruf}</Text>
-            <Text className="mt-1 text-xs text-db-navy-light">
+          <View className="rounded-xl border border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24] p-4">
+            <Text className="text-sm font-semibold text-db-navy dark:text-[#EEF1F4]">Lernfelder · {curriculum.beruf}</Text>
+            <Text className="mt-1 text-xs text-db-navy-light dark:text-[#9AA4B0]">
               Rahmenlehrplan der Berufsschule – zeigt, wo du im Vergleich zum Lehrplan stehst.
             </Text>
             <View className="mt-3 gap-2">
               {curriculum.lernfelder.map((lf) => (
                 <View
                   key={lf.nummer}
-                  className="flex-row items-center justify-between gap-3 rounded-lg border border-db-gray-200 px-3 py-2.5"
+                  className="flex-row items-center justify-between gap-3 rounded-lg border border-db-gray-200 dark:border-[#2A323D] px-3 py-2.5"
                 >
                   <View className="flex-1">
-                    <Text className="text-sm text-db-navy">
-                      <Text className="text-xs text-db-navy-light">LF{lf.nummer} </Text>
+                    <Text className="text-sm text-db-navy dark:text-[#EEF1F4]">
+                      <Text className="text-xs text-db-navy-light dark:text-[#9AA4B0]">LF{lf.nummer} </Text>
                       {lf.titel}
                     </Text>
-                    <Text className="text-xs text-db-navy-light">
+                    <Text className="text-xs text-db-navy-light dark:text-[#9AA4B0]">
                       {lf.ausbildungsjahr}. Ausbildungsjahr · {lf.stunden} Std.
                     </Text>
                   </View>
@@ -200,21 +202,21 @@ export default function Ausbildungsplan() {
             </View>
           </View>
 
-          <View className="rounded-xl border border-db-gray-200 bg-white p-4">
-            <Text className="text-sm font-semibold text-db-navy">Abschlussprüfung (gestreckt)</Text>
+          <View className="rounded-xl border border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24] p-4">
+            <Text className="text-sm font-semibold text-db-navy dark:text-[#EEF1F4]">Abschlussprüfung (gestreckt)</Text>
             <View className="mt-3 gap-3">
               {[curriculum.teil1, curriculum.teil2].map((teil) => (
-                <View key={teil.bezeichnung} className="rounded-lg bg-db-gray-50 p-3">
+                <View key={teil.bezeichnung} className="rounded-lg bg-db-gray-50 dark:bg-[#10141B] p-3">
                   <View className="flex-row items-center justify-between">
-                    <Text className="text-sm font-semibold text-db-navy">{teil.bezeichnung}</Text>
+                    <Text className="text-sm font-semibold text-db-navy dark:text-[#EEF1F4]">{teil.bezeichnung}</Text>
                     <Text className="text-xs font-semibold text-db-red">{teil.gewichtungGesamt}</Text>
                   </View>
-                  <Text className="text-xs text-db-navy-light">{teil.zeitpunkt}</Text>
+                  <Text className="text-xs text-db-navy-light dark:text-[#9AA4B0]">{teil.zeitpunkt}</Text>
                   <View className="mt-2 gap-1">
                     {teil.bereiche.map((b) => (
                       <View key={b.name} className="flex-row items-center justify-between">
-                        <Text className="text-xs text-db-navy">{b.name}</Text>
-                        <Text className="text-xs text-db-navy-light">
+                        <Text className="text-xs text-db-navy dark:text-[#EEF1F4]">{b.name}</Text>
+                        <Text className="text-xs text-db-navy-light dark:text-[#9AA4B0]">
                           {b.gewichtung}
                           {b.dauer ? ` · ${b.dauer}` : ''}
                         </Text>
@@ -226,7 +228,7 @@ export default function Ausbildungsplan() {
             </View>
             <View className="mt-3 flex-row items-start gap-1.5">
               <ExternalLink size={12} color="#5C6670" style={{ marginTop: 2 }} />
-              <Text className="flex-1 text-xs text-db-navy-light">
+              <Text className="flex-1 text-xs text-db-navy-light dark:text-[#9AA4B0]">
                 Quelle: {curriculum.quelle}. Öffentlich zugängliche IHK-/KMK-Angaben – die verbindliche Fassung gilt
                 laut deinem Ausbildungsvertrag und deiner IHK.
               </Text>

@@ -14,14 +14,14 @@ const ausbildungsberufe: AusbildungsberufName[] = curricula.map((c) => c.beruf)
 function Feld({ label, children }: { label: string; children: ReactNode }) {
   return (
     <View>
-      <Text className="mb-1 text-xs font-medium text-db-navy-light">{label}</Text>
+      <Text className="mb-1 text-xs font-medium text-db-navy-light dark:text-[#9AA4B0]">{label}</Text>
       {children}
     </View>
   )
 }
 
 const inputClass =
-  'w-full rounded-lg border border-db-gray-200 px-3 py-2.5 text-sm text-db-navy'
+  'w-full rounded-lg border border-db-gray-200 dark:border-[#2A323D] px-3 py-2.5 text-sm text-db-navy dark:text-[#EEF1F4]'
 
 export default function ProfilForm({
   profil,
@@ -53,7 +53,7 @@ export default function ProfilForm({
   const zurueck = () => setSchritt((s) => Math.max(1, s - 1))
 
   return (
-    <View className="flex-1 bg-db-gray-50">
+    <View className="flex-1 bg-db-gray-50 dark:bg-[#10141B]">
       <ScrollView contentContainerClassName="px-4 py-8" keyboardShouldPersistTaps="handled">
         <View className="mb-6 flex-row gap-1.5">
           {[1, 2, 3].map((s) => (
@@ -65,8 +65,8 @@ export default function ProfilForm({
           {schritt === 1 && (
             <>
               <View>
-                <Text className="text-lg font-semibold text-db-navy">Wer bist du?</Text>
-                <Text className="text-sm text-db-navy-light">Und wo arbeitest du, welchen Beruf lernst du?</Text>
+                <Text className="text-lg font-semibold text-db-navy dark:text-[#EEF1F4]">Wer bist du?</Text>
+                <Text className="text-sm text-db-navy-light dark:text-[#9AA4B0]">Und wo arbeitest du, welchen Beruf lernst du?</Text>
               </View>
 
               <Feld label="Wie heißt du?">
@@ -94,12 +94,12 @@ export default function ProfilForm({
                       key={beruf}
                       onPress={() => aktualisieren('ausbildungsberuf', beruf)}
                       className={`rounded-lg border px-3 py-2.5 ${
-                        entwurf.ausbildungsberuf === beruf ? 'border-db-red bg-db-red/5' : 'border-db-gray-200'
+                        entwurf.ausbildungsberuf === beruf ? 'border-db-red bg-db-red/5' : 'border-db-gray-200 dark:border-[#2A323D]'
                       }`}
                     >
                       <Text
                         className={`text-sm font-medium ${
-                          entwurf.ausbildungsberuf === beruf ? 'text-db-red-dark' : 'text-db-navy'
+                          entwurf.ausbildungsberuf === beruf ? 'text-db-red-dark' : 'text-db-navy dark:text-[#EEF1F4]'
                         }`}
                       >
                         {beruf}
@@ -114,8 +114,8 @@ export default function ProfilForm({
           {schritt === 2 && (
             <>
               <View>
-                <Text className="text-lg font-semibold text-db-navy">Lehrjahr</Text>
-                <Text className="text-sm text-db-navy-light">
+                <Text className="text-lg font-semibold text-db-navy dark:text-[#EEF1F4]">Lehrjahr</Text>
+                <Text className="text-sm text-db-navy-light dark:text-[#9AA4B0]">
                   In welchem Ausbildungsjahr bist du gerade? ({entwurf.ausbildungsberuf}, insgesamt{' '}
                   {entwurf.lehrjahreGesamt} Jahre)
                 </Text>
@@ -127,13 +127,13 @@ export default function ProfilForm({
                     key={jahr}
                     onPress={() => aktualisieren('lehrjahr', jahr)}
                     className={`w-[47%] items-center rounded-xl border px-4 py-4 ${
-                      entwurf.lehrjahr === jahr ? 'border-db-red bg-db-red/5' : 'border-db-gray-200'
+                      entwurf.lehrjahr === jahr ? 'border-db-red bg-db-red/5' : 'border-db-gray-200 dark:border-[#2A323D]'
                     }`}
                   >
-                    <Text className={`text-2xl font-bold ${entwurf.lehrjahr === jahr ? 'text-db-red-dark' : 'text-db-navy'}`}>
+                    <Text className={`text-2xl font-bold ${entwurf.lehrjahr === jahr ? 'text-db-red-dark' : 'text-db-navy dark:text-[#EEF1F4]'}`}>
                       {jahr}
                     </Text>
-                    <Text className={`text-xs ${entwurf.lehrjahr === jahr ? 'text-db-red-dark' : 'text-db-navy'}`}>
+                    <Text className={`text-xs ${entwurf.lehrjahr === jahr ? 'text-db-red-dark' : 'text-db-navy dark:text-[#EEF1F4]'}`}>
                       . Lehrjahr
                     </Text>
                   </Pressable>
@@ -154,8 +154,8 @@ export default function ProfilForm({
           {schritt === 3 && (
             <>
               <View>
-                <Text className="text-lg font-semibold text-db-navy">Abteilung &amp; Werk</Text>
-                <Text className="text-sm text-db-navy-light">Wo genau bist du eingesetzt?</Text>
+                <Text className="text-lg font-semibold text-db-navy dark:text-[#EEF1F4]">Abteilung &amp; Werk</Text>
+                <Text className="text-sm text-db-navy-light dark:text-[#9AA4B0]">Wo genau bist du eingesetzt?</Text>
               </View>
 
               <Feld label="Abteilung">
@@ -200,11 +200,11 @@ export default function ProfilForm({
         </View>
       </ScrollView>
 
-      <View className="flex-row items-center gap-2 border-t border-db-gray-200 bg-db-gray-50 px-4 py-4">
+      <View className="flex-row items-center gap-2 border-t border-db-gray-200 dark:border-[#2A323D] bg-db-gray-50 dark:bg-[#10141B] px-4 py-4">
         {schritt > 1 && (
           <Pressable
             onPress={zurueck}
-            className="items-center justify-center rounded-full border border-db-gray-200 bg-white px-4 py-3"
+            className="items-center justify-center rounded-full border border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24] px-4 py-3"
           >
             <ChevronLeft size={16} color="#14181F" />
           </Pressable>
