@@ -105,10 +105,6 @@ export default function Berichtsheft() {
     setBearbeitung(null)
   }
 
-  const einreichen = (id: string) => {
-    setEintraege((prev) => prev.map((e) => (e.id === id && e.taetigkeiten.trim() ? { ...e, status: 'Eingereicht' } : e)))
-  }
-
   const wocheExportieren = async (unterschriftDataUrl: string) => {
     setExportiert(true)
     try {
@@ -264,11 +260,6 @@ export default function Berichtsheft() {
                       <Text className="font-semibold text-db-navy">Ausbilder: </Text>
                       {e.ausbilderKommentar}
                     </Text>
-                  )}
-                  {e.status === 'Entwurf' && e.taetigkeiten.trim() && (
-                    <Pressable onPress={() => einreichen(e.id)} className="mt-3 self-start rounded-full bg-db-red px-3.5 py-1.5">
-                      <Text className="text-xs font-semibold text-white">Zur Freigabe einreichen</Text>
-                    </Pressable>
                   )}
                 </View>
               )

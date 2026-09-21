@@ -89,12 +89,6 @@ export default function Berichtsheft() {
     setBearbeitung(null)
   }
 
-  const einreichen = (id: string) => {
-    setEintraege((prev) =>
-      prev.map((e) => (e.id === id && e.taetigkeiten.trim() ? { ...e, status: 'Eingereicht' } : e)),
-    )
-  }
-
   const vorherigeWoche = () => setAusgewaehlteWoche((w) => wocheVerschieben(w, -1))
   const naechsteWoche = () => setAusgewaehlteWoche((w) => wocheVerschieben(w, 1))
   const zurAktuellenWoche = () => setAusgewaehlteWoche(heuteSchluessel)
@@ -120,7 +114,7 @@ export default function Berichtsheft() {
       const { exportBerichtsheftPdf } = await import('../lib/exportBerichtsheft')
       const { von, bis } = wochenStartEnde(ausgewaehlteWoche)
       const nr = String(alleWochenMitEintraegen.indexOf(ausgewaehlteWoche) + 1).padStart(3, '0')
-      exportBerichtsheftPdf(profil, wocheEintraege, { nr, von, bis, unterschriftDataUrl })
+      await exportBerichtsheftPdf(profil, wocheEintraege, { nr, von, bis, unterschriftDataUrl })
     } finally {
       setExportiert(false)
     }
@@ -336,14 +330,6 @@ export default function Berichtsheft() {
                   <p className="mt-2 rounded-lg bg-db-gray-50 p-2 text-xs text-db-navy-light">
                     <span className="font-semibold text-db-navy">Ausbilder:</span> {e.ausbilderKommentar}
                   </p>
-                )}
-                {e.status === 'Entwurf' && e.taetigkeiten.trim() && (
-                  <button
-                    onClick={() => einreichen(e.id)}
-                    className="mt-3 rounded-full bg-db-red px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-db-red-dark"
-                  >
-                    Zur Freigabe einreichen
-                  </button>
                 )}
               </div>
             )

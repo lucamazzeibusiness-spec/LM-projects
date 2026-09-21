@@ -28,9 +28,32 @@ function alsStichpunkte(text: string): string {
     .join('\n')
 }
 
+interface ClaudeDownloads {
+  save(request: { filename: string; data: Blob }): Promise<{ status: string }>
+}
+
+// Im normalen Browser (echte App) triggert doc.save() einen ganz normalen Download. In der
+// claude.ai-Artifact-Vorschau ist das gesperrt – dort läuft der Download stattdessen über die
+// downloads-Capability der Sandbox, falls vorhanden.
+async function pdfSpeichern(doc: jsPDF, dateiname: string) {
+  const claudeApi = (window as unknown as { claude?: { use(name: string): Promise<unknown> } }).claude
+  if (claudeApi) {
+    try {
+      const downloads = (await claudeApi.use('downloads')) as ClaudeDownloads | null
+      if (downloads) {
+        await downloads.save({ filename: dateiname, data: doc.output('blob') })
+        return
+      }
+    } catch {
+      // Kein Download über die Sandbox möglich – normalen Browser-Download versuchen.
+    }
+  }
+  doc.save(dateiname)
+}
+
 // Baut das PDF im Layout des offiziellen DB-Ausbildungsnachweis-Formulars nach
 // (Kopfbereich mit Nr./Zeitraum/Ausbildungsjahr, Tagestabelle, Unterschriftenblock).
-export function exportBerichtsheftPdf(profil: AzubiProfil, eintraege: BerichtsheftEintrag[], optionen: ExportOptions) {
+export async function exportBerichtsheftPdf(profil: AzubiProfil, eintraege: BerichtsheftEintrag[], optionen: ExportOptions) {
   const { nr, von, bis, unterschriftDataUrl } = optionen
   const doc = new jsPDF({ unit: 'mm', format: 'a4' })
   const seitenbreite = doc.internal.pageSize.getWidth()
@@ -197,5 +220,5 @@ export function exportBerichtsheftPdf(profil: AzubiProfil, eintraege: Berichtshe
   doc.text('Seite 1/1', li, seitenhoehe - 10)
 
   const dateiname = `Ausbildungsnachweis_${profil.name.replace(/\s+/g, '_')}_${nr}.pdf`
-  doc.save(dateiname)
+  await pdfSpeichern(doc, dateiname)
 }
