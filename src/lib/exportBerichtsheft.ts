@@ -41,12 +41,14 @@ export function exportBerichtsheftPdf(profil: AzubiProfil, eintraege: Berichtshe
   doc.setTextColor(90)
   doc.text('DB Intern / DB internal', li, 11)
 
-  doc.setFillColor(236, 0, 22)
-  doc.roundedRect(li, 14, 16, 10.5, 1.2, 1.2, 'F')
-  doc.setTextColor(255)
+  doc.setFillColor(255, 255, 255)
+  doc.setDrawColor(236, 0, 22)
+  doc.setLineWidth(1)
+  doc.roundedRect(li, 14, 16, 10.5, 1.4, 1.4, 'FD')
+  doc.setTextColor(236, 0, 22)
   doc.setFont('helvetica', 'bold')
-  doc.setFontSize(11)
-  doc.text('DB', li + 8, 20.7, { align: 'center' })
+  doc.setFontSize(12)
+  doc.text('DB', li + 8, 20.9, { align: 'center' })
 
   doc.setTextColor(...tinte)
   doc.setFontSize(11)
@@ -109,27 +111,42 @@ export function exportBerichtsheftPdf(profil: AzubiProfil, eintraege: Berichtshe
   autoTable(doc, {
     startY: 50,
     head: [['Tag', 'Ausgeführte betriebliche Tätigkeiten, Unterweisungen, Berufsschulunterricht usw.', 'Einzel-\nstunden', 'Gesamt-\nstunden']],
-    body: zeilen.map((z) => [z.tag, z.taetigkeiten, '', z.stunden]),
+    body: zeilen.map((z) => ['', z.taetigkeiten, '', z.stunden]),
     foot: [[{ content: 'Wochenstunden:', colSpan: 3, styles: { halign: 'right' } } as never, String(wochenstunden)]],
     theme: 'grid',
     styles: {
       fontSize: 9,
       cellPadding: 2.4,
       valign: 'middle',
-      lineColor: tinte,
-      lineWidth: 0.2,
+      lineColor: [0, 0, 0],
+      lineWidth: 0.3,
       textColor: tinte,
-      minCellHeight: 9,
+      minCellHeight: 18,
     },
-    headStyles: { fillColor: 255, textColor: tinte, fontStyle: 'bold', halign: 'left' },
-    footStyles: { fillColor: 255, textColor: tinte, fontStyle: 'bold' },
+    headStyles: { fillColor: 255, textColor: tinte, fontStyle: 'bold', halign: 'left', minCellHeight: 9 },
+    footStyles: { fillColor: 255, textColor: tinte, fontStyle: 'bold', minCellHeight: 9 },
     columnStyles: {
-      0: { cellWidth: 26, fontStyle: 'bold' },
+      0: { cellWidth: 14 },
       1: { cellWidth: 'auto' },
       2: { cellWidth: 18, halign: 'center' },
       3: { cellWidth: 18, halign: 'center', fontStyle: 'bold' },
     },
     margin: { left: li, right: 14 },
+    didDrawCell: (data) => {
+      if (data.section === 'body' && data.column.index === 0) {
+        const tag = zeilen[data.row.index]?.tag
+        if (!tag) return
+        doc.setFont('helvetica', 'bold')
+        doc.setFontSize(9)
+        doc.setTextColor(...tinte)
+        // Bei angle:90 wächst der Text von der Ankerposition aus nach oben, daher wird der
+        // Anker um die halbe Textbreite nach unten verschoben, damit er in der Zelle zentriert steht.
+        const textbreite = doc.getTextWidth(tag)
+        const x = data.cell.x + data.cell.width / 2 + 1.5
+        const y = data.cell.y + data.cell.height / 2 + textbreite / 2
+        doc.text(tag, x, y, { angle: 90 })
+      }
+    },
   })
 
   let y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 8
@@ -148,7 +165,7 @@ export function exportBerichtsheftPdf(profil: AzubiProfil, eintraege: Berichtshe
       ['Auszubildende/-r', 'Ausbilder/-in', 'Gesetzliche/-r Vertreter/-in'],
     ],
     theme: 'grid',
-    styles: { fontSize: 9, cellPadding: 3, lineColor: tinte, lineWidth: 0.2, textColor: tinte },
+    styles: { fontSize: 9, cellPadding: 3, lineColor: [0, 0, 0], lineWidth: 0.3, textColor: tinte },
     columnStyles: {
       0: { cellWidth: (re - li) / 3 },
       1: { cellWidth: (re - li) / 3 },
