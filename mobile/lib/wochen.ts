@@ -66,3 +66,19 @@ export function aktuelleWochentage(): Wochentag[] {
     return { tag, datum: fmt(d) }
   })
 }
+
+// schluessel ist der ISO-Montag der Woche. Liefert Montag–Freitag als ISO-Datumsstrings.
+export function arbeitstageDerWoche(schluessel: string): string[] {
+  const montag = new Date(`${schluessel}T00:00:00`)
+  return Array.from({ length: 5 }, (_, i) => {
+    const d = new Date(montag)
+    d.setDate(d.getDate() + i)
+    return isoDatum(d)
+  })
+}
+
+export function wocheVerschieben(schluessel: string, deltaWochen: number): string {
+  const montag = new Date(`${schluessel}T00:00:00`)
+  montag.setDate(montag.getDate() + deltaWochen * 7)
+  return isoDatum(montag)
+}

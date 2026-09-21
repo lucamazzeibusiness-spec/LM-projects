@@ -1,21 +1,37 @@
-import { CalendarCheck, Download, Loader2, Pencil, X } from 'lucide-react-native'
-import { useMemo, useState } from 'react'
-import { Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native'
+import { CalendarCheck, ChevronLeft, ChevronRight, Download, Loader2, Pencil, Plus, X } from 'lucide-react-native'
+import { useMemo, useRef, useState } from 'react'
+import { Modal, PanResponder, Pressable, ScrollView, Text, TextInput, View } from 'react-native'
 import { BerichtStatusBadge } from '../../components/Badges'
 import SignaturePad from '../../components/SignaturePad'
 import { useAzubiProfil } from '../../context/AzubiProfilContext'
 import { useBerichtsheft } from '../../hooks/useBerichtsheft'
 import { exportBerichtsheftPdf } from '../../lib/exportBerichtsheft'
-import { heuteISO, heutigesDatumLabel, wochenLabel, wochenSchluessel, wochenStartEnde } from '../../lib/wochen'
+import {
+  arbeitstageDerWoche,
+  heuteISO,
+  heutigesDatumLabel,
+  wochenLabel,
+  wochenSchluessel,
+  wochenStartEnde,
+  wocheVerschieben,
+} from '../../lib/wochen'
 import type { BerichtsheftEintrag, BerichtsheftKategorie } from '../../data/mock'
 
 const kategorien: BerichtsheftKategorie[] = ['Betrieblich', 'Berufsschule', 'DB Training']
 
-function neuerTageseintrag(): BerichtsheftEintrag {
+function datumLabelFuer(datumISO: string): string {
+  return new Date(`${datumISO}T00:00:00`).toLocaleDateString('de-DE', {
+    weekday: 'long',
+    day: '2-digit',
+    month: '2-digit',
+  })
+}
+
+function neuerTageseintragFuer(datumISO: string): BerichtsheftEintrag {
   return {
     id: `B-${Date.now()}`,
-    datumISO: heuteISO(),
-    datum: heutigesDatumLabel(),
+    datumISO,
+    datum: datumLabelFuer(datumISO),
     kategorie: 'Betrieblich',
     taetigkeiten: '',
     stunden: 8,
@@ -23,47 +39,65 @@ function neuerTageseintrag(): BerichtsheftEintrag {
   }
 }
 
-interface Wochengruppe {
-  schluessel: string
-  label: string
-  eintraege: BerichtsheftEintrag[]
-}
-
 export default function Berichtsheft() {
   const { profil } = useAzubiProfil()
   const { eintraege, setEintraege } = useBerichtsheft()
   const [bearbeitung, setBearbeitung] = useState<BerichtsheftEintrag | null>(null)
-  const [exportierendeWoche, setExportierendeWoche] = useState<string | null>(null)
-  const [signieren, setSignieren] = useState<Wochengruppe | null>(null)
+  const [exportiert, setExportiert] = useState(false)
+  const [signaturOffen, setSignaturOffen] = useState(false)
   const [unterschrift, setUnterschrift] = useState<string | null>(null)
+  const [ausgewaehlteWoche, setAusgewaehlteWoche] = useState(() => wochenSchluessel(heuteISO()))
 
   const heute = heuteISO()
   const heutigerEintrag = eintraege.find((e) => e.datumISO === heute)
+  const heuteSchluessel = wochenSchluessel(heute)
+  const istAktuelleWoche = ausgewaehlteWoche === heuteSchluessel
 
-  const wochen: Wochengruppe[] = useMemo(() => {
-    const gruppen = new Map<string, BerichtsheftEintrag[]>()
-    for (const e of eintraege) {
-      const schluessel = wochenSchluessel(e.datumISO)
-      const liste = gruppen.get(schluessel) ?? []
-      liste.push(e)
-      gruppen.set(schluessel, liste)
-    }
-    return [...gruppen.entries()]
-      .sort((a, b) => b[0].localeCompare(a[0]))
-      .map(([schluessel, liste]) => ({
-        schluessel,
-        label: wochenLabel(liste[0].datumISO),
-        eintraege: liste.sort((a, b) => a.datumISO.localeCompare(b.datumISO)),
-      }))
-  }, [eintraege])
+  const stundenAktuelleWoche = useMemo(
+    () => eintraege.filter((e) => wochenSchluessel(e.datumISO) === heuteSchluessel).reduce((sum, e) => sum + e.stunden, 0),
+    [eintraege, heuteSchluessel],
+  )
+  const offeneEntwuerfe = eintraege.filter((e) => e.status === 'Entwurf' && e.taetigkeiten.trim()).length
+
+  const montagFreitag = useMemo(() => arbeitstageDerWoche(ausgewaehlteWoche), [ausgewaehlteWoche])
+  const wocheEintraege = useMemo(
+    () => eintraege.filter((e) => wochenSchluessel(e.datumISO) === ausgewaehlteWoche),
+    [eintraege, ausgewaehlteWoche],
+  )
+  const eintraegeNachDatum = useMemo(() => new Map(wocheEintraege.map((e) => [e.datumISO, e])), [wocheEintraege])
+  const zusatzTage = useMemo(
+    () => wocheEintraege.map((e) => e.datumISO).filter((d) => !montagFreitag.includes(d)).sort(),
+    [wocheEintraege, montagFreitag],
+  )
+  const anzeigeTage = [...montagFreitag, ...zusatzTage]
+
+  const wocheStunden = wocheEintraege.reduce((sum, e) => sum + e.stunden, 0)
+  const erfassteTage = montagFreitag.filter((d) => eintraegeNachDatum.get(d)?.taetigkeiten.trim()).length
+  const wocheVollstaendig = erfassteTage === montagFreitag.length
+
+  const alleWochenMitEintraegen = useMemo(() => {
+    const set = new Set(eintraege.map((e) => wochenSchluessel(e.datumISO)))
+    set.add(ausgewaehlteWoche)
+    return [...set].sort()
+  }, [eintraege, ausgewaehlteWoche])
+
+  const vorherigeWoche = () => setAusgewaehlteWoche((w) => wocheVerschieben(w, -1))
+  const naechsteWoche = () => setAusgewaehlteWoche((w) => wocheVerschieben(w, 1))
+  const zurAktuellenWoche = () => setAusgewaehlteWoche(heuteSchluessel)
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_, gesture) => Math.abs(gesture.dx) > 20 && Math.abs(gesture.dx) > Math.abs(gesture.dy),
+      onPanResponderRelease: (_, gesture) => {
+        if (gesture.dx > 50) vorherigeWoche()
+        else if (gesture.dx < -50) naechsteWoche()
+      },
+    }),
+  ).current
 
   if (!profil) return null
 
-  const aktuelleWoche = wochen.find((w) => w.schluessel === wochenSchluessel(heute))
-  const stundenDieseWoche = aktuelleWoche?.eintraege.reduce((sum, e) => sum + e.stunden, 0) ?? 0
-  const offeneEntwuerfe = eintraege.filter((e) => e.status === 'Entwurf' && e.taetigkeiten.trim()).length
-
-  const heuteBearbeiten = () => setBearbeitung(heutigerEintrag ?? neuerTageseintrag())
+  const heuteBearbeiten = () => setBearbeitung(heutigerEintrag ?? neuerTageseintragFuer(heute))
 
   const speichern = () => {
     if (!bearbeitung || !bearbeitung.taetigkeiten.trim()) return
@@ -75,22 +109,21 @@ export default function Berichtsheft() {
     setEintraege((prev) => prev.map((e) => (e.id === id && e.taetigkeiten.trim() ? { ...e, status: 'Eingereicht' } : e)))
   }
 
-  const wocheExportieren = async (gruppe: Wochengruppe, unterschriftDataUrl: string) => {
-    setExportierendeWoche(gruppe.schluessel)
+  const wocheExportieren = async (unterschriftDataUrl: string) => {
+    setExportiert(true)
     try {
-      const { von, bis } = wochenStartEnde(gruppe.schluessel)
-      const alleSchluessel = wochen.map((w) => w.schluessel).sort()
-      const nr = String(alleSchluessel.indexOf(gruppe.schluessel) + 1).padStart(3, '0')
-      await exportBerichtsheftPdf(profil, gruppe.eintraege, { nr, von, bis, unterschriftDataUrl })
+      const { von, bis } = wochenStartEnde(ausgewaehlteWoche)
+      const nr = String(alleWochenMitEintraegen.indexOf(ausgewaehlteWoche) + 1).padStart(3, '0')
+      await exportBerichtsheftPdf(profil, wocheEintraege, { nr, von, bis, unterschriftDataUrl })
     } finally {
-      setExportierendeWoche(null)
+      setExportiert(false)
     }
   }
 
   const signaturBestaetigen = async () => {
-    if (!signieren || !unterschrift) return
-    await wocheExportieren(signieren, unterschrift)
-    setSignieren(null)
+    if (!unterschrift) return
+    await wocheExportieren(unterschrift)
+    setSignaturOffen(false)
     setUnterschrift(null)
   }
 
@@ -129,7 +162,7 @@ export default function Berichtsheft() {
 
         <View className="flex-row gap-3">
           <View className="flex-1 rounded-xl border border-db-gray-200 bg-white p-4">
-            <Text className="text-2xl font-semibold text-db-navy">{stundenDieseWoche} Std.</Text>
+            <Text className="text-2xl font-semibold text-db-navy">{stundenAktuelleWoche} Std.</Text>
             <Text className="text-xs text-db-navy-light">Erfasst diese Woche</Text>
           </View>
           <View className="flex-1 rounded-xl border border-db-gray-200 bg-white p-4">
@@ -140,79 +173,107 @@ export default function Berichtsheft() {
           </View>
         </View>
 
-        <View className="gap-5">
-          {wochen.map((gruppe) => {
-            const vollstaendig = gruppe.eintraege.every((e) => e.taetigkeiten.trim())
-            const stunden = gruppe.eintraege.reduce((sum, e) => sum + e.stunden, 0)
-            return (
-              <View key={gruppe.schluessel} className="gap-2">
-                <View className="flex-row items-center justify-between gap-3 px-1">
-                  <View>
-                    <Text className="text-sm font-semibold text-db-navy">Woche {gruppe.label}</Text>
-                    <Text className="text-xs text-db-navy-light">
-                      {gruppe.eintraege.length} Einträge · {stunden} Std. ·{' '}
-                      <Text className={vollstaendig ? 'text-db-green' : 'text-db-amber'}>
-                        {vollstaendig ? 'vollständig' : 'in Bearbeitung'}
-                      </Text>
-                    </Text>
-                  </View>
-                  <Pressable
-                    onPress={() => {
-                      setUnterschrift(null)
-                      setSignieren(gruppe)
-                    }}
-                    disabled={exportierendeWoche === gruppe.schluessel}
-                    className="flex-row items-center gap-1.5 rounded-full border border-db-gray-200 bg-white px-3 py-1.5"
-                  >
-                    {exportierendeWoche === gruppe.schluessel ? (
-                      <Loader2 size={14} color="#14181F" />
-                    ) : (
-                      <Download size={14} color="#14181F" />
-                    )}
-                    <Text className="text-xs font-semibold text-db-navy">Ausbildungsnachweis</Text>
-                  </Pressable>
-                </View>
+        <View className="gap-3" {...panResponder.panHandlers}>
+          <View className="flex-row items-center justify-between gap-2 px-1">
+            <Pressable
+              onPress={vorherigeWoche}
+              className="h-8 w-8 shrink-0 items-center justify-center rounded-full border border-db-gray-200 bg-white"
+            >
+              <ChevronLeft size={16} color="#5C6670" />
+            </Pressable>
 
-                <View className="gap-3">
-                  {gruppe.eintraege.map((e) => (
-                    <View key={e.id} className="rounded-xl border border-db-gray-200 bg-white p-4">
-                      <View className="flex-row items-start justify-between gap-3">
-                        <View>
-                          <Text className="text-sm font-semibold text-db-navy">{e.datum}</Text>
-                          <Text className="text-xs text-db-navy-light">
-                            {e.kategorie} · {e.stunden} Std.
-                          </Text>
-                        </View>
-                        <View className="flex-row items-center gap-2">
-                          <BerichtStatusBadge status={e.status} />
-                          <Pressable onPress={() => setBearbeitung(e)}>
-                            <Pencil size={14} color="#5C6670" />
-                          </Pressable>
-                        </View>
-                      </View>
-                      <Text className="mt-2 text-sm text-db-navy">
-                        {e.taetigkeiten || <Text className="italic text-db-navy-light">Noch keine Angaben</Text>}
-                      </Text>
-                      {e.ausbilderKommentar && (
-                        <Text className="mt-2 rounded-lg bg-db-gray-50 p-2 text-xs text-db-navy-light">
-                          <Text className="font-semibold text-db-navy">Ausbilder: </Text>
-                          {e.ausbilderKommentar}
-                        </Text>
-                      )}
-                      {e.status === 'Entwurf' && e.taetigkeiten.trim() && (
-                        <Pressable
-                          onPress={() => einreichen(e.id)}
-                          className="mt-3 self-start rounded-full bg-db-red px-3.5 py-1.5"
-                        >
-                          <Text className="text-xs font-semibold text-white">Zur Freigabe einreichen</Text>
-                        </Pressable>
-                      )}
+            <View className="min-w-0 flex-1 items-center">
+              <Text className="text-sm font-semibold text-db-navy">
+                Woche {wochenLabel(ausgewaehlteWoche)}
+                {istAktuelleWoche && <Text className="text-xs font-medium text-db-red"> · aktuell</Text>}
+              </Text>
+              <Text className="text-xs text-db-navy-light">
+                {erfassteTage}/{montagFreitag.length} Tage erfasst · {wocheStunden} Std. ·{' '}
+                <Text className={wocheVollstaendig ? 'text-db-green' : 'text-db-amber'}>
+                  {wocheVollstaendig ? 'vollständig' : 'in Bearbeitung'}
+                </Text>
+              </Text>
+            </View>
+
+            <Pressable
+              onPress={naechsteWoche}
+              className="h-8 w-8 shrink-0 items-center justify-center rounded-full border border-db-gray-200 bg-white"
+            >
+              <ChevronRight size={16} color="#5C6670" />
+            </Pressable>
+          </View>
+
+          <View className="flex-row items-center gap-2">
+            {!istAktuelleWoche && (
+              <Pressable onPress={zurAktuellenWoche} className="rounded-full border border-db-gray-200 bg-white px-3 py-1.5">
+                <Text className="text-xs font-semibold text-db-navy">Zur aktuellen Woche</Text>
+              </Pressable>
+            )}
+            <Pressable
+              onPress={() => {
+                setUnterschrift(null)
+                setSignaturOffen(true)
+              }}
+              disabled={exportiert}
+              className="ml-auto flex-row items-center gap-1.5 rounded-full border border-db-gray-200 bg-white px-3 py-1.5"
+            >
+              {exportiert ? <Loader2 size={14} color="#14181F" /> : <Download size={14} color="#14181F" />}
+              <Text className="text-xs font-semibold text-db-navy">Ausbildungsnachweis</Text>
+            </Pressable>
+          </View>
+
+          <View className="gap-3">
+            {anzeigeTage.map((datumISO) => {
+              const e = eintraegeNachDatum.get(datumISO)
+              if (!e) {
+                return (
+                  <Pressable
+                    key={datumISO}
+                    onPress={() => setBearbeitung(neuerTageseintragFuer(datumISO))}
+                    className="flex-row items-center justify-between rounded-xl border border-dashed border-db-gray-200 bg-white p-4"
+                  >
+                    <Text className="text-sm font-medium text-db-navy-light">{datumLabelFuer(datumISO)}</Text>
+                    <View className="flex-row items-center gap-1">
+                      <Plus size={13} color="#EC0016" />
+                      <Text className="text-xs font-medium text-db-red">Eintragen</Text>
                     </View>
-                  ))}
+                  </Pressable>
+                )
+              }
+              return (
+                <View key={e.id} className="rounded-xl border border-db-gray-200 bg-white p-4">
+                  <View className="flex-row items-start justify-between gap-3">
+                    <View>
+                      <Text className="text-sm font-semibold text-db-navy">{e.datum}</Text>
+                      <Text className="text-xs text-db-navy-light">
+                        {e.kategorie} · {e.stunden} Std.
+                      </Text>
+                    </View>
+                    <View className="flex-row items-center gap-2">
+                      <BerichtStatusBadge status={e.status} />
+                      <Pressable onPress={() => setBearbeitung(e)}>
+                        <Pencil size={14} color="#5C6670" />
+                      </Pressable>
+                    </View>
+                  </View>
+                  <Text className="mt-2 text-sm text-db-navy">
+                    {e.taetigkeiten || <Text className="italic text-db-navy-light">Noch keine Angaben</Text>}
+                  </Text>
+                  {e.ausbilderKommentar && (
+                    <Text className="mt-2 rounded-lg bg-db-gray-50 p-2 text-xs text-db-navy-light">
+                      <Text className="font-semibold text-db-navy">Ausbilder: </Text>
+                      {e.ausbilderKommentar}
+                    </Text>
+                  )}
+                  {e.status === 'Entwurf' && e.taetigkeiten.trim() && (
+                    <Pressable onPress={() => einreichen(e.id)} className="mt-3 self-start rounded-full bg-db-red px-3.5 py-1.5">
+                      <Text className="text-xs font-semibold text-white">Zur Freigabe einreichen</Text>
+                    </Pressable>
+                  )}
                 </View>
-              </View>
-            )
-          })}
+              )
+            })}
+          </View>
         </View>
       </ScrollView>
 
@@ -271,45 +332,39 @@ export default function Berichtsheft() {
         </Pressable>
       </Modal>
 
-      <Modal visible={!!signieren} transparent animationType="fade" onRequestClose={() => setSignieren(null)}>
-        <Pressable className="flex-1 justify-end bg-black/40 sm:items-center sm:justify-center" onPress={() => setSignieren(null)}>
-          {signieren && (
-            <Pressable className="gap-4 rounded-t-2xl bg-white p-5 sm:w-full sm:max-w-md sm:rounded-2xl" onPress={(e) => e.stopPropagation()}>
-              <View className="flex-row items-center justify-between">
-                <View>
-                  <Text className="text-sm font-semibold text-db-navy">Unterschrift bestätigen</Text>
-                  <Text className="text-xs text-db-navy-light">
-                    Woche {signieren.label} · {signieren.eintraege.length} Einträge
-                  </Text>
-                </View>
-                <Pressable onPress={() => setSignieren(null)}>
-                  <X size={18} color="#5C6670" />
-                </Pressable>
+      <Modal visible={signaturOffen} transparent animationType="fade" onRequestClose={() => setSignaturOffen(false)}>
+        <Pressable className="flex-1 justify-end bg-black/40 sm:items-center sm:justify-center" onPress={() => setSignaturOffen(false)}>
+          <Pressable className="gap-4 rounded-t-2xl bg-white p-5 sm:w-full sm:max-w-md sm:rounded-2xl" onPress={(e) => e.stopPropagation()}>
+            <View className="flex-row items-center justify-between">
+              <View>
+                <Text className="text-sm font-semibold text-db-navy">Unterschrift bestätigen</Text>
+                <Text className="text-xs text-db-navy-light">
+                  Woche {wochenLabel(ausgewaehlteWoche)} · {wocheEintraege.length} Einträge
+                </Text>
               </View>
-
-              <Text className="text-xs text-db-navy-light">
-                Mit deiner Unterschrift bestätigst du, dass die Angaben in diesem Ausbildungsnachweis richtig und
-                vollständig sind.
-              </Text>
-
-              <SignaturePad onChange={setUnterschrift} />
-
-              <Pressable
-                onPress={signaturBestaetigen}
-                disabled={!unterschrift || exportierendeWoche === signieren.schluessel}
-                className={`flex-row items-center justify-center gap-2 rounded-full bg-db-red px-4 py-3 ${
-                  !unterschrift ? 'opacity-50' : ''
-                }`}
-              >
-                {exportierendeWoche === signieren.schluessel ? (
-                  <Loader2 size={16} color="#fff" />
-                ) : (
-                  <Download size={16} color="#fff" />
-                )}
-                <Text className="text-sm font-semibold text-white">Unterschreiben &amp; PDF erstellen</Text>
+              <Pressable onPress={() => setSignaturOffen(false)}>
+                <X size={18} color="#5C6670" />
               </Pressable>
+            </View>
+
+            <Text className="text-xs text-db-navy-light">
+              Mit deiner Unterschrift bestätigst du, dass die Angaben in diesem Ausbildungsnachweis richtig und
+              vollständig sind.
+            </Text>
+
+            <SignaturePad onChange={setUnterschrift} />
+
+            <Pressable
+              onPress={signaturBestaetigen}
+              disabled={!unterschrift || exportiert}
+              className={`flex-row items-center justify-center gap-2 rounded-full bg-db-red px-4 py-3 ${
+                !unterschrift ? 'opacity-50' : ''
+              }`}
+            >
+              {exportiert ? <Loader2 size={16} color="#fff" /> : <Download size={16} color="#fff" />}
+              <Text className="text-sm font-semibold text-white">Unterschreiben &amp; PDF erstellen</Text>
             </Pressable>
-          )}
+          </Pressable>
         </Pressable>
       </Modal>
     </View>
