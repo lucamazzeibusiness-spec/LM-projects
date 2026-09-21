@@ -43,12 +43,12 @@ export function exportBerichtsheftPdf(profil: AzubiProfil, eintraege: Berichtshe
 
   doc.setFillColor(255, 255, 255)
   doc.setDrawColor(236, 0, 22)
-  doc.setLineWidth(1)
-  doc.roundedRect(li, 14, 16, 10.5, 1.4, 1.4, 'FD')
+  doc.setLineWidth(1.3)
+  doc.roundedRect(li, 14, 16, 10.5, 0.9, 0.9, 'FD')
   doc.setTextColor(236, 0, 22)
   doc.setFont('helvetica', 'bold')
-  doc.setFontSize(17)
-  doc.text('DB', li + 8, 21.3, { align: 'center' })
+  doc.setFontSize(18)
+  doc.text('DB', li + 8, 21.4, { align: 'center', charSpace: -0.3 })
 
   doc.setTextColor(...tinte)
   doc.setFontSize(11)
