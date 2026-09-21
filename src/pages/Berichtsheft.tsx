@@ -53,12 +53,8 @@ export default function Berichtsheft() {
   const heutigerEintrag = eintraege.find((e) => e.datumISO === heute)
   const heuteSchluessel = wochenSchluessel(heute)
   const istAktuelleWoche = ausgewaehlteWoche === heuteSchluessel
-
-  const stundenAktuelleWoche = useMemo(
-    () => eintraege.filter((e) => wochenSchluessel(e.datumISO) === heuteSchluessel).reduce((sum, e) => sum + e.stunden, 0),
-    [eintraege, heuteSchluessel],
-  )
-  const offeneEntwuerfe = eintraege.filter((e) => e.status === 'Entwurf' && e.taetigkeiten.trim()).length
+  const beginnSchluessel = profil?.ausbildungsbeginn ? wochenSchluessel(profil.ausbildungsbeginn) : null
+  const kannZurueck = !beginnSchluessel || ausgewaehlteWoche > beginnSchluessel
 
   const montagFreitag = useMemo(() => arbeitstageDerWoche(ausgewaehlteWoche), [ausgewaehlteWoche])
   const wocheEintraege = useMemo(
@@ -92,7 +88,12 @@ export default function Berichtsheft() {
     setBearbeitung(null)
   }
 
-  const vorherigeWoche = () => setAusgewaehlteWoche((w) => wocheVerschieben(w, -1))
+  const vorherigeWoche = () =>
+    setAusgewaehlteWoche((w) => {
+      const ziel = wocheVerschieben(w, -1)
+      if (beginnSchluessel && ziel < beginnSchluessel) return w
+      return ziel
+    })
   const naechsteWoche = () => setAusgewaehlteWoche((w) => wocheVerschieben(w, 1))
   const zurAktuellenWoche = () => setAusgewaehlteWoche(heuteSchluessel)
 
@@ -171,19 +172,6 @@ export default function Berichtsheft() {
         </button>
       )}
 
-      <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-xl border border-db-gray-200 bg-white p-4">
-          <p className="text-2xl font-semibold text-db-navy">{stundenAktuelleWoche} Std.</p>
-          <p className="text-xs text-db-navy-light">Erfasst diese Woche</p>
-        </div>
-        <div className="rounded-xl border border-db-gray-200 bg-white p-4">
-          <p className={`text-2xl font-semibold ${offeneEntwuerfe > 0 ? 'text-db-red' : 'text-db-green'}`}>
-            {offeneEntwuerfe}
-          </p>
-          <p className="text-xs text-db-navy-light">Noch nicht eingereicht</p>
-        </div>
-      </div>
-
       {bearbeitung && (
         <div
           className="fixed inset-0 z-30 flex items-end justify-center bg-black/40 p-4 sm:items-center"
@@ -248,7 +236,8 @@ export default function Berichtsheft() {
         <div className="flex items-center justify-between gap-2 px-1">
           <button
             onClick={vorherigeWoche}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-db-gray-200 bg-white text-db-navy-light hover:border-db-navy/30"
+            disabled={!kannZurueck}
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-db-gray-200 bg-white text-db-navy-light hover:border-db-navy/30 disabled:opacity-30"
           >
             <ChevronLeft size={16} />
           </button>

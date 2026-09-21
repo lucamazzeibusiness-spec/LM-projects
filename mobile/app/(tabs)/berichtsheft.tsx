@@ -55,12 +55,8 @@ export default function Berichtsheft() {
   const heutigerEintrag = eintraege.find((e) => e.datumISO === heute)
   const heuteSchluessel = wochenSchluessel(heute)
   const istAktuelleWoche = ausgewaehlteWoche === heuteSchluessel
-
-  const stundenAktuelleWoche = useMemo(
-    () => eintraege.filter((e) => wochenSchluessel(e.datumISO) === heuteSchluessel).reduce((sum, e) => sum + e.stunden, 0),
-    [eintraege, heuteSchluessel],
-  )
-  const offeneEntwuerfe = eintraege.filter((e) => e.status === 'Entwurf' && e.taetigkeiten.trim()).length
+  const beginnSchluessel = profil?.ausbildungsbeginn ? wochenSchluessel(profil.ausbildungsbeginn) : null
+  const kannZurueck = !beginnSchluessel || ausgewaehlteWoche > beginnSchluessel
 
   const montagFreitag = useMemo(() => arbeitstageDerWoche(ausgewaehlteWoche), [ausgewaehlteWoche])
   const wocheEintraege = useMemo(
@@ -84,7 +80,12 @@ export default function Berichtsheft() {
     return [...set].sort()
   }, [eintraege, ausgewaehlteWoche])
 
-  const vorherigeWoche = () => setAusgewaehlteWoche((w) => wocheVerschieben(w, -1))
+  const vorherigeWoche = () =>
+    setAusgewaehlteWoche((w) => {
+      const ziel = wocheVerschieben(w, -1)
+      if (beginnSchluessel && ziel < beginnSchluessel) return w
+      return ziel
+    })
   const naechsteWoche = () => setAusgewaehlteWoche((w) => wocheVerschieben(w, 1))
   const zurAktuellenWoche = () => setAusgewaehlteWoche(heuteSchluessel)
 
@@ -163,24 +164,14 @@ export default function Berichtsheft() {
           )}
         </Pressable>
 
-        <View className="flex-row gap-3">
-          <View className="flex-1 rounded-xl border border-db-gray-200 bg-white p-4">
-            <Text className="text-2xl font-semibold text-db-navy">{stundenAktuelleWoche} Std.</Text>
-            <Text className="text-xs text-db-navy-light">Erfasst diese Woche</Text>
-          </View>
-          <View className="flex-1 rounded-xl border border-db-gray-200 bg-white p-4">
-            <Text className={`text-2xl font-semibold ${offeneEntwuerfe > 0 ? 'text-db-red' : 'text-db-green'}`}>
-              {offeneEntwuerfe}
-            </Text>
-            <Text className="text-xs text-db-navy-light">Noch nicht eingereicht</Text>
-          </View>
-        </View>
-
         <View className="gap-3" {...panResponder.panHandlers}>
           <View className="flex-row items-center justify-between gap-2 px-1">
             <Pressable
               onPress={vorherigeWoche}
-              className="h-8 w-8 shrink-0 items-center justify-center rounded-full border border-db-gray-200 bg-white"
+              disabled={!kannZurueck}
+              className={`h-8 w-8 shrink-0 items-center justify-center rounded-full border border-db-gray-200 bg-white ${
+                kannZurueck ? '' : 'opacity-30'
+              }`}
             >
               <ChevronLeft size={16} color="#5C6670" />
             </Pressable>
