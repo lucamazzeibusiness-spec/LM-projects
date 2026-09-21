@@ -1,4 +1,4 @@
-import { ChevronLeft, GraduationCap } from 'lucide-react'
+import { ChevronLeft } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -9,6 +9,7 @@ import {
   type AzubiProfil,
 } from '../data/mock'
 import { useAzubiProfil } from '../context/AzubiProfilContext'
+import { DB_LOGO_PNG } from '../lib/dbLogo'
 
 const ausbildungsberufe: AusbildungsberufName[] = curricula.map((c) => c.beruf)
 
@@ -45,11 +46,9 @@ export default function Onboarding() {
     <div className="flex min-h-screen flex-col bg-db-gray-50">
       <div className="mx-auto flex w-full max-w-md flex-1 flex-col px-4 py-8">
         <div className="mb-6 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-db-red text-white">
-            <GraduationCap size={22} />
-          </div>
+          <img src={DB_LOGO_PNG} alt="DB" className="h-9 w-auto" />
           <div>
-            <p className="text-sm font-bold text-db-navy">DB Azubi</p>
+            <p className="text-sm font-bold text-db-navy">Azubi</p>
             <p className="text-xs text-db-navy-light">Kurz einrichten, dann geht's los</p>
           </div>
         </div>

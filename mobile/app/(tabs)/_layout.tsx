@@ -12,7 +12,7 @@ function Header() {
     <View className="flex-row items-center gap-3 border-b border-db-gray-200 bg-white px-4 pb-3 pt-14">
       <Image source={{ uri: DB_LOGO_PNG }} style={{ width: 38, height: 26 }} resizeMode="contain" />
       <View className="flex-1">
-        <Text className="text-sm font-bold text-db-navy">DB Azubi</Text>
+        <Text className="text-sm font-bold text-db-navy">Azubi</Text>
         {profil && (
           <Text className="text-xs text-db-navy-light">
             {profil.ausbildungsberuf} · {profil.lehrjahr}. Lehrjahr

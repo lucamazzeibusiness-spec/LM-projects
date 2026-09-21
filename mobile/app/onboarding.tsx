@@ -18,7 +18,7 @@ export default function Onboarding() {
       <View className="flex-row items-center gap-3 px-4 pt-14">
         <Image source={{ uri: DB_LOGO_PNG }} className="h-9" style={{ width: 40, height: 26 }} resizeMode="contain" />
         <View>
-          <Text className="text-sm font-bold text-db-navy">DB Azubi</Text>
+          <Text className="text-sm font-bold text-db-navy">Azubi</Text>
           <Text className="text-xs text-db-navy-light">Kurz einrichten, dann geht's los</Text>
         </View>
       </View>

@@ -23,7 +23,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
           <img src={DB_LOGO_PNG} alt="DB" className="h-8 w-auto" />
           <div className="flex flex-col leading-tight">
-            <span className="text-sm font-bold tracking-tight text-db-navy">DB Azubi</span>
+            <span className="text-sm font-bold tracking-tight text-db-navy">Azubi</span>
             <span className="text-xs text-db-navy-light">
               {profil.ausbildungsberuf} · {profil.lehrjahr}. Lehrjahr
             </span>
