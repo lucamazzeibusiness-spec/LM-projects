@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import type { AzubiProfil, BerichtsheftEintrag } from '../data/mock'
+import { DB_LOGO_ASPECT, DB_LOGO_PNG } from './dbLogo'
 import { heutigesDatumVoll } from './wochen'
 
 interface ExportOptions {
@@ -41,14 +42,9 @@ export function exportBerichtsheftPdf(profil: AzubiProfil, eintraege: Berichtshe
   doc.setTextColor(90)
   doc.text('DB Intern / DB internal', li, 11)
 
-  doc.setFillColor(255, 255, 255)
-  doc.setDrawColor(236, 0, 22)
-  doc.setLineWidth(1.3)
-  doc.roundedRect(li, 14, 16, 10.5, 0.9, 0.9, 'FD')
-  doc.setTextColor(236, 0, 22)
-  doc.setFont('helvetica', 'bold')
-  doc.setFontSize(18)
-  doc.text('DB', li + 8, 21.4, { align: 'center', charSpace: -0.3 })
+  const logoBreite = 16
+  const logoHoehe = logoBreite / DB_LOGO_ASPECT
+  doc.addImage(DB_LOGO_PNG, 'PNG', li, 14, logoBreite, logoHoehe)
 
   doc.setTextColor(...tinte)
   doc.setFontSize(11)
