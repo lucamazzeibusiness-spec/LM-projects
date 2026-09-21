@@ -1,6 +1,7 @@
 import { CalendarCheck, Download, Loader2, Pencil, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { BerichtStatusBadge } from '../components/Badges'
+import SignaturePad from '../components/SignaturePad'
 import { useAzubiProfil } from '../context/AzubiProfilContext'
 import { useBerichtsheft } from '../hooks/useBerichtsheft'
 import type { BerichtsheftEintrag, BerichtsheftKategorie } from '../data/mock'
@@ -31,6 +32,8 @@ export default function Berichtsheft() {
   const { eintraege, setEintraege } = useBerichtsheft()
   const [bearbeitung, setBearbeitung] = useState<BerichtsheftEintrag | null>(null)
   const [exportierendeWoche, setExportierendeWoche] = useState<string | null>(null)
+  const [signieren, setSignieren] = useState<Wochengruppe | null>(null)
+  const [unterschrift, setUnterschrift] = useState<string | null>(null)
 
   const heute = heuteISO()
   const heutigerEintrag = eintraege.find((e) => e.datumISO === heute)
@@ -72,17 +75,24 @@ export default function Berichtsheft() {
     )
   }
 
-  const wocheExportieren = async (gruppe: Wochengruppe) => {
+  const wocheExportieren = async (gruppe: Wochengruppe, unterschriftDataUrl: string) => {
     setExportierendeWoche(gruppe.schluessel)
     try {
       const { exportBerichtsheftPdf } = await import('../lib/exportBerichtsheft')
       const { von, bis } = wochenStartEnde(gruppe.schluessel)
       const alleSchluessel = wochen.map((w) => w.schluessel).sort()
       const nr = String(alleSchluessel.indexOf(gruppe.schluessel) + 1).padStart(3, '0')
-      exportBerichtsheftPdf(profil, gruppe.eintraege, { nr, von, bis })
+      exportBerichtsheftPdf(profil, gruppe.eintraege, { nr, von, bis, unterschriftDataUrl })
     } finally {
       setExportierendeWoche(null)
     }
+  }
+
+  const signaturBestaetigen = async () => {
+    if (!signieren || !unterschrift) return
+    await wocheExportieren(signieren, unterschrift)
+    setSignieren(null)
+    setUnterschrift(null)
   }
 
   return (
@@ -204,7 +214,10 @@ export default function Berichtsheft() {
                   </p>
                 </div>
                 <button
-                  onClick={() => wocheExportieren(gruppe)}
+                  onClick={() => {
+                    setUnterschrift(null)
+                    setSignieren(gruppe)
+                  }}
                   disabled={exportierendeWoche === gruppe.schluessel}
                   className="flex shrink-0 items-center gap-1.5 rounded-full border border-db-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-db-navy hover:border-db-navy/30 disabled:opacity-60"
                 >
@@ -252,6 +265,50 @@ export default function Berichtsheft() {
           )
         })}
       </div>
+
+      {signieren && (
+        <div
+          className="fixed inset-0 z-30 flex items-end justify-center bg-black/40 p-4 sm:items-center"
+          onClick={() => setSignieren(null)}
+        >
+          <div
+            className="w-full max-w-md space-y-4 rounded-2xl bg-white p-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-semibold text-db-navy">Unterschrift bestätigen</p>
+                <p className="text-xs text-db-navy-light">
+                  Woche {signieren.label} · {signieren.eintraege.length} Einträge
+                </p>
+              </div>
+              <button onClick={() => setSignieren(null)} className="text-db-navy-light hover:text-db-navy">
+                <X size={18} />
+              </button>
+            </div>
+
+            <p className="text-xs text-db-navy-light">
+              Mit deiner Unterschrift bestätigst du, dass die Angaben in diesem Ausbildungsnachweis richtig und
+              vollständig sind.
+            </p>
+
+            <SignaturePad onChange={setUnterschrift} />
+
+            <button
+              onClick={signaturBestaetigen}
+              disabled={!unterschrift || exportierendeWoche === signieren.schluessel}
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-db-red px-4 py-3 text-sm font-semibold text-white hover:bg-db-red-dark disabled:opacity-50"
+            >
+              {exportierendeWoche === signieren.schluessel ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Download size={16} />
+              )}
+              Unterschreiben &amp; PDF erstellen
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -7,6 +7,7 @@ interface ExportOptions {
   nr: string
   von: string
   bis: string
+  unterschriftDataUrl: string
 }
 
 const tinte: [number, number, number] = [20, 24, 31]
@@ -29,7 +30,7 @@ function alsStichpunkte(text: string): string {
 // Baut das PDF im Layout des offiziellen DB-Ausbildungsnachweis-Formulars nach
 // (Kopfbereich mit Nr./Zeitraum/Ausbildungsjahr, Tagestabelle, Unterschriftenblock).
 export function exportBerichtsheftPdf(profil: AzubiProfil, eintraege: BerichtsheftEintrag[], optionen: ExportOptions) {
-  const { nr, von, bis } = optionen
+  const { nr, von, bis, unterschriftDataUrl } = optionen
   const doc = new jsPDF({ unit: 'mm', format: 'a4' })
   const seitenbreite = doc.internal.pageSize.getWidth()
   const seitenhoehe = doc.internal.pageSize.getHeight()
@@ -40,7 +41,7 @@ export function exportBerichtsheftPdf(profil: AzubiProfil, eintraege: Berichtshe
   doc.setTextColor(90)
   doc.text('DB Intern / DB internal', li, 11)
 
-  doc.setFillColor(226, 0, 26)
+  doc.setFillColor(236, 0, 22)
   doc.roundedRect(li, 14, 16, 10.5, 1.2, 1.2, 'F')
   doc.setTextColor(255)
   doc.setFont('helvetica', 'bold')
@@ -159,6 +160,21 @@ export function exportBerichtsheftPdf(profil: AzubiProfil, eintraege: Berichtshe
       if (data.row.index === 3) {
         data.cell.styles.fontStyle = 'bold'
         data.cell.styles.halign = 'center'
+      }
+    },
+    didDrawCell: (data) => {
+      if (data.row.index === 2 && data.column.index === 0) {
+        const rand = 1.5
+        doc.addImage(
+          unterschriftDataUrl,
+          'PNG',
+          data.cell.x + rand,
+          data.cell.y + rand,
+          data.cell.width - rand * 2,
+          data.cell.height - rand * 2,
+          undefined,
+          'FAST',
+        )
       }
     },
   })
