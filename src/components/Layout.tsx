@@ -2,6 +2,7 @@ import { AlertTriangle, BookOpen, CalendarDays, ClipboardList, GraduationCap, La
 import { type ReactNode } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useAzubiProfil } from '../context/AzubiProfilContext'
+import { DB_LOGO_PNG } from '../lib/dbLogo'
 
 const navItems = [
   { to: '/', label: 'Start', icon: LayoutGrid, end: true },
@@ -20,9 +21,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-db-gray-50">
       <header className="sticky top-0 z-20 border-b border-db-gray-200 bg-white">
         <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-db-red text-white">
-            <GraduationCap size={20} />
-          </div>
+          <img src={DB_LOGO_PNG} alt="DB" className="h-8 w-auto" />
           <div className="flex flex-col leading-tight">
             <span className="text-sm font-bold tracking-tight text-db-navy">DB Azubi</span>
             <span className="text-xs text-db-navy-light">
