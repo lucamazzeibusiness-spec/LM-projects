@@ -32,6 +32,20 @@ export function heutigesDatumLabel(): string {
   return new Date().toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: '2-digit' })
 }
 
+export function heutigesDatumVoll(): string {
+  return new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })
+}
+
+// schluessel ist der ISO-Montag der Woche (siehe wochenSchluessel). Der Ausbildungsnachweis
+// bezieht sich auf die betriebliche Ausbildungswoche Montag–Freitag.
+export function wochenStartEnde(schluessel: string): { von: string; bis: string } {
+  const montag = new Date(`${schluessel}T00:00:00`)
+  const freitag = new Date(montag)
+  freitag.setDate(freitag.getDate() + 4)
+  const fmt = (d: Date) => d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })
+  return { von: fmt(montag), bis: fmt(freitag) }
+}
+
 const wochentagsnamen = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag']
 
 export function heutigerWochentagIndex(): number {

@@ -4,7 +4,7 @@ import { BerichtStatusBadge } from '../components/Badges'
 import { useAzubiProfil } from '../context/AzubiProfilContext'
 import { useBerichtsheft } from '../hooks/useBerichtsheft'
 import type { BerichtsheftEintrag, BerichtsheftKategorie } from '../data/mock'
-import { heuteISO, heutigesDatumLabel, wochenLabel, wochenSchluessel } from '../lib/wochen'
+import { heuteISO, heutigesDatumLabel, wochenLabel, wochenSchluessel, wochenStartEnde } from '../lib/wochen'
 
 const kategorien: BerichtsheftKategorie[] = ['Betrieblich', 'Berufsschule', 'DB Training']
 
@@ -76,11 +76,10 @@ export default function Berichtsheft() {
     setExportierendeWoche(gruppe.schluessel)
     try {
       const { exportBerichtsheftPdf } = await import('../lib/exportBerichtsheft')
-      exportBerichtsheftPdf(profil, gruppe.eintraege, {
-        titel: 'Wochenbericht',
-        zeitraum: gruppe.label,
-        dateiSuffix: gruppe.schluessel,
-      })
+      const { von, bis } = wochenStartEnde(gruppe.schluessel)
+      const alleSchluessel = wochen.map((w) => w.schluessel).sort()
+      const nr = String(alleSchluessel.indexOf(gruppe.schluessel) + 1).padStart(3, '0')
+      exportBerichtsheftPdf(profil, gruppe.eintraege, { nr, von, bis })
     } finally {
       setExportierendeWoche(null)
     }
@@ -214,7 +213,7 @@ export default function Berichtsheft() {
                   ) : (
                     <Download size={14} />
                   )}
-                  Wochenbericht
+                  Ausbildungsnachweis
                 </button>
               </div>
 
