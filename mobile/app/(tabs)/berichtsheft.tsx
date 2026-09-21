@@ -110,7 +110,8 @@ export default function Berichtsheft() {
     try {
       const { von, bis } = wochenStartEnde(ausgewaehlteWoche)
       const nr = String(alleWochenMitEintraegen.indexOf(ausgewaehlteWoche) + 1).padStart(3, '0')
-      await exportBerichtsheftPdf(profil, wocheEintraege, { nr, von, bis, unterschriftDataUrl })
+      const jahr = Number(ausgewaehlteWoche.slice(0, 4))
+      await exportBerichtsheftPdf(profil, wocheEintraege, { nr, von, bis, jahr, unterschriftDataUrl })
     } finally {
       setExportiert(false)
     }
@@ -341,6 +342,9 @@ export default function Berichtsheft() {
             <Text className="text-xs text-db-navy-light">
               Mit deiner Unterschrift bestätigst du, dass die Angaben in diesem Ausbildungsnachweis richtig und
               vollständig sind.
+              {profil.ausbilderEmail.trim()
+                ? ` Danach öffnet sich eine vorausgefüllte E-Mail an ${profil.ausbilderEmail} mit der PDF als Anhang.`
+                : ''}
             </Text>
 
             <SignaturePad onChange={setUnterschrift} />

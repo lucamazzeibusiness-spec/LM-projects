@@ -175,6 +175,17 @@ export default function ProfilForm({
                   className={inputClass}
                 />
               </Feld>
+
+              <Feld label="E-Mail für die Abgabe des Ausbildungsnachweises (optional)">
+                <TextInput
+                  value={entwurf.ausbilderEmail}
+                  onChangeText={(t) => aktualisieren('ausbilderEmail', t)}
+                  placeholder="z. B. Ausbildungswerkstatt.Musterstadt@deutschebahn.com"
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                  className={inputClass}
+                />
+              </Feld>
             </>
           )}
         </View>

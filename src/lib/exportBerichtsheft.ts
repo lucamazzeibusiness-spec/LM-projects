@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
-import type { AzubiProfil, BerichtsheftEintrag } from '../data/mock'
+import { berufAbkuerzung, type AzubiProfil, type BerichtsheftEintrag } from '../data/mock'
 import { DB_LOGO_ASPECT, DB_LOGO_PNG } from './dbLogo'
 import { heutigesDatumVoll } from './wochen'
 
@@ -8,7 +8,17 @@ interface ExportOptions {
   nr: string
   von: string
   bis: string
+  jahr: number
   unterschriftDataUrl: string
+}
+
+// Format laut betrieblicher Vorgabe: BERUF_JAHR_NR_Ausbildungsnachweis_Vorname_Nachname
+// (dient sowohl als Dateiname als auch als E-Mail-Betreff bei der Abgabe an den Ausbilder).
+export function ausbildungsnachweisBezeichnung(profil: AzubiProfil, nr: string, jahr: number): string {
+  const berufAbk = berufAbkuerzung[profil.ausbildungsberuf]
+  const [vorname, ...rest] = profil.name.trim().split(/\s+/)
+  const nachname = rest.join('_') || vorname || 'Azubi'
+  return `${berufAbk}_${jahr}_${nr}_Ausbildungsnachweis_${vorname || 'Azubi'}_${nachname}`
 }
 
 const tinte: [number, number, number] = [20, 24, 31]
@@ -53,8 +63,12 @@ async function pdfSpeichern(doc: jsPDF, dateiname: string) {
 
 // Baut das PDF im Layout des offiziellen DB-Ausbildungsnachweis-Formulars nach
 // (Kopfbereich mit Nr./Zeitraum/Ausbildungsjahr, Tagestabelle, Unterschriftenblock).
-export async function exportBerichtsheftPdf(profil: AzubiProfil, eintraege: BerichtsheftEintrag[], optionen: ExportOptions) {
-  const { nr, von, bis, unterschriftDataUrl } = optionen
+export async function exportBerichtsheftPdf(
+  profil: AzubiProfil,
+  eintraege: BerichtsheftEintrag[],
+  optionen: ExportOptions,
+): Promise<string> {
+  const { nr, von, bis, jahr, unterschriftDataUrl } = optionen
   const doc = new jsPDF({ unit: 'mm', format: 'a4' })
   const seitenbreite = doc.internal.pageSize.getWidth()
   const seitenhoehe = doc.internal.pageSize.getHeight()
@@ -219,6 +233,7 @@ export async function exportBerichtsheftPdf(profil: AzubiProfil, eintraege: Beri
   doc.setTextColor(120)
   doc.text('Seite 1/1', li, seitenhoehe - 10)
 
-  const dateiname = `Ausbildungsnachweis_${profil.name.replace(/\s+/g, '_')}_${nr}.pdf`
-  await pdfSpeichern(doc, dateiname)
+  const basisname = ausbildungsnachweisBezeichnung(profil, nr, jahr)
+  await pdfSpeichern(doc, `${basisname}.pdf`)
+  return basisname
 }

@@ -167,6 +167,16 @@ export default function Onboarding() {
                   className="w-full rounded-lg border border-db-gray-200 px-3 py-2.5 text-sm text-db-navy outline-none focus:border-db-red"
                 />
               </Feld>
+
+              <Feld label="E-Mail für die Abgabe des Ausbildungsnachweises (optional)">
+                <input
+                  type="email"
+                  value={entwurf.ausbilderEmail}
+                  onChange={(e) => aktualisieren('ausbilderEmail', e.target.value)}
+                  placeholder="z. B. Ausbildungswerkstatt.Musterstadt@deutschebahn.com"
+                  className="w-full rounded-lg border border-db-gray-200 px-3 py-2.5 text-sm text-db-navy outline-none focus:border-db-red"
+                />
+              </Feld>
             </>
           )}
         </div>

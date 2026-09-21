@@ -1,6 +1,8 @@
+import { File, Paths } from 'expo-file-system'
+import * as MailComposer from 'expo-mail-composer'
 import * as Print from 'expo-print'
 import * as Sharing from 'expo-sharing'
-import type { AzubiProfil, BerichtsheftEintrag } from '../data/mock'
+import { berufAbkuerzung, type AzubiProfil, type BerichtsheftEintrag } from '../data/mock'
 import { DB_LOGO_PNG } from './dbLogo'
 import { heutigesDatumVoll } from './wochen'
 
@@ -8,7 +10,17 @@ interface ExportOptions {
   nr: string
   von: string
   bis: string
+  jahr: number
   unterschriftDataUrl: string
+}
+
+// Format laut betrieblicher Vorgabe: BERUF_JAHR_NR_Ausbildungsnachweis_Vorname_Nachname
+// (dient sowohl als Dateiname als auch als E-Mail-Betreff bei der Abgabe an den Ausbilder).
+export function ausbildungsnachweisBezeichnung(profil: AzubiProfil, nr: string, jahr: number): string {
+  const berufAbk = berufAbkuerzung[profil.ausbildungsberuf]
+  const [vorname, ...rest] = profil.name.trim().split(/\s+/)
+  const nachname = rest.join('_') || vorname || 'Azubi'
+  return `${berufAbk}_${jahr}_${nr}_Ausbildungsnachweis_${vorname || 'Azubi'}_${nachname}`
 }
 
 const wochentage = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag']
@@ -175,15 +187,28 @@ export async function exportBerichtsheftPdf(
   profil: AzubiProfil,
   eintraege: BerichtsheftEintrag[],
   optionen: ExportOptions,
-): Promise<void> {
+): Promise<string> {
   const html = baueHtml(profil, eintraege, optionen)
   const { uri } = await Print.printToFileAsync({ html, base64: false })
+
+  const basisname = ausbildungsnachweisBezeichnung(profil, optionen.nr, optionen.jahr)
+  const ziel = new File(Paths.cache, `${basisname}.pdf`)
+  if (ziel.exists) ziel.delete()
+  await new File(uri).copy(ziel)
+
+  const ausbilderEmail = profil.ausbilderEmail.trim()
+  if (ausbilderEmail && (await MailComposer.isAvailableAsync())) {
+    await MailComposer.composeAsync({
+      recipients: [ausbilderEmail],
+      subject: basisname,
+      attachments: [ziel.uri],
+    })
+    return basisname
+  }
+
   const kannTeilen = await Sharing.isAvailableAsync()
   if (kannTeilen) {
-    await Sharing.shareAsync(uri, {
-      mimeType: 'application/pdf',
-      dialogTitle: `Ausbildungsnachweis_${profil.name}_${optionen.nr}`,
-      UTI: 'com.adobe.pdf',
-    })
+    await Sharing.shareAsync(ziel.uri, { mimeType: 'application/pdf', dialogTitle: basisname, UTI: 'com.adobe.pdf' })
   }
+  return basisname
 }
