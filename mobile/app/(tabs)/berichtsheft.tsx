@@ -53,7 +53,7 @@ export default function Berichtsheft() {
       .map(([schluessel, liste]) => ({
         schluessel,
         label: wochenLabel(liste[0].datumISO),
-        eintraege: liste.sort((a, b) => b.datumISO.localeCompare(a.datumISO)),
+        eintraege: liste.sort((a, b) => a.datumISO.localeCompare(b.datumISO)),
       }))
   }, [eintraege])
 
