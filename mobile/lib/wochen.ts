@@ -82,3 +82,12 @@ export function wocheVerschieben(schluessel: string, deltaWochen: number): strin
   montag.setDate(montag.getDate() + deltaWochen * 7)
   return isoDatum(montag)
 }
+
+// Fortlaufende Wochennummer seit Ausbildungsbeginn (1-basiert): die Woche, in der die
+// Ausbildung begonnen hat, ist Nr. 1, jede folgende Woche zählt eins weiter.
+export function wochenNummerSeit(beginnISO: string, schluessel: string): number {
+  const beginnMontag = new Date(`${wochenSchluessel(beginnISO)}T00:00:00`)
+  const zielMontag = new Date(`${schluessel}T00:00:00`)
+  const diffTage = Math.round((zielMontag.getTime() - beginnMontag.getTime()) / 86400000)
+  return Math.floor(diffTage / 7) + 1
+}

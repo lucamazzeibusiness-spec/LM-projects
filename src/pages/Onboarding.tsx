@@ -131,6 +131,15 @@ export default function Onboarding() {
                   </button>
                 ))}
               </div>
+
+              <Feld label="Ausbildungsbeginn (für die Nummerierung im Ausbildungsnachweis)">
+                <input
+                  type="date"
+                  value={entwurf.ausbildungsbeginn}
+                  onChange={(e) => aktualisieren('ausbildungsbeginn', e.target.value)}
+                  className="w-full rounded-lg border border-db-gray-200 px-3 py-2.5 text-sm text-db-navy outline-none focus:border-db-red"
+                />
+              </Feld>
             </>
           )}
 

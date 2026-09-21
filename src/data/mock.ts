@@ -12,6 +12,9 @@ export interface AzubiProfil {
   werk: string
   ausbilder: string
   ausbilderEmail: string
+  // ISO-Datum (YYYY-MM-DD). Bestimmt die fortlaufende Nummerierung (Nr.) des Ausbildungsnachweises:
+  // Nr. 001 ist die Woche, in der die Ausbildung begonnen hat, danach zählt jede Woche eins weiter.
+  ausbildungsbeginn: string
 }
 
 // Nur Vorbelegung für das Onboarding-Formular – das tatsächliche Profil trägt jede:r selbst ein.
@@ -25,15 +28,14 @@ export const azubiProfilBeispiel: AzubiProfil = {
   werk: '',
   ausbilder: '',
   ausbilderEmail: '',
+  ausbildungsbeginn: '',
 }
 
 // Kürzel für Dateiname/Betreff des Ausbildungsnachweises (Format: BERUF_JAHR_NR_Ausbildungsnachweis_Vorname_Nachname).
-// EBET ist aus einer echten DB-internen Anleitung übernommen; die anderen beiden sind nach dem gleichen
-// Muster abgeleitet und nicht offiziell bestätigt – bei Bedarf im Profil-Namen einfach anpassen.
 export const berufAbkuerzung: Record<AusbildungsberufName, string> = {
   'Elektroniker für Betriebstechnik': 'EBET',
   Industriemechaniker: 'IM',
-  Mechatroniker: 'MA',
+  Mechatroniker: 'Metro',
 }
 
 export interface ChecklistItem {

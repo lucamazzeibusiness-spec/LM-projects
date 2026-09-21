@@ -139,6 +139,15 @@ export default function ProfilForm({
                   </Pressable>
                 ))}
               </View>
+
+              <Feld label="Ausbildungsbeginn (für die Nummerierung im Ausbildungsnachweis)">
+                <TextInput
+                  value={entwurf.ausbildungsbeginn}
+                  onChangeText={(t) => aktualisieren('ausbildungsbeginn', t)}
+                  placeholder="JJJJ-MM-TT, z. B. 2026-09-01"
+                  className={inputClass}
+                />
+              </Feld>
             </>
           )}
 

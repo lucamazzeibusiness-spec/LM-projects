@@ -11,6 +11,7 @@ import {
   heuteISO,
   heutigesDatumLabel,
   wochenLabel,
+  wochenNummerSeit,
   wochenSchluessel,
   wochenStartEnde,
   wocheVerschieben,
@@ -109,7 +110,10 @@ export default function Berichtsheft() {
     setExportiert(true)
     try {
       const { von, bis } = wochenStartEnde(ausgewaehlteWoche)
-      const nr = String(alleWochenMitEintraegen.indexOf(ausgewaehlteWoche) + 1).padStart(3, '0')
+      const nrZahl = profil.ausbildungsbeginn
+        ? wochenNummerSeit(profil.ausbildungsbeginn, ausgewaehlteWoche)
+        : alleWochenMitEintraegen.indexOf(ausgewaehlteWoche) + 1
+      const nr = String(Math.max(1, nrZahl)).padStart(3, '0')
       const jahr = Number(ausgewaehlteWoche.slice(0, 4))
       await exportBerichtsheftPdf(profil, wocheEintraege, { nr, von, bis, jahr, unterschriftDataUrl })
     } finally {
