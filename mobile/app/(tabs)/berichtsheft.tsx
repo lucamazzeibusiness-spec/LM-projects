@@ -15,6 +15,7 @@ import {
   wochenSchluessel,
   wochenStartEnde,
   wocheVerschieben,
+  wochentagIndexVon,
 } from '../../lib/wochen'
 import type { BerichtsheftEintrag, BerichtsheftKategorie } from '../../data/mock'
 
@@ -29,13 +30,14 @@ function datumLabelFuer(datumISO: string): string {
 }
 
 function neuerTageseintragFuer(datumISO: string): BerichtsheftEintrag {
+  const istFreitag = wochentagIndexVon(datumISO) === 4
   return {
     id: `B-${Date.now()}`,
     datumISO,
     datum: datumLabelFuer(datumISO),
     kategorie: 'Betrieblich',
     taetigkeiten: '',
-    stunden: 8,
+    stunden: istFreitag ? 6 : 8,
     status: 'Entwurf',
   }
 }

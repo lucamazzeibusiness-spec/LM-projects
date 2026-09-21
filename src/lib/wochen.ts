@@ -52,6 +52,11 @@ export function heutigerWochentagIndex(): number {
   return (new Date().getDay() + 6) % 7 // 0 = Montag ... 6 = Sonntag
 }
 
+export function wochentagIndexVon(datumISO: string): number {
+  const d = new Date(`${datumISO}T00:00:00`)
+  return (d.getDay() + 6) % 7 // 0 = Montag ... 6 = Sonntag
+}
+
 export interface Wochentag {
   tag: string
   datum: string
