@@ -31,8 +31,8 @@ interface Entwurf {
   ort: string
 }
 
-function entwurfAus(eintrag: Ausbildungsblock | null): Entwurf {
-  return eintrag ? { ...eintrag } : { typ: 'Betrieb', thema: '', ort: '' }
+function entwurfAus(eintrag: Ausbildungsblock | null, standardOrt: string): Entwurf {
+  return eintrag ? { ...eintrag } : { typ: 'Betrieb', thema: '', ort: standardOrt }
 }
 
 export default function Ausbildungsplan() {
@@ -46,19 +46,40 @@ export default function Ausbildungsplan() {
 
   if (!profil) return null
   const curriculum = curricula.find((c) => c.beruf === profil.ausbildungsberuf)
+  const lernfeldVorschlaege = curriculum
+    ? curriculum.lernfelder.filter((lf) => lf.ausbildungsjahr === profil.lehrjahr).length > 0
+      ? curriculum.lernfelder.filter((lf) => lf.ausbildungsjahr === profil.lehrjahr)
+      : curriculum.lernfelder
+    : []
 
   const bearbeiten = (index: number) => {
-    setEntwurf(entwurfAus(vorlage[index]))
+    setEntwurf(entwurfAus(vorlage[index], profil.werk))
     setBearbeitungsIndex(index)
+  }
+
+  const eintragSpeichern = (index: number, wert: Entwurf) => {
+    if (wert.typ === 'Frei') {
+      tagSetzen(index, null)
+    } else {
+      tagSetzen(index, { typ: wert.typ, thema: wert.thema, ort: wert.ort })
+    }
   }
 
   const speichern = () => {
     if (bearbeitungsIndex === null) return
-    if (entwurf.typ === 'Frei') {
-      tagSetzen(bearbeitungsIndex, null)
-    } else {
-      tagSetzen(bearbeitungsIndex, { typ: entwurf.typ, thema: entwurf.thema, ort: entwurf.ort })
-    }
+    eintragSpeichern(bearbeitungsIndex, entwurf)
+    setBearbeitungsIndex(null)
+  }
+
+  const freiWaehlen = () => {
+    if (bearbeitungsIndex === null) return
+    tagSetzen(bearbeitungsIndex, null)
+    setBearbeitungsIndex(null)
+  }
+
+  const fuerGanzeWocheUebernehmen = () => {
+    if (bearbeitungsIndex === null || entwurf.typ === 'Frei') return
+    for (let i = 0; i < 5; i++) eintragSpeichern(i, entwurf)
     setBearbeitungsIndex(null)
   }
 
@@ -98,7 +119,7 @@ export default function Ausbildungsplan() {
                       </button>
                     </div>
                     <div className="flex flex-wrap gap-1.5">
-                      {[...typen, 'Frei' as const].map((t) => (
+                      {typen.map((t) => (
                         <button
                           key={t}
                           onClick={() => setEntwurf((d) => ({ ...d, typ: t }))}
@@ -111,6 +132,12 @@ export default function Ausbildungsplan() {
                           {t}
                         </button>
                       ))}
+                      <button
+                        onClick={freiWaehlen}
+                        className="rounded-full border border-dashed border-db-gray-200 bg-db-surface px-2.5 py-1 text-xs font-medium text-db-navy-light"
+                      >
+                        Frei
+                      </button>
                     </div>
                     {entwurf.typ !== 'Frei' && (
                       <>
@@ -120,6 +147,19 @@ export default function Ausbildungsplan() {
                           placeholder="z. B. Fahrzeuginstandhaltung – Elektrik / Lernfeld 6"
                           className="w-full rounded-lg border border-db-gray-200 px-3 py-2 text-sm text-db-navy outline-none focus:border-db-red"
                         />
+                        {entwurf.typ === 'Berufsschule' && lernfeldVorschlaege.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5">
+                            {lernfeldVorschlaege.map((lf) => (
+                              <button
+                                key={lf.nummer}
+                                onClick={() => setEntwurf((d) => ({ ...d, thema: `LF${lf.nummer} ${lf.titel}` }))}
+                                className="max-w-full truncate rounded-full border border-db-gray-200 bg-db-gray-50 px-2.5 py-1 text-xs text-db-navy-light hover:border-db-red/40"
+                              >
+                                LF{lf.nummer} {lf.titel}
+                              </button>
+                            ))}
+                          </div>
+                        )}
                         <input
                           value={entwurf.ort}
                           onChange={(e) => setEntwurf((d) => ({ ...d, ort: e.target.value }))}
@@ -128,12 +168,22 @@ export default function Ausbildungsplan() {
                         />
                       </>
                     )}
-                    <button
-                      onClick={speichern}
-                      className="w-full rounded-full bg-db-red px-4 py-2 text-sm font-semibold text-white hover:bg-db-red-dark"
-                    >
-                      Speichern
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={speichern}
+                        className="flex-1 rounded-full bg-db-red px-4 py-2 text-sm font-semibold text-white hover:bg-db-red-dark"
+                      >
+                        Speichern
+                      </button>
+                      {entwurf.typ !== 'Frei' && bearbeitungsIndex !== null && bearbeitungsIndex < 5 && (
+                        <button
+                          onClick={fuerGanzeWocheUebernehmen}
+                          className="flex-1 rounded-full border border-db-gray-200 px-4 py-2 text-xs font-semibold text-db-navy-light hover:border-db-red/40"
+                        >
+                          Für Mo–Fr übernehmen
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ) : (
                   <button onClick={() => bearbeiten(i)} className="flex w-full items-center gap-3 px-4 py-3 text-left">

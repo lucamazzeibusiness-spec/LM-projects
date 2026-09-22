@@ -32,8 +32,8 @@ interface Entwurf {
   ort: string
 }
 
-function entwurfAus(eintrag: Ausbildungsblock | null): Entwurf {
-  return eintrag ? { ...eintrag } : { typ: 'Betrieb', thema: '', ort: '' }
+function entwurfAus(eintrag: Ausbildungsblock | null, standardOrt: string): Entwurf {
+  return eintrag ? { ...eintrag } : { typ: 'Betrieb', thema: '', ort: standardOrt }
 }
 
 export default function Ausbildungsplan() {
@@ -47,19 +47,40 @@ export default function Ausbildungsplan() {
 
   if (!profil) return null
   const curriculum = curricula.find((c) => c.beruf === profil.ausbildungsberuf)
+  const lernfeldVorschlaege = curriculum
+    ? curriculum.lernfelder.filter((lf) => lf.ausbildungsjahr === profil.lehrjahr).length > 0
+      ? curriculum.lernfelder.filter((lf) => lf.ausbildungsjahr === profil.lehrjahr)
+      : curriculum.lernfelder
+    : []
 
   const bearbeiten = (index: number) => {
-    setEntwurf(entwurfAus(vorlage[index]))
+    setEntwurf(entwurfAus(vorlage[index], profil.werk))
     setBearbeitungsIndex(index)
+  }
+
+  const eintragSpeichern = (index: number, wert: Entwurf) => {
+    if (wert.typ === 'Frei') {
+      tagSetzen(index, null)
+    } else {
+      tagSetzen(index, { typ: wert.typ, thema: wert.thema, ort: wert.ort })
+    }
   }
 
   const speichern = () => {
     if (bearbeitungsIndex === null) return
-    if (entwurf.typ === 'Frei') {
-      tagSetzen(bearbeitungsIndex, null)
-    } else {
-      tagSetzen(bearbeitungsIndex, { typ: entwurf.typ, thema: entwurf.thema, ort: entwurf.ort })
-    }
+    eintragSpeichern(bearbeitungsIndex, entwurf)
+    setBearbeitungsIndex(null)
+  }
+
+  const freiWaehlen = () => {
+    if (bearbeitungsIndex === null) return
+    tagSetzen(bearbeitungsIndex, null)
+    setBearbeitungsIndex(null)
+  }
+
+  const fuerGanzeWocheUebernehmen = () => {
+    if (bearbeitungsIndex === null || entwurf.typ === 'Frei') return
+    for (let i = 0; i < 5; i++) eintragSpeichern(i, entwurf)
     setBearbeitungsIndex(null)
   }
 
@@ -99,7 +120,7 @@ export default function Ausbildungsplan() {
                       </Pressable>
                     </View>
                     <View className="flex-row flex-wrap gap-1.5">
-                      {[...typen, 'Frei' as const].map((t) => (
+                      {typen.map((t) => (
                         <Pressable
                           key={t}
                           onPress={() => setEntwurf((d) => ({ ...d, typ: t }))}
@@ -114,6 +135,12 @@ export default function Ausbildungsplan() {
                           </Text>
                         </Pressable>
                       ))}
+                      <Pressable
+                        onPress={freiWaehlen}
+                        className="rounded-full border border-dashed border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24] px-2.5 py-1"
+                      >
+                        <Text className="text-xs font-medium text-db-navy-light dark:text-[#9AA4B0]">Frei</Text>
+                      </Pressable>
                     </View>
                     {entwurf.typ !== 'Frei' && (
                       <>
@@ -123,6 +150,21 @@ export default function Ausbildungsplan() {
                           placeholder="z. B. Fahrzeuginstandhaltung – Elektrik / Lernfeld 6"
                           className="w-full rounded-lg border border-db-gray-200 dark:border-[#2A323D] px-3 py-2 text-sm text-db-navy dark:text-[#EEF1F4]"
                         />
+                        {entwurf.typ === 'Berufsschule' && lernfeldVorschlaege.length > 0 && (
+                          <View className="flex-row flex-wrap gap-1.5">
+                            {lernfeldVorschlaege.map((lf) => (
+                              <Pressable
+                                key={lf.nummer}
+                                onPress={() => setEntwurf((d) => ({ ...d, thema: `LF${lf.nummer} ${lf.titel}` }))}
+                                className="max-w-full rounded-full border border-db-gray-200 dark:border-[#2A323D] bg-db-gray-50 dark:bg-[#10141B] px-2.5 py-1"
+                              >
+                                <Text className="text-xs text-db-navy-light dark:text-[#9AA4B0]" numberOfLines={1}>
+                                  LF{lf.nummer} {lf.titel}
+                                </Text>
+                              </Pressable>
+                            ))}
+                          </View>
+                        )}
                         <TextInput
                           value={entwurf.ort}
                           onChangeText={(t) => setEntwurf((d) => ({ ...d, ort: t }))}
@@ -131,9 +173,21 @@ export default function Ausbildungsplan() {
                         />
                       </>
                     )}
-                    <Pressable onPress={speichern} className="items-center rounded-full bg-db-red px-4 py-2">
-                      <Text className="text-sm font-semibold text-white">Speichern</Text>
-                    </Pressable>
+                    <View className="flex-row gap-2">
+                      <Pressable onPress={speichern} className="flex-1 items-center rounded-full bg-db-red px-4 py-2">
+                        <Text className="text-sm font-semibold text-white">Speichern</Text>
+                      </Pressable>
+                      {entwurf.typ !== 'Frei' && bearbeitungsIndex !== null && bearbeitungsIndex < 5 && (
+                        <Pressable
+                          onPress={fuerGanzeWocheUebernehmen}
+                          className="flex-1 items-center rounded-full border border-db-gray-200 dark:border-[#2A323D] px-4 py-2"
+                        >
+                          <Text className="text-center text-xs font-semibold text-db-navy-light dark:text-[#9AA4B0]">
+                            Für Mo–Fr übernehmen
+                          </Text>
+                        </Pressable>
+                      )}
+                    </View>
                   </View>
                 ) : (
                   <Pressable onPress={() => bearbeiten(i)} className="flex-row items-center gap-3 px-4 py-3">
