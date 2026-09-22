@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import type { AzubiProfil } from '../data/mock'
+import { cloudSchreiben } from '../lib/cloudSync'
 import { ladeGespeichert, speichere } from '../lib/storage'
 
 const STORAGE_KEY = 'azubi:profil'
@@ -27,6 +28,7 @@ export function AzubiProfilProvider({ children }: { children: ReactNode }) {
   const profilSpeichern = (p: AzubiProfil) => {
     setProfil(p)
     speichere(STORAGE_KEY, p)
+    cloudSchreiben(STORAGE_KEY, p)
   }
 
   const profilZuruecksetzen = () => {

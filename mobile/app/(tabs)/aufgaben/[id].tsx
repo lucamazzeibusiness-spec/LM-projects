@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { Pressable, ScrollView, Text, TextInput, View } from 'react-native'
 import { GewerkBadge, PrioBadge, StatusBadge } from '../../../components/Badges'
 import { lernaufgaben } from '../../../data/mock'
+import { cloudSchreiben } from '../../../lib/cloudSync'
 import { ladeGespeichert, speichere } from '../../../lib/storage'
 
 interface Draft {
@@ -30,6 +31,7 @@ export default function AufgabeDetail() {
     setDraft((d) => {
       const naechster = updater(d)
       speichere(storageKey, naechster)
+      cloudSchreiben(storageKey, naechster)
       return naechster
     })
     setSavedHint(true)

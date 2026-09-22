@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ausbildungsplanVorlage, type Ausbildungsblock } from '../data/mock'
+import { cloudSchreiben } from '../lib/cloudSync'
 import { ladeGespeichert, speichere } from '../lib/storage'
 
 const STORAGE_KEY = 'ausbildungsplan:vorlage'
@@ -18,7 +19,10 @@ export function useAusbildungsplan() {
   }, [])
 
   useEffect(() => {
-    if (geladen) speichere(STORAGE_KEY, vorlage)
+    if (geladen) {
+      speichere(STORAGE_KEY, vorlage)
+      cloudSchreiben(STORAGE_KEY, vorlage)
+    }
   }, [vorlage, geladen])
 
   const tagSetzen = (index: number, eintrag: Ausbildungsblock | null) => {

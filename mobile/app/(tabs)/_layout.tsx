@@ -1,13 +1,15 @@
 import { Redirect, router, Tabs } from 'expo-router'
-import { BookOpen, CalendarDays, ClipboardList, GraduationCap, LayoutGrid, Moon, Sun } from 'lucide-react-native'
+import { BookOpen, CalendarDays, ClipboardList, GraduationCap, LayoutGrid, LogOut, Moon, Sun } from 'lucide-react-native'
 import { useColorScheme } from 'nativewind'
 import { Image, Pressable, Text, View } from 'react-native'
+import { useAuth } from '../../context/AuthContext'
 import { useAzubiProfil } from '../../context/AzubiProfilContext'
 import { DB_LOGO_PNG } from '../../lib/dbLogo'
 import { themeSetzen } from '../../lib/theme'
 
 function Header() {
   const { profil } = useAzubiProfil()
+  const { abmelden } = useAuth()
   const { colorScheme } = useColorScheme()
   const initialen = profil ? profil.name.slice(0, 2).toUpperCase() || '?' : '?'
 
@@ -27,6 +29,12 @@ function Header() {
         className="h-8 w-8 items-center justify-center rounded-full bg-db-gray-100 dark:bg-[#1A2029]"
       >
         {colorScheme === 'dark' ? <Sun size={15} color="#9AA4B0" /> : <Moon size={15} color="#5C6670" />}
+      </Pressable>
+      <Pressable
+        onPress={abmelden}
+        className="h-8 w-8 items-center justify-center rounded-full bg-db-gray-100 dark:bg-[#1A2029]"
+      >
+        <LogOut size={15} color="#5C6670" />
       </Pressable>
       <Pressable
         onPress={() => router.push('/profil')}
