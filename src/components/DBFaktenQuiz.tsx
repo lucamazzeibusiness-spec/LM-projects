@@ -1,8 +1,11 @@
-import { Check, RotateCcw, Sparkles } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { Check, RotateCcw, Shuffle, Sparkles, Trophy } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import { dbFakten, type DBFakt, type DBFaktKategorie } from '../data/mock'
 import { usePunkte } from '../context/PunkteContext'
+import { useZuordnenBestzeiten } from '../context/ZuordnenContext'
+import { formatZeit } from '../lib/zeit'
 import Flashcard from './Flashcard'
+import Zuordnen from './Zuordnen'
 
 const kategorien: (DBFaktKategorie | 'Alle')[] = [
   'Alle',
@@ -24,11 +27,15 @@ function shuffle(fakten: DBFakt[]): DBFakt[] {
 
 export default function DBFaktenQuiz() {
   const [kategorieFilter, setKategorieFilter] = useState<DBFaktKategorie | 'Alle'>('Alle')
+  const [modus, setModus] = useState<'karten' | 'zuordnen'>('karten')
   const [deck, setDeck] = useState<DBFakt[]>([])
   const [flipped, setFlipped] = useState(false)
   const [gewusst, setGewusst] = useState(0)
   const [wiederholen, setWiederholen] = useState(0)
+  const [zuordnenRunde, setZuordnenRunde] = useState(0)
+  const [zuordnenErgebnis, setZuordnenErgebnis] = useState<{ sekunden: number; fehler: number; neuerBest: boolean } | null>(null)
   const { punkteVergeben } = usePunkte()
+  const { bestFuer, bestSetzenWennBesser } = useZuordnenBestzeiten()
 
   const gefiltert = () => dbFakten.filter((f) => kategorieFilter === 'Alle' || f.kategorie === kategorieFilter)
 
@@ -40,6 +47,7 @@ export default function DBFaktenQuiz() {
   }
 
   useEffect(starten, [kategorieFilter])
+  useEffect(() => setZuordnenErgebnis(null), [kategorieFilter])
 
   const aktuell = deck[0]
   const gesamt = gefiltert().length
@@ -55,6 +63,28 @@ export default function DBFaktenQuiz() {
     setDeck((d) => [...d.slice(1), d[0]])
     setWiederholen((w) => w + 1)
     setFlipped(false)
+  }
+
+  const zuordnenSchluessel = `dbfakten:${kategorieFilter}`
+  const zuordnenPaare = useMemo(
+    () => shuffle(gefiltert()).slice(0, 6).map((f) => ({ id: f.id, begriff: f.frage, definition: f.antwort })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [kategorieFilter, zuordnenRunde],
+  )
+  const zuordnenBest = bestFuer(zuordnenSchluessel)
+
+  const zuordnenAbschluss = (sekunden: number, fehler: number) => {
+    const neuerBest = bestSetzenWennBesser(zuordnenSchluessel, sekunden)
+    if (neuerBest) {
+      const punkte = Math.max(10, 40 - Math.round(sekunden / 2) - fehler * 2)
+      punkteVergeben(`zuordnen-best:${zuordnenSchluessel}:${Date.now()}`, punkte, `Neue Bestzeit Zuordnen: ${formatZeit(sekunden)}`)
+    }
+    setZuordnenErgebnis({ sekunden, fehler, neuerBest })
+  }
+
+  const neueZuordnenRunde = () => {
+    setZuordnenErgebnis(null)
+    setZuordnenRunde((r) => r + 1)
   }
 
   return (
@@ -75,7 +105,26 @@ export default function DBFaktenQuiz() {
         ))}
       </div>
 
-      {gesamt > 0 && (
+      <div className="flex gap-1 rounded-full bg-db-gray-100 p-1">
+        <button
+          onClick={() => setModus('karten')}
+          className={`flex-1 rounded-full py-1.5 text-xs font-semibold ${
+            modus === 'karten' ? 'bg-db-surface text-db-navy shadow-sm' : 'text-db-navy-light'
+          }`}
+        >
+          Karteikarten
+        </button>
+        <button
+          onClick={() => setModus('zuordnen')}
+          className={`flex-1 rounded-full py-1.5 text-xs font-semibold ${
+            modus === 'zuordnen' ? 'bg-db-surface text-db-navy shadow-sm' : 'text-db-navy-light'
+          }`}
+        >
+          Zuordnen
+        </button>
+      </div>
+
+      {modus === 'karten' && gesamt > 0 && (
         <div className="space-y-1.5">
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-db-gray-100">
             <div
@@ -95,7 +144,43 @@ export default function DBFaktenQuiz() {
         </div>
       )}
 
-      {aktuell ? (
+      {modus === 'zuordnen' ? (
+        zuordnenPaare.length < 4 ? (
+          <div className="rounded-xl border border-db-gray-200 bg-db-surface p-6 text-center">
+            <p className="text-sm text-db-navy-light">Zu wenige Fakten für diesen Filter (mind. 4 nötig).</p>
+          </div>
+        ) : zuordnenErgebnis ? (
+          <div className="space-y-3 rounded-xl border border-db-green/30 bg-db-green/5 p-6 text-center">
+            <Sparkles size={24} className="mx-auto text-db-green" />
+            <p className="text-lg font-semibold text-db-navy">Geschafft in {formatZeit(zuordnenErgebnis.sekunden)}!</p>
+            <p className="text-sm text-db-navy-light">
+              {zuordnenErgebnis.fehler === 0 ? 'Ohne Fehler – stark!' : `${zuordnenErgebnis.fehler} Fehler (je +3 Sek.)`}
+            </p>
+            {zuordnenErgebnis.neuerBest ? (
+              <p className="flex items-center justify-center gap-1.5 text-sm font-semibold text-db-amber">
+                <Trophy size={15} /> Neue Bestzeit für diesen Filter!
+              </p>
+            ) : (
+              zuordnenBest !== null && <p className="text-xs text-db-navy-light">Bestzeit: {formatZeit(zuordnenBest)}</p>
+            )}
+            <button
+              onClick={neueZuordnenRunde}
+              className="mx-auto flex items-center gap-1.5 rounded-full bg-db-red px-5 py-2.5 text-sm font-semibold text-white hover:bg-db-red-dark"
+            >
+              <Shuffle size={15} /> Neue Runde
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {zuordnenBest !== null && (
+              <p className="flex items-center gap-1.5 text-xs text-db-navy-light">
+                <Trophy size={13} className="text-db-amber" /> Bestzeit für diesen Filter: {formatZeit(zuordnenBest)}
+              </p>
+            )}
+            <Zuordnen key={zuordnenRunde} paare={zuordnenPaare} onAbschluss={zuordnenAbschluss} />
+          </div>
+        )
+      ) : aktuell ? (
         <div className="space-y-3">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-db-gray-100 px-2.5 py-1 text-xs font-medium text-db-navy-light">

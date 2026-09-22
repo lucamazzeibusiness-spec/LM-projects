@@ -3,6 +3,7 @@ import Layout from './components/Layout'
 import { useAuth } from './context/AuthContext'
 import { AzubiProfilProvider, useAzubiProfil } from './context/AzubiProfilContext'
 import { PunkteProvider } from './context/PunkteContext'
+import { ZuordnenProvider } from './context/ZuordnenContext'
 import Ausbildungsplan from './pages/Ausbildungsplan'
 import Berichtsheft from './pages/Berichtsheft'
 import Dashboard from './pages/Dashboard'
@@ -29,7 +30,9 @@ export default function App() {
   return (
     <AzubiProfilProvider>
       <PunkteProvider>
-        <AppRoutes />
+        <ZuordnenProvider>
+          <AppRoutes />
+        </ZuordnenProvider>
       </PunkteProvider>
     </AzubiProfilProvider>
   )
