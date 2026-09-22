@@ -2,9 +2,11 @@ import { Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout'
 import { useAuth } from './context/AuthContext'
 import { AzubiProfilProvider, useAzubiProfil } from './context/AzubiProfilContext'
+import { PunkteProvider } from './context/PunkteContext'
 import Ausbildungsplan from './pages/Ausbildungsplan'
 import Berichtsheft from './pages/Berichtsheft'
 import Dashboard from './pages/Dashboard'
+import Fortschritt from './pages/Fortschritt'
 import LernaufgabeDetail from './pages/LernaufgabeDetail'
 import Lernaufgaben from './pages/Lernaufgaben'
 import Login from './pages/Login'
@@ -26,7 +28,9 @@ export default function App() {
   // Cloud-Daten wurden von AuthProvider bereits dort hineingespiegelt.
   return (
     <AzubiProfilProvider>
-      <AppRoutes />
+      <PunkteProvider>
+        <AppRoutes />
+      </PunkteProvider>
     </AzubiProfilProvider>
   )
 }
@@ -47,6 +51,7 @@ function AppRoutes() {
         <Route path="/berichtsheft" element={<Berichtsheft />} />
         <Route path="/wissen" element={<Wissen />} />
         <Route path="/ausbildungsplan" element={<Ausbildungsplan />} />
+        <Route path="/fortschritt" element={<Fortschritt />} />
         <Route path="/profil" element={<Onboarding />} />
       </Routes>
     </Layout>

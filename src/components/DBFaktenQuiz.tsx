@@ -1,6 +1,7 @@
 import { Check, RotateCcw, Sparkles } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { dbFakten, type DBFakt, type DBFaktKategorie } from '../data/mock'
+import { usePunkte } from '../context/PunkteContext'
 import Flashcard from './Flashcard'
 
 const kategorien: (DBFaktKategorie | 'Alle')[] = [
@@ -27,6 +28,7 @@ export default function DBFaktenQuiz() {
   const [flipped, setFlipped] = useState(false)
   const [gewusst, setGewusst] = useState(0)
   const [wiederholen, setWiederholen] = useState(0)
+  const { punkteVergeben } = usePunkte()
 
   const gefiltert = () => dbFakten.filter((f) => kategorieFilter === 'Alle' || f.kategorie === kategorieFilter)
 
@@ -43,6 +45,7 @@ export default function DBFaktenQuiz() {
   const gesamt = gefiltert().length
 
   const kannIch = () => {
+    if (aktuell) punkteVergeben(`karte:${aktuell.id}`, 5, `DB-Fakt gemeistert: ${aktuell.kategorie}`)
     setDeck((d) => d.slice(1))
     setGewusst((g) => g + 1)
     setFlipped(false)

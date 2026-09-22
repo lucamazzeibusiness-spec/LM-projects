@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react'
 import { GewerkBadge } from '../components/Badges'
 import DBFaktenQuiz from '../components/DBFaktenQuiz'
 import LernkartenQuiz from '../components/LernkartenQuiz'
+import RangKarte from '../components/RangKarte'
 import { ersatzteile, fehlerfaelle, type Gewerk } from '../data/mock'
 
 const gewerke: (Gewerk | 'Alle')[] = ['Alle', 'Elektrik', 'Mechanik', 'Mechatronik']
@@ -47,6 +48,8 @@ export default function Wissen() {
         <h1 className="text-xl font-semibold text-db-navy">Wissen</h1>
         <p className="text-sm text-db-navy-light">Nachschlagen und verstehen – nicht nur auswendig lernen</p>
       </div>
+
+      <RangKarte kompakt />
 
       <div className="flex gap-1 overflow-x-auto rounded-full bg-db-gray-100 p-1">
         <button

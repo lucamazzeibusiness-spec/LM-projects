@@ -1,6 +1,7 @@
 import { AlertTriangle, BookOpen, CalendarDays, ClipboardList, GraduationCap, LayoutGrid, LogOut, Moon, Sun } from 'lucide-react'
 import { type ReactNode, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
+import RangBadge from './RangBadge'
 import { useAuth } from '../context/AuthContext'
 import { useAzubiProfil } from '../context/AzubiProfilContext'
 import { DB_LOGO_PNG } from '../lib/dbLogo'
@@ -38,6 +39,7 @@ export default function Layout({ children }: { children: ReactNode }) {
             </span>
           </div>
           <div className="ml-auto flex items-center gap-2">
+            <RangBadge />
             <button
               onClick={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
               title={theme === 'dark' ? 'Helles Design' : 'Dunkles Design'}
