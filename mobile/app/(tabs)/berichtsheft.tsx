@@ -4,6 +4,7 @@ import { Modal, PanResponder, Pressable, ScrollView, Text, TextInput, View } fro
 import { BerichtStatusBadge } from '../../components/Badges'
 import SignaturePad from '../../components/SignaturePad'
 import { useAzubiProfil } from '../../context/AzubiProfilContext'
+import { berichtsheftStreak, usePunkte } from '../../context/PunkteContext'
 import { useBerichtsheft } from '../../hooks/useBerichtsheft'
 import { exportBerichtsheftPdf } from '../../lib/exportBerichtsheft'
 import {
@@ -45,6 +46,7 @@ function neuerTageseintragFuer(datumISO: string): BerichtsheftEintrag {
 export default function Berichtsheft() {
   const { profil } = useAzubiProfil()
   const { eintraege, setEintraege } = useBerichtsheft()
+  const { punkteVergeben, stand: punkteStand } = usePunkte()
   const [bearbeitung, setBearbeitung] = useState<BerichtsheftEintrag | null>(null)
   const [exportiert, setExportiert] = useState(false)
   const [signaturOffen, setSignaturOffen] = useState(false)
@@ -106,6 +108,14 @@ export default function Berichtsheft() {
   const speichern = () => {
     if (!bearbeitung || !bearbeitung.taetigkeiten.trim()) return
     setEintraege((prev) => [bearbeitung, ...prev.filter((e) => e.id !== bearbeitung.id)])
+
+    const ereignisId = `berichtsheft:${bearbeitung.datumISO}`
+    const neueStreak = berichtsheftStreak([{ id: ereignisId, betrag: 0, grund: '', datum: '' }, ...punkteStand.verlauf])
+    const bonus = Math.min(neueStreak, 10) * 2
+    const grund =
+      neueStreak > 1 ? `Berichtsheft: ${bearbeitung.datum} (🔥 ${neueStreak} Tage in Folge)` : `Berichtsheft: ${bearbeitung.datum}`
+    punkteVergeben(ereignisId, 15 + bonus, grund)
+
     setBearbeitung(null)
   }
 

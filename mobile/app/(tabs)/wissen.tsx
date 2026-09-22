@@ -5,6 +5,7 @@ import { Pressable } from 'react-native'
 import { GewerkBadge } from '../../components/Badges'
 import DBFaktenQuiz from '../../components/DBFaktenQuiz'
 import LernkartenQuiz from '../../components/LernkartenQuiz'
+import RangKarte from '../../components/RangKarte'
 import { ersatzteile, fehlerfaelle, type Gewerk } from '../../data/mock'
 
 const gewerke: (Gewerk | 'Alle')[] = ['Alle', 'Elektrik', 'Mechanik', 'Mechatronik']
@@ -49,6 +50,8 @@ export default function Wissen() {
         <Text className="text-xl font-semibold text-db-navy dark:text-[#EEF1F4]">Wissen</Text>
         <Text className="text-sm text-db-navy-light dark:text-[#9AA4B0]">Nachschlagen und verstehen – nicht nur auswendig lernen</Text>
       </View>
+
+      <RangKarte kompakt />
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-1 rounded-full bg-db-gray-100 dark:bg-[#1A2029] p-1 pr-2">
         {(

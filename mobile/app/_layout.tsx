@@ -5,6 +5,7 @@ import '../global.css'
 import Login from '../components/Login'
 import { AuthProvider, useAuth } from '../context/AuthContext'
 import { AzubiProfilProvider } from '../context/AzubiProfilContext'
+import { PunkteProvider } from '../context/PunkteContext'
 import { themeInitialisieren } from '../lib/theme'
 
 function Gate() {
@@ -17,11 +18,14 @@ function Gate() {
   // Cloud-Daten wurden von AuthProvider bereits dort hineingespiegelt.
   return (
     <AzubiProfilProvider>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="onboarding" />
-        <Stack.Screen name="profil" options={{ headerShown: true, title: 'Profil bearbeiten', presentation: 'modal' }} />
-      </Stack>
+      <PunkteProvider>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="onboarding" />
+          <Stack.Screen name="profil" options={{ headerShown: true, title: 'Profil bearbeiten', presentation: 'modal' }} />
+          <Stack.Screen name="fortschritt" options={{ headerShown: true, title: 'Fortschritt', presentation: 'modal' }} />
+        </Stack>
+      </PunkteProvider>
     </AzubiProfilProvider>
   )
 }

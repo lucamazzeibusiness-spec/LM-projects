@@ -1,6 +1,7 @@
 import { Check, RotateCcw, Sparkles } from 'lucide-react-native'
 import { useEffect, useState } from 'react'
 import { Pressable, ScrollView, Text, View } from 'react-native'
+import { usePunkte } from '../context/PunkteContext'
 import { dbFakten, type DBFakt, type DBFaktKategorie } from '../data/mock'
 import Flashcard from './Flashcard'
 
@@ -28,6 +29,7 @@ export default function DBFaktenQuiz() {
   const [flipped, setFlipped] = useState(false)
   const [gewusst, setGewusst] = useState(0)
   const [wiederholen, setWiederholen] = useState(0)
+  const { punkteVergeben } = usePunkte()
 
   const gefiltert = () => dbFakten.filter((f) => kategorieFilter === 'Alle' || f.kategorie === kategorieFilter)
 
@@ -44,6 +46,7 @@ export default function DBFaktenQuiz() {
   const gesamt = gefiltert().length
 
   const kannIch = () => {
+    if (aktuell) punkteVergeben(`karte:${aktuell.id}`, 5, `DB-Fakt gemeistert: ${aktuell.kategorie}`)
     setDeck((d) => d.slice(1))
     setGewusst((g) => g + 1)
     setFlipped(false)

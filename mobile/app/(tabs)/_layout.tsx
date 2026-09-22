@@ -2,6 +2,7 @@ import { Redirect, router, Tabs } from 'expo-router'
 import { BookOpen, CalendarDays, ClipboardList, GraduationCap, LayoutGrid, LogOut, Moon, Sun } from 'lucide-react-native'
 import { useColorScheme } from 'nativewind'
 import { Image, Pressable, Text, View } from 'react-native'
+import RangBadge from '../../components/RangBadge'
 import { useAuth } from '../../context/AuthContext'
 import { useAzubiProfil } from '../../context/AzubiProfilContext'
 import { DB_LOGO_PNG } from '../../lib/dbLogo'
@@ -16,14 +17,15 @@ function Header() {
   return (
     <View className="flex-row items-center gap-3 border-b border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24] px-4 pb-3 pt-14">
       <Image source={{ uri: DB_LOGO_PNG }} style={{ width: 38, height: 26 }} resizeMode="contain" />
-      <View className="flex-1">
+      <View className="min-w-0 flex-1">
         <Text className="text-sm font-bold text-db-navy dark:text-[#EEF1F4]">Azubi</Text>
         {profil && (
-          <Text className="text-xs text-db-navy-light dark:text-[#9AA4B0]">
+          <Text className="text-xs text-db-navy-light dark:text-[#9AA4B0]" numberOfLines={1}>
             {profil.ausbildungsberuf} · {profil.lehrjahr}. Lehrjahr
           </Text>
         )}
       </View>
+      <RangBadge />
       <Pressable
         onPress={() => themeSetzen(colorScheme === 'dark' ? 'light' : 'dark')}
         className="h-8 w-8 items-center justify-center rounded-full bg-db-gray-100 dark:bg-[#1A2029]"

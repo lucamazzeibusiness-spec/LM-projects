@@ -1,6 +1,7 @@
 import { Check, RotateCcw, Sparkles } from 'lucide-react-native'
 import { useEffect, useState } from 'react'
 import { Pressable, ScrollView, Text, View } from 'react-native'
+import { usePunkte } from '../context/PunkteContext'
 import { lernkarten, type Lernkarte, type Pruefungsphase, type Themenbereich } from '../data/mock'
 import Flashcard from './Flashcard'
 
@@ -38,6 +39,7 @@ export default function LernkartenQuiz() {
   const [flipped, setFlipped] = useState(false)
   const [gewusst, setGewusst] = useState(0)
   const [wiederholen, setWiederholen] = useState(0)
+  const { punkteVergeben } = usePunkte()
 
   const gefiltert = () =>
     lernkarten.filter(
@@ -57,6 +59,7 @@ export default function LernkartenQuiz() {
   const gesamt = gefiltert().length
 
   const kannIch = () => {
+    if (aktuell) punkteVergeben(`karte:${aktuell.id}`, 5, `Lernkarte gemeistert: ${aktuell.themenbereich}`)
     setDeck((d) => d.slice(1))
     setGewusst((g) => g + 1)
     setFlipped(false)
