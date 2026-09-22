@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { berichtsheft as initialEintraege, type BerichtsheftEintrag } from '../data/mock'
+import { cloudSchreiben } from '../lib/cloudSync'
 
 const STORAGE_KEY = 'berichtsheft:eintraege'
 
@@ -17,6 +18,7 @@ export function useBerichtsheft() {
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(eintraege))
+    cloudSchreiben(STORAGE_KEY, eintraege)
   }, [eintraege])
 
   return { eintraege, setEintraege }

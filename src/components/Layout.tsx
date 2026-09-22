@@ -1,6 +1,7 @@
-import { AlertTriangle, BookOpen, CalendarDays, ClipboardList, GraduationCap, LayoutGrid, Moon, Sun } from 'lucide-react'
+import { AlertTriangle, BookOpen, CalendarDays, ClipboardList, GraduationCap, LayoutGrid, LogOut, Moon, Sun } from 'lucide-react'
 import { type ReactNode, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import { useAzubiProfil } from '../context/AzubiProfilContext'
 import { DB_LOGO_PNG } from '../lib/dbLogo'
 import { aktuellesTheme, themeSetzen, type Theme } from '../lib/theme'
@@ -15,6 +16,7 @@ const navItems = [
 
 export default function Layout({ children }: { children: ReactNode }) {
   const { profil } = useAzubiProfil()
+  const { abmelden } = useAuth()
   const [theme, setTheme] = useState<Theme>(aktuellesTheme)
 
   useEffect(() => {
@@ -42,6 +44,13 @@ export default function Layout({ children }: { children: ReactNode }) {
               className="flex h-8 w-8 items-center justify-center rounded-full bg-db-gray-100 text-db-navy hover:bg-db-gray-200"
             >
               {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
+            </button>
+            <button
+              onClick={abmelden}
+              title="Abmelden"
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-db-gray-100 text-db-navy hover:bg-db-gray-200"
+            >
+              <LogOut size={15} />
             </button>
             <NavLink
               to="/profil"

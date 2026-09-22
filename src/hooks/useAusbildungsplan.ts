@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ausbildungsplanVorlage, type Ausbildungsblock } from '../data/mock'
+import { cloudSchreiben } from '../lib/cloudSync'
 
 const STORAGE_KEY = 'ausbildungsplan:vorlage'
 
@@ -19,6 +20,7 @@ export function useAusbildungsplan() {
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(vorlage))
+    cloudSchreiben(STORAGE_KEY, vorlage)
   }, [vorlage])
 
   const tagSetzen = (index: number, eintrag: Ausbildungsblock | null) => {

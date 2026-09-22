@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import type { AzubiProfil } from '../data/mock'
+import { cloudSchreiben } from '../lib/cloudSync'
 
 const STORAGE_KEY = 'azubi:profil'
 
@@ -24,7 +25,10 @@ export function AzubiProfilProvider({ children }: { children: ReactNode }) {
   const [profil, setProfil] = useState<AzubiProfil | null>(geladenesProfil)
 
   useEffect(() => {
-    if (profil) localStorage.setItem(STORAGE_KEY, JSON.stringify(profil))
+    if (profil) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(profil))
+      cloudSchreiben(STORAGE_KEY, profil)
+    }
   }, [profil])
 
   const profilZuruecksetzen = () => {

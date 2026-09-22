@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { GewerkBadge, PrioBadge, StatusBadge } from '../components/Badges'
 import { lernaufgaben } from '../data/mock'
+import { cloudSchreiben } from '../lib/cloudSync'
 
 interface Draft {
   checked: Record<string, boolean>
@@ -44,6 +45,7 @@ export default function LernaufgabeDetail() {
     setDraft((d) => {
       const naechster = updater(d)
       localStorage.setItem(storageKey, JSON.stringify(naechster))
+      cloudSchreiben(storageKey, naechster)
       return naechster
     })
     setSavedHint(true)
