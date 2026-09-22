@@ -1191,3 +1191,173 @@ export const lernkarten: Lernkarte[] = [
       '2) Bohrerdurchmesser, Werkstoff, Schneidstoff. Die Drehzahl ergibt sich aus n = vc / (π · d) – die zulässige Schnittgeschwindigkeit vc hängt von der Werkstoff-Schneidstoff-Paarung ab, d ist der Bohrerdurchmesser.',
   },
 ]
+
+export type DBFaktKategorie = 'Geschichte' | 'Unternehmen' | 'Fahrzeuge & Technik' | 'Netz & Strecken' | 'Rekorde & Zahlen'
+
+export interface DBFakt {
+  id: string
+  kategorie: DBFaktKategorie
+  frage: string
+  antwort: string
+}
+
+export const dbFakten: DBFakt[] = [
+  // --- Geschichte ---
+  {
+    id: 'DBF-1',
+    kategorie: 'Geschichte',
+    frage: 'Wann wurde die Deutsche Bahn AG gegründet?',
+    antwort:
+      'Am 1. Januar 1994, im Zuge der Bahnreform. Sie entstand aus der Fusion der Deutschen Bundesbahn (Westdeutschland) und der Deutschen Reichsbahn (DDR).',
+  },
+  {
+    id: 'DBF-2',
+    kategorie: 'Geschichte',
+    frage: 'Wo und wann fuhr die erste deutsche Eisenbahn?',
+    antwort: '1835 zwischen Nürnberg und Fürth, mit der Dampflok „Adler" – die Strecke war rund 6 km lang.',
+  },
+  {
+    id: 'DBF-3',
+    kategorie: 'Geschichte',
+    frage: 'Seit wann gibt es den ICE (InterCityExpress)?',
+    antwort: 'Der erste ICE ging 1991 in Betrieb, zunächst auf der Strecke Hamburg–München.',
+  },
+  {
+    id: 'DBF-4',
+    kategorie: 'Geschichte',
+    frage: 'Was war die „Bahnreform" von 1994?',
+    antwort:
+      'Die Umwandlung der beiden deutschen Staatsbahnen in ein wirtschaftlich eigenständiges Unternehmen (DB AG), um die Bahn wettbewerbsfähiger zu machen.',
+  },
+  {
+    id: 'DBF-5',
+    kategorie: 'Geschichte',
+    frage: 'Wie hieß die Vorgängergesellschaft im Westen vor 1994?',
+    antwort: 'Deutsche Bundesbahn. Im Osten hieß das Pendant Deutsche Reichsbahn.',
+  },
+  // --- Unternehmen ---
+  {
+    id: 'DBF-6',
+    kategorie: 'Unternehmen',
+    frage: 'Wem gehört die Deutsche Bahn AG?',
+    antwort: 'Zu 100 % dem Bund, also der Bundesrepublik Deutschland.',
+  },
+  {
+    id: 'DBF-7',
+    kategorie: 'Unternehmen',
+    frage: 'Wo hat die Deutsche Bahn ihren Hauptsitz?',
+    antwort: 'In Berlin.',
+  },
+  {
+    id: 'DBF-8',
+    kategorie: 'Unternehmen',
+    frage: 'Nenne drei bekannte Tochtergesellschaften des DB-Konzerns.',
+    antwort: 'Zum Beispiel DB Fernverkehr, DB Regio, DB Cargo, DB InfraGO oder DB Sicherheit.',
+  },
+  {
+    id: 'DBF-9',
+    kategorie: 'Unternehmen',
+    frage: 'Was macht DB Cargo?',
+    antwort: 'DB Cargo ist für den Güterverkehr auf der Schiene zuständig – Transport von Waren statt Personen.',
+  },
+  {
+    id: 'DBF-10',
+    kategorie: 'Unternehmen',
+    frage: 'Wer betreibt das Schienennetz und die Bahnhöfe in Deutschland?',
+    antwort:
+      'DB InfraGO AG (hervorgegangen aus DB Netz und DB Station&Service) – sie ist für Gleise, Stellwerke und Bahnhöfe zuständig.',
+  },
+  {
+    id: 'DBF-11',
+    kategorie: 'Unternehmen',
+    frage: 'Welches Klimaziel hat sich der DB-Konzern gesetzt?',
+    antwort: 'Bis 2040 will der Konzern klimaneutral werden – das ist ein erklärtes Unternehmensziel.',
+  },
+  // --- Fahrzeuge & Technik ---
+  {
+    id: 'DBF-12',
+    kategorie: 'Fahrzeuge & Technik',
+    frage: 'Welche Spurweite hat das deutsche Regelnetz?',
+    antwort: '1435 mm – das ist die „Normalspur", die in weiten Teilen Europas verwendet wird.',
+  },
+  {
+    id: 'DBF-13',
+    kategorie: 'Fahrzeuge & Technik',
+    frage: 'Mit welcher Spannung und Frequenz fährt die Bahn unter Fahrdraht?',
+    antwort: '15 kV Wechselspannung bei 16,7 Hz – anders als das öffentliche Stromnetz mit 50 Hz.',
+  },
+  {
+    id: 'DBF-14',
+    kategorie: 'Fahrzeuge & Technik',
+    frage: 'Wie schnell fährt ein ICE 3 im Regelbetrieb höchstens?',
+    antwort: 'Bis zu 300 km/h, z. B. auf der Schnellfahrstrecke Köln–Frankfurt.',
+  },
+  {
+    id: 'DBF-15',
+    kategorie: 'Fahrzeuge & Technik',
+    frage: 'Was bedeutet die Abkürzung „Tf"?',
+    antwort: 'Triebfahrzeugführer – die offizielle Berufsbezeichnung für Lokführerinnen und Lokführer.',
+  },
+  {
+    id: 'DBF-16',
+    kategorie: 'Fahrzeuge & Technik',
+    frage: 'Was ist eine Oberleitung?',
+    antwort:
+      'Der über dem Gleis gespannte Fahrdraht, aus dem elektrische Triebfahrzeuge über den Stromabnehmer (Pantograf) Strom beziehen.',
+  },
+  {
+    id: 'DBF-17',
+    kategorie: 'Fahrzeuge & Technik',
+    frage: 'Was unterscheidet einen Triebwagen von einem lokbespannten Zug?',
+    antwort:
+      'Beim Triebwagen sind Antrieb und Wagen fest zu einer Einheit verbunden (z. B. ICE 3, viele S-Bahnen). Bei lokbespannten Zügen zieht eine separate Lok die Wagen.',
+  },
+  // --- Netz & Strecken ---
+  {
+    id: 'DBF-18',
+    kategorie: 'Netz & Strecken',
+    frage: 'Wie lang ist das deutsche Schienennetz ungefähr?',
+    antwort: 'Rund 33.000 Streckenkilometer – eines der dichtesten Netze Europas.',
+  },
+  {
+    id: 'DBF-19',
+    kategorie: 'Netz & Strecken',
+    frage: 'Was ist ein Stellwerk?',
+    antwort:
+      'Die Betriebsstelle, von der aus Weichen und Signale gestellt und Zugfahrten gesichert werden – heute meist elektronisch (ESTW).',
+  },
+  {
+    id: 'DBF-20',
+    kategorie: 'Netz & Strecken',
+    frage: 'Wofür steht „ETCS"?',
+    antwort:
+      'European Train Control System – ein europaweit einheitliches Zugsicherungssystem, das nationale Systeme wie PZB/LZB langfristig ablösen soll.',
+  },
+  {
+    id: 'DBF-21',
+    kategorie: 'Netz & Strecken',
+    frage: 'Was bedeutet „PZB"?',
+    antwort:
+      'Punktförmige Zugbeeinflussung – ein Sicherungssystem, das u. a. prüft, ob ein Zug rechtzeitig vor einem Halt zeigenden Signal bremst.',
+  },
+  // --- Rekorde & Zahlen ---
+  {
+    id: 'DBF-22',
+    kategorie: 'Rekorde & Zahlen',
+    frage: 'Welchen Geschwindigkeitsrekord stellte ein deutscher Versuchszug auf?',
+    antwort:
+      '1988 erreichte der InterCityExperimental (ICE-V) auf der Schnellfahrstrecke bei Fulda 406,9 km/h – bis heute ein deutscher Schienengeschwindigkeitsrekord.',
+  },
+  {
+    id: 'DBF-23',
+    kategorie: 'Rekorde & Zahlen',
+    frage: 'Ist die Deutsche Bahn einer der größten Arbeitgeber Deutschlands?',
+    antwort: 'Ja – der DB-Konzern beschäftigt weltweit deutlich über 200.000 Mitarbeitende, die meisten davon in Deutschland.',
+  },
+  {
+    id: 'DBF-24',
+    kategorie: 'Rekorde & Zahlen',
+    frage: 'Was zeigt das DB-Logo?',
+    antwort: 'Die weißen Buchstaben „DB" auf rotem Grund mit weißem Rahmen – eines der bekanntesten Markenzeichen Deutschlands.',
+  },
+]

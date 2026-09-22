@@ -3,11 +3,12 @@ import { useMemo, useState } from 'react'
 import { ScrollView, Text, TextInput, View } from 'react-native'
 import { Pressable } from 'react-native'
 import { GewerkBadge } from '../../components/Badges'
+import DBFaktenQuiz from '../../components/DBFaktenQuiz'
 import LernkartenQuiz from '../../components/LernkartenQuiz'
 import { ersatzteile, fehlerfaelle, type Gewerk } from '../../data/mock'
 
 const gewerke: (Gewerk | 'Alle')[] = ['Alle', 'Elektrik', 'Mechanik', 'Mechatronik']
-type Tab = 'fehlerdiagnose' | 'ersatzteile' | 'pruefung'
+type Tab = 'fehlerdiagnose' | 'ersatzteile' | 'dbfakten' | 'pruefung'
 
 const schwierigkeitStyle: Record<string, string> = {
   Grundlagen: 'bg-db-green/10 text-db-green',
@@ -49,27 +50,29 @@ export default function Wissen() {
         <Text className="text-sm text-db-navy-light dark:text-[#9AA4B0]">Nachschlagen und verstehen – nicht nur auswendig lernen</Text>
       </View>
 
-      <View className="flex-row gap-1 rounded-full bg-db-gray-100 dark:bg-[#1A2029] p-1">
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-1 rounded-full bg-db-gray-100 dark:bg-[#1A2029] p-1 pr-2">
         {(
           [
             ['fehlerdiagnose', 'Fehlerdiagnose'],
             ['ersatzteile', 'Ersatzteile-Lexikon'],
+            ['dbfakten', 'DB-Fakten'],
             ['pruefung', 'Prüfungstraining'],
           ] as const
         ).map(([key, label]) => (
           <Pressable
             key={key}
             onPress={() => setTab(key)}
-            className={`flex-1 items-center rounded-full py-2 ${tab === key ? 'bg-white dark:bg-[#171C24]' : ''}`}
+            className={`items-center rounded-full px-3 py-2 ${tab === key ? 'bg-white dark:bg-[#171C24]' : ''}`}
           >
             <Text className={`text-sm font-semibold ${tab === key ? 'text-db-navy dark:text-[#EEF1F4]' : 'text-db-navy-light dark:text-[#9AA4B0]'}`}>{label}</Text>
           </Pressable>
         ))}
-      </View>
+      </ScrollView>
 
       {tab === 'pruefung' && <LernkartenQuiz />}
+      {tab === 'dbfakten' && <DBFaktenQuiz />}
 
-      {tab !== 'pruefung' && (
+      {tab !== 'pruefung' && tab !== 'dbfakten' && (
         <>
           <View className="relative justify-center">
             <Search size={16} color="#5C6670" style={{ position: 'absolute', left: 12, zIndex: 1 }} />

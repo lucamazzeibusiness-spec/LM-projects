@@ -1,11 +1,12 @@
 import { AlertCircle, MapPin, Search, Wrench } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { GewerkBadge } from '../components/Badges'
+import DBFaktenQuiz from '../components/DBFaktenQuiz'
 import LernkartenQuiz from '../components/LernkartenQuiz'
 import { ersatzteile, fehlerfaelle, type Gewerk } from '../data/mock'
 
 const gewerke: (Gewerk | 'Alle')[] = ['Alle', 'Elektrik', 'Mechanik', 'Mechatronik']
-type Tab = 'fehlerdiagnose' | 'ersatzteile' | 'pruefung'
+type Tab = 'fehlerdiagnose' | 'ersatzteile' | 'dbfakten' | 'pruefung'
 
 const schwierigkeitStyle: Record<string, string> = {
   Grundlagen: 'bg-db-green/10 text-db-green',
@@ -47,10 +48,10 @@ export default function Wissen() {
         <p className="text-sm text-db-navy-light">Nachschlagen und verstehen – nicht nur auswendig lernen</p>
       </div>
 
-      <div className="flex gap-1 rounded-full bg-db-gray-100 p-1">
+      <div className="flex gap-1 overflow-x-auto rounded-full bg-db-gray-100 p-1">
         <button
           onClick={() => setTab('fehlerdiagnose')}
-          className={`flex-1 rounded-full py-2 text-sm font-semibold ${
+          className={`shrink-0 rounded-full px-3 py-2 text-sm font-semibold ${
             tab === 'fehlerdiagnose' ? 'bg-db-surface text-db-navy shadow-sm' : 'text-db-navy-light'
           }`}
         >
@@ -58,15 +59,23 @@ export default function Wissen() {
         </button>
         <button
           onClick={() => setTab('ersatzteile')}
-          className={`flex-1 rounded-full py-2 text-sm font-semibold ${
+          className={`shrink-0 rounded-full px-3 py-2 text-sm font-semibold ${
             tab === 'ersatzteile' ? 'bg-db-surface text-db-navy shadow-sm' : 'text-db-navy-light'
           }`}
         >
           Ersatzteile-Lexikon
         </button>
         <button
+          onClick={() => setTab('dbfakten')}
+          className={`shrink-0 rounded-full px-3 py-2 text-sm font-semibold ${
+            tab === 'dbfakten' ? 'bg-db-surface text-db-navy shadow-sm' : 'text-db-navy-light'
+          }`}
+        >
+          DB-Fakten
+        </button>
+        <button
           onClick={() => setTab('pruefung')}
-          className={`flex-1 rounded-full py-2 text-sm font-semibold ${
+          className={`shrink-0 rounded-full px-3 py-2 text-sm font-semibold ${
             tab === 'pruefung' ? 'bg-db-surface text-db-navy shadow-sm' : 'text-db-navy-light'
           }`}
         >
@@ -75,8 +84,9 @@ export default function Wissen() {
       </div>
 
       {tab === 'pruefung' && <LernkartenQuiz />}
+      {tab === 'dbfakten' && <DBFaktenQuiz />}
 
-      {tab !== 'pruefung' && (
+      {tab !== 'pruefung' && tab !== 'dbfakten' && (
         <>
           <div className="relative">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-db-navy-light" />
