@@ -1,6 +1,7 @@
 import { Check, RotateCcw, Sparkles } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { lernkarten, type Lernkarte, type Pruefungsphase, type Themenbereich } from '../data/mock'
+import Flashcard from './Flashcard'
 
 const themenbereiche: (Themenbereich | 'Alle')[] = [
   'Alle',
@@ -100,19 +101,29 @@ export default function LernkartenQuiz() {
         ))}
       </div>
 
-      <div className="flex items-center justify-between text-xs text-db-navy-light">
-        <span>
-          Noch {deck.length} von {gesamt} Karten
-        </span>
-        <span className="flex items-center gap-3">
-          <span className="text-db-green">✓ {gewusst}</span>
-          <span className="text-db-amber">↻ {wiederholen}</span>
-        </span>
-      </div>
+      {gesamt > 0 && (
+        <div className="space-y-1.5">
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-db-gray-100">
+            <div
+              className="h-full rounded-full bg-db-red transition-all duration-300"
+              style={{ width: `${((gesamt - deck.length) / gesamt) * 100}%` }}
+            />
+          </div>
+          <div className="flex items-center justify-between text-xs text-db-navy-light">
+            <span>
+              Karte {Math.min(gesamt - deck.length + 1, gesamt)} von {gesamt}
+            </span>
+            <span className="flex items-center gap-3">
+              <span className="text-db-green">✓ {gewusst}</span>
+              <span className="text-db-amber">↻ {wiederholen}</span>
+            </span>
+          </div>
+        </div>
+      )}
 
       {aktuell ? (
-        <div className="rounded-xl border border-db-gray-200 bg-db-surface p-5">
-          <div className="mb-3 flex flex-wrap items-center gap-2">
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-db-gray-100 px-2.5 py-1 text-xs font-medium text-db-navy-light">
               {aktuell.themenbereich}
             </span>
@@ -124,19 +135,10 @@ export default function LernkartenQuiz() {
             </span>
           </div>
 
-          <p className="min-h-24 whitespace-pre-line text-sm font-medium leading-relaxed text-db-navy md:text-base">
-            {flipped ? aktuell.antwort : aktuell.frage}
-          </p>
+          <Flashcard key={aktuell.id} front={aktuell.frage} back={aktuell.antwort} onFlipChange={setFlipped} />
 
-          {!flipped ? (
-            <button
-              onClick={() => setFlipped(true)}
-              className="mt-5 w-full rounded-full bg-db-ink px-4 py-3 text-sm font-semibold text-white hover:bg-db-ink-light"
-            >
-              Antwort zeigen
-            </button>
-          ) : (
-            <div className="mt-5 flex gap-2">
+          {flipped && (
+            <div className="flex gap-2">
               <button
                 onClick={nochUeben}
                 className="flex flex-1 items-center justify-center gap-1.5 rounded-full border border-db-amber/40 bg-db-amber/5 px-4 py-3 text-sm font-semibold text-db-amber hover:bg-db-amber/10"

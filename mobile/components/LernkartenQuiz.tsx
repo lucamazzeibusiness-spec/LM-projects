@@ -2,6 +2,7 @@ import { Check, RotateCcw, Sparkles } from 'lucide-react-native'
 import { useEffect, useState } from 'react'
 import { Pressable, ScrollView, Text, View } from 'react-native'
 import { lernkarten, type Lernkarte, type Pruefungsphase, type Themenbereich } from '../data/mock'
+import Flashcard from './Flashcard'
 
 const themenbereiche: (Themenbereich | 'Alle')[] = [
   'Alle',
@@ -97,19 +98,29 @@ export default function LernkartenQuiz() {
         ))}
       </View>
 
-      <View className="flex-row items-center justify-between">
-        <Text className="text-xs text-db-navy-light dark:text-[#9AA4B0]">
-          Noch {deck.length} von {gesamt} Karten
-        </Text>
-        <View className="flex-row gap-3">
-          <Text className="text-xs text-db-green">✓ {gewusst}</Text>
-          <Text className="text-xs text-db-amber">↻ {wiederholen}</Text>
+      {gesamt > 0 && (
+        <View className="gap-1.5">
+          <View className="h-1.5 w-full overflow-hidden rounded-full bg-db-gray-100 dark:bg-[#1A2029]">
+            <View
+              className="h-full rounded-full bg-db-red"
+              style={{ width: `${((gesamt - deck.length) / gesamt) * 100}%` }}
+            />
+          </View>
+          <View className="flex-row items-center justify-between">
+            <Text className="text-xs text-db-navy-light dark:text-[#9AA4B0]">
+              Karte {Math.min(gesamt - deck.length + 1, gesamt)} von {gesamt}
+            </Text>
+            <View className="flex-row gap-3">
+              <Text className="text-xs text-db-green">✓ {gewusst}</Text>
+              <Text className="text-xs text-db-amber">↻ {wiederholen}</Text>
+            </View>
+          </View>
         </View>
-      </View>
+      )}
 
       {aktuell ? (
-        <View className="rounded-xl border border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24] p-5">
-          <View className="mb-3 flex-row flex-wrap items-center gap-2">
+        <View className="gap-3">
+          <View className="flex-row flex-wrap items-center gap-2">
             <Text className="overflow-hidden rounded-full bg-db-gray-100 dark:bg-[#1A2029] px-2.5 py-1 text-xs font-medium text-db-navy-light dark:text-[#9AA4B0]">
               {aktuell.themenbereich}
             </Text>
@@ -121,16 +132,10 @@ export default function LernkartenQuiz() {
             </Text>
           </View>
 
-          <Text className="min-h-24 text-sm font-medium leading-relaxed text-db-navy dark:text-[#EEF1F4]">
-            {flipped ? aktuell.antwort : aktuell.frage}
-          </Text>
+          <Flashcard key={aktuell.id} front={aktuell.frage} back={aktuell.antwort} onFlipChange={setFlipped} />
 
-          {!flipped ? (
-            <Pressable onPress={() => setFlipped(true)} className="mt-5 items-center rounded-full bg-db-navy px-4 py-3 dark:bg-[#3A4453]">
-              <Text className="text-sm font-semibold text-white">Antwort zeigen</Text>
-            </Pressable>
-          ) : (
-            <View className="mt-5 flex-row gap-2">
+          {flipped && (
+            <View className="flex-row gap-2">
               <Pressable
                 onPress={nochUeben}
                 className="flex-1 flex-row items-center justify-center gap-1.5 rounded-full border border-db-amber/40 bg-db-amber/5 px-4 py-3"
