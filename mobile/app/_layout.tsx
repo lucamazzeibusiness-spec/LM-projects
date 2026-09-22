@@ -6,6 +6,7 @@ import Login from '../components/Login'
 import { AuthProvider, useAuth } from '../context/AuthContext'
 import { AzubiProfilProvider } from '../context/AzubiProfilContext'
 import { PunkteProvider } from '../context/PunkteContext'
+import { ZuordnenProvider } from '../context/ZuordnenContext'
 import { themeInitialisieren } from '../lib/theme'
 
 function Gate() {
@@ -19,12 +20,14 @@ function Gate() {
   return (
     <AzubiProfilProvider>
       <PunkteProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="onboarding" />
-          <Stack.Screen name="profil" options={{ headerShown: true, title: 'Profil bearbeiten', presentation: 'modal' }} />
-          <Stack.Screen name="fortschritt" options={{ headerShown: true, title: 'Fortschritt', presentation: 'modal' }} />
-        </Stack>
+        <ZuordnenProvider>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="onboarding" />
+            <Stack.Screen name="profil" options={{ headerShown: true, title: 'Profil bearbeiten', presentation: 'modal' }} />
+            <Stack.Screen name="fortschritt" options={{ headerShown: true, title: 'Fortschritt', presentation: 'modal' }} />
+          </Stack>
+        </ZuordnenProvider>
       </PunkteProvider>
     </AzubiProfilProvider>
   )

@@ -1,9 +1,12 @@
-import { Check, RotateCcw, Sparkles } from 'lucide-react-native'
-import { useEffect, useState } from 'react'
+import { Check, RotateCcw, Shuffle, Sparkles, Trophy } from 'lucide-react-native'
+import { useEffect, useMemo, useState } from 'react'
 import { Pressable, ScrollView, Text, View } from 'react-native'
 import { usePunkte } from '../context/PunkteContext'
+import { useZuordnenBestzeiten } from '../context/ZuordnenContext'
 import { dbFakten, type DBFakt, type DBFaktKategorie } from '../data/mock'
+import { formatZeit } from '../lib/zeit'
 import Flashcard from './Flashcard'
+import Zuordnen from './Zuordnen'
 
 const kategorien: (DBFaktKategorie | 'Alle')[] = [
   'Alle',
@@ -25,11 +28,15 @@ function shuffle(fakten: DBFakt[]): DBFakt[] {
 
 export default function DBFaktenQuiz() {
   const [kategorieFilter, setKategorieFilter] = useState<DBFaktKategorie | 'Alle'>('Alle')
+  const [modus, setModus] = useState<'karten' | 'zuordnen'>('karten')
   const [deck, setDeck] = useState<DBFakt[]>([])
   const [flipped, setFlipped] = useState(false)
   const [gewusst, setGewusst] = useState(0)
   const [wiederholen, setWiederholen] = useState(0)
+  const [zuordnenRunde, setZuordnenRunde] = useState(0)
+  const [zuordnenErgebnis, setZuordnenErgebnis] = useState<{ sekunden: number; fehler: number; neuerBest: boolean } | null>(null)
   const { punkteVergeben } = usePunkte()
+  const { bestFuer, bestSetzenWennBesser } = useZuordnenBestzeiten()
 
   const gefiltert = () => dbFakten.filter((f) => kategorieFilter === 'Alle' || f.kategorie === kategorieFilter)
 
@@ -41,6 +48,7 @@ export default function DBFaktenQuiz() {
   }
 
   useEffect(starten, [kategorieFilter])
+  useEffect(() => setZuordnenErgebnis(null), [kategorieFilter])
 
   const aktuell = deck[0]
   const gesamt = gefiltert().length
@@ -56,6 +64,28 @@ export default function DBFaktenQuiz() {
     setDeck((d) => [...d.slice(1), d[0]])
     setWiederholen((w) => w + 1)
     setFlipped(false)
+  }
+
+  const zuordnenSchluessel = `dbfakten:${kategorieFilter}`
+  const zuordnenPaare = useMemo(
+    () => shuffle(gefiltert()).slice(0, 6).map((f) => ({ id: f.id, begriff: f.frage, definition: f.antwort })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [kategorieFilter, zuordnenRunde],
+  )
+  const zuordnenBest = bestFuer(zuordnenSchluessel)
+
+  const zuordnenAbschluss = (sekunden: number, fehler: number) => {
+    const neuerBest = bestSetzenWennBesser(zuordnenSchluessel, sekunden)
+    if (neuerBest) {
+      const punkte = Math.max(10, 40 - Math.round(sekunden / 2) - fehler * 2)
+      punkteVergeben(`zuordnen-best:${zuordnenSchluessel}:${Date.now()}`, punkte, `Neue Bestzeit Zuordnen: ${formatZeit(sekunden)}`)
+    }
+    setZuordnenErgebnis({ sekunden, fehler, neuerBest })
+  }
+
+  const neueZuordnenRunde = () => {
+    setZuordnenErgebnis(null)
+    setZuordnenRunde((r) => r + 1)
   }
 
   return (
@@ -74,7 +104,26 @@ export default function DBFaktenQuiz() {
         ))}
       </ScrollView>
 
-      {gesamt > 0 && (
+      <View className="flex-row gap-1 rounded-full bg-db-gray-100 dark:bg-[#1A2029] p-1">
+        <Pressable
+          onPress={() => setModus('karten')}
+          className={`flex-1 items-center rounded-full py-1.5 ${modus === 'karten' ? 'bg-white dark:bg-[#171C24]' : ''}`}
+        >
+          <Text className={`text-xs font-semibold ${modus === 'karten' ? 'text-db-navy dark:text-[#EEF1F4]' : 'text-db-navy-light dark:text-[#9AA4B0]'}`}>
+            Karteikarten
+          </Text>
+        </Pressable>
+        <Pressable
+          onPress={() => setModus('zuordnen')}
+          className={`flex-1 items-center rounded-full py-1.5 ${modus === 'zuordnen' ? 'bg-white dark:bg-[#171C24]' : ''}`}
+        >
+          <Text className={`text-xs font-semibold ${modus === 'zuordnen' ? 'text-db-navy dark:text-[#EEF1F4]' : 'text-db-navy-light dark:text-[#9AA4B0]'}`}>
+            Zuordnen
+          </Text>
+        </Pressable>
+      </View>
+
+      {modus === 'karten' && gesamt > 0 && (
         <View className="gap-1.5">
           <View className="h-1.5 w-full overflow-hidden rounded-full bg-db-gray-100 dark:bg-[#1A2029]">
             <View
@@ -94,7 +143,50 @@ export default function DBFaktenQuiz() {
         </View>
       )}
 
-      {aktuell ? (
+      {modus === 'zuordnen' ? (
+        zuordnenPaare.length < 4 ? (
+          <View className="items-center rounded-xl border border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24] p-6">
+            <Text className="text-sm text-db-navy-light dark:text-[#9AA4B0]">Zu wenige Fakten für diesen Filter (mind. 4 nötig).</Text>
+          </View>
+        ) : zuordnenErgebnis ? (
+          <View className="items-center gap-3 rounded-xl border border-db-green/30 bg-db-green/5 p-6">
+            <Sparkles size={24} color="#1E8A3C" />
+            <Text className="text-lg font-semibold text-db-navy dark:text-[#EEF1F4]">Geschafft in {formatZeit(zuordnenErgebnis.sekunden)}!</Text>
+            <Text className="text-sm text-db-navy-light dark:text-[#9AA4B0]">
+              {zuordnenErgebnis.fehler === 0 ? 'Ohne Fehler – stark!' : `${zuordnenErgebnis.fehler} Fehler (je +3 Sek.)`}
+            </Text>
+            {zuordnenErgebnis.neuerBest ? (
+              <View className="flex-row items-center gap-1.5">
+                <Trophy size={15} color="#D98600" />
+                <Text className="text-sm font-semibold text-db-amber">Neue Bestzeit für diesen Filter!</Text>
+              </View>
+            ) : (
+              zuordnenBest !== null && (
+                <Text className="text-xs text-db-navy-light dark:text-[#9AA4B0]">Bestzeit: {formatZeit(zuordnenBest)}</Text>
+              )
+            )}
+            <Pressable
+              onPress={neueZuordnenRunde}
+              className="flex-row items-center gap-1.5 rounded-full bg-db-red px-5 py-2.5"
+            >
+              <Shuffle size={15} color="#fff" />
+              <Text className="text-sm font-semibold text-white">Neue Runde</Text>
+            </Pressable>
+          </View>
+        ) : (
+          <View className="gap-2">
+            {zuordnenBest !== null && (
+              <View className="flex-row items-center gap-1.5">
+                <Trophy size={13} color="#D98600" />
+                <Text className="text-xs text-db-navy-light dark:text-[#9AA4B0]">
+                  Bestzeit für diesen Filter: {formatZeit(zuordnenBest)}
+                </Text>
+              </View>
+            )}
+            <Zuordnen key={zuordnenRunde} paare={zuordnenPaare} onAbschluss={zuordnenAbschluss} />
+          </View>
+        )
+      ) : aktuell ? (
         <View className="gap-3">
           <View className="flex-row flex-wrap items-center gap-2">
             <Text className="overflow-hidden rounded-full bg-db-gray-100 dark:bg-[#1A2029] px-2.5 py-1 text-xs font-medium text-db-navy-light dark:text-[#9AA4B0]">
