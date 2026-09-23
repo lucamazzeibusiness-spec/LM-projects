@@ -12,6 +12,7 @@ import LernaufgabeDetail from './pages/LernaufgabeDetail'
 import Lernaufgaben from './pages/Lernaufgaben'
 import Login from './pages/Login'
 import Onboarding from './pages/Onboarding'
+import ProfilBearbeiten from './pages/ProfilBearbeiten'
 import Wissen from './pages/Wissen'
 
 export default function App() {
@@ -55,7 +56,7 @@ function AppRoutes() {
         <Route path="/wissen" element={<Wissen />} />
         <Route path="/ausbildungsplan" element={<Ausbildungsplan />} />
         <Route path="/fortschritt" element={<Fortschritt />} />
-        <Route path="/profil" element={<Onboarding />} />
+        <Route path="/profil" element={<ProfilBearbeiten />} />
       </Routes>
     </Layout>
   )
