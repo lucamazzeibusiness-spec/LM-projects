@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout'
 import { useAuth } from './context/AuthContext'
 import { AzubiProfilProvider, useAzubiProfil } from './context/AzubiProfilContext'
+import { BerichtsheftProvider } from './context/BerichtsheftContext'
 import { PunkteProvider } from './context/PunkteContext'
 import { ZuordnenProvider } from './context/ZuordnenContext'
 import Ausbildungsplan from './pages/Ausbildungsplan'
@@ -30,11 +31,13 @@ export default function App() {
   // Cloud-Daten wurden von AuthProvider bereits dort hineingespiegelt.
   return (
     <AzubiProfilProvider>
-      <PunkteProvider>
-        <ZuordnenProvider>
-          <AppRoutes />
-        </ZuordnenProvider>
-      </PunkteProvider>
+      <BerichtsheftProvider>
+        <PunkteProvider>
+          <ZuordnenProvider>
+            <AppRoutes />
+          </ZuordnenProvider>
+        </PunkteProvider>
+      </BerichtsheftProvider>
     </AzubiProfilProvider>
   )
 }

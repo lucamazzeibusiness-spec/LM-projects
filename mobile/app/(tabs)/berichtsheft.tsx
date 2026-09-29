@@ -6,7 +6,7 @@ import { BerichtStatusBadge } from '../../components/Badges'
 import SignaturePad from '../../components/SignaturePad'
 import { useAzubiProfil } from '../../context/AzubiProfilContext'
 import { berichtsheftStreak, usePunkte } from '../../context/PunkteContext'
-import { useBerichtsheft } from '../../hooks/useBerichtsheft'
+import { useBerichtsheft } from '../../context/BerichtsheftContext'
 import { ausbildungsnachweisVorschauHtml, exportBerichtsheftPdf } from '../../lib/exportBerichtsheft'
 import {
   arbeitstageDerWoche,

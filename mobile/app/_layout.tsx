@@ -5,6 +5,7 @@ import '../global.css'
 import Login from '../components/Login'
 import { AuthProvider, useAuth } from '../context/AuthContext'
 import { AzubiProfilProvider } from '../context/AzubiProfilContext'
+import { BerichtsheftProvider } from '../context/BerichtsheftContext'
 import { PunkteProvider } from '../context/PunkteContext'
 import { ZuordnenProvider } from '../context/ZuordnenContext'
 import { themeInitialisieren } from '../lib/theme'
@@ -19,16 +20,18 @@ function Gate() {
   // Cloud-Daten wurden von AuthProvider bereits dort hineingespiegelt.
   return (
     <AzubiProfilProvider>
-      <PunkteProvider>
-        <ZuordnenProvider>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="onboarding" />
-            <Stack.Screen name="profil" options={{ headerShown: true, title: 'Profil bearbeiten', presentation: 'modal' }} />
-            <Stack.Screen name="fortschritt" options={{ headerShown: true, title: 'Fortschritt', presentation: 'modal' }} />
-          </Stack>
-        </ZuordnenProvider>
-      </PunkteProvider>
+      <BerichtsheftProvider>
+        <PunkteProvider>
+          <ZuordnenProvider>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="(tabs)" />
+              <Stack.Screen name="onboarding" />
+              <Stack.Screen name="profil" options={{ headerShown: true, title: 'Profil bearbeiten', presentation: 'modal' }} />
+              <Stack.Screen name="fortschritt" options={{ headerShown: true, title: 'Fortschritt', presentation: 'modal' }} />
+            </Stack>
+          </ZuordnenProvider>
+        </PunkteProvider>
+      </BerichtsheftProvider>
     </AzubiProfilProvider>
   )
 }

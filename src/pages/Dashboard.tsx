@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { GewerkBadge, PrioBadge, StatusBadge } from '../components/Badges'
 import { useAzubiProfil } from '../context/AzubiProfilContext'
 import { useAusbildungsplan } from '../hooks/useAusbildungsplan'
-import { useBerichtsheft } from '../hooks/useBerichtsheft'
+import { useBerichtsheft } from '../context/BerichtsheftContext'
 import {
   erinnerungAktivieren,
   erinnerungDeaktivieren,

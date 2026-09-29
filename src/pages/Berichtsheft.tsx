@@ -3,7 +3,7 @@ import { useMemo, useRef, useState } from 'react'
 import { BerichtStatusBadge } from '../components/Badges'
 import SignaturePad from '../components/SignaturePad'
 import { useAzubiProfil } from '../context/AzubiProfilContext'
-import { useBerichtsheft } from '../hooks/useBerichtsheft'
+import { useBerichtsheft } from '../context/BerichtsheftContext'
 import { berichtsheftStreak, usePunkte } from '../context/PunkteContext'
 import type { BerichtsheftEintrag, BerichtsheftKategorie } from '../data/mock'
 import {
