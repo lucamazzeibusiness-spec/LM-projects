@@ -14,6 +14,8 @@ interface ExportOptions {
   unterschriftDataUrl: string
 }
 
+type HtmlOptionen = Omit<ExportOptions, 'unterschriftDataUrl'> & { unterschriftDataUrl?: string }
+
 // Format laut betrieblicher Vorgabe: BERUF_JAHR_NR_Ausbildungsnachweis_Vorname_Nachname
 // (dient sowohl als Dateiname als auch als E-Mail-Betreff bei der Abgabe an den Ausbilder).
 export function ausbildungsnachweisBezeichnung(profil: AzubiProfil, nr: string, jahr: number): string {
@@ -43,7 +45,7 @@ function escapeHtml(text: string): string {
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
-function baueHtml(profil: AzubiProfil, eintraege: BerichtsheftEintrag[], optionen: ExportOptions): string {
+function baueHtml(profil: AzubiProfil, eintraege: BerichtsheftEintrag[], optionen: HtmlOptionen): string {
   const { nr, von, bis, unterschriftDataUrl } = optionen
 
   const nachTag = new Map<number, BerichtsheftEintrag>()
@@ -167,7 +169,7 @@ function baueHtml(profil: AzubiProfil, eintraege: BerichtsheftEintrag[], optione
         <td>Datum:</td>
       </tr>
       <tr class="sig">
-        <td><img src="${unterschriftDataUrl}" /></td>
+        <td>${unterschriftDataUrl ? `<img src="${unterschriftDataUrl}" />` : ''}</td>
         <td></td>
         <td></td>
       </tr>
@@ -181,6 +183,17 @@ function baueHtml(profil: AzubiProfil, eintraege: BerichtsheftEintrag[], optione
     <div class="seite">Seite 1/1</div>
   </body>
   </html>`
+}
+
+// Für die Vorschau vor dem Unterschreiben – gleiches Layout (per WebView gerendert), aber ohne
+// Unterschrift und ohne PDF-Erzeugung/Versand, damit der Azubi die Angaben erst prüfen und ggf.
+// korrigieren kann.
+export function ausbildungsnachweisVorschauHtml(
+  profil: AzubiProfil,
+  eintraege: BerichtsheftEintrag[],
+  optionen: Omit<ExportOptions, 'unterschriftDataUrl'>,
+): string {
+  return baueHtml(profil, eintraege, optionen)
 }
 
 export async function exportBerichtsheftPdf(

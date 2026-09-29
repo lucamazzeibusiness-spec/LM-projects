@@ -1,12 +1,13 @@
-import { CalendarCheck, ChevronLeft, ChevronRight, Download, Loader2, Pencil, Plus, X } from 'lucide-react-native'
+import { CalendarCheck, ChevronLeft, ChevronRight, Download, Eye, Loader2, Pencil, Plus, X } from 'lucide-react-native'
 import { useMemo, useRef, useState } from 'react'
-import { Modal, PanResponder, Pressable, ScrollView, Text, TextInput, View } from 'react-native'
+import { Dimensions, Modal, PanResponder, Pressable, ScrollView, Text, TextInput, View } from 'react-native'
+import { WebView } from 'react-native-webview'
 import { BerichtStatusBadge } from '../../components/Badges'
 import SignaturePad from '../../components/SignaturePad'
 import { useAzubiProfil } from '../../context/AzubiProfilContext'
 import { berichtsheftStreak, usePunkte } from '../../context/PunkteContext'
 import { useBerichtsheft } from '../../hooks/useBerichtsheft'
-import { exportBerichtsheftPdf } from '../../lib/exportBerichtsheft'
+import { ausbildungsnachweisVorschauHtml, exportBerichtsheftPdf } from '../../lib/exportBerichtsheft'
 import {
   arbeitstageDerWoche,
   heuteISO,
@@ -49,6 +50,7 @@ export default function Berichtsheft() {
   const { punkteVergeben, stand: punkteStand } = usePunkte()
   const [bearbeitung, setBearbeitung] = useState<BerichtsheftEintrag | null>(null)
   const [exportiert, setExportiert] = useState(false)
+  const [vorschauHtml, setVorschauHtml] = useState<string | null>(null)
   const [signaturOffen, setSignaturOffen] = useState(false)
   const [unterschrift, setUnterschrift] = useState<string | null>(null)
   const [ausgewaehlteWoche, setAusgewaehlteWoche] = useState(() => wochenSchluessel(heuteISO()))
@@ -81,6 +83,17 @@ export default function Berichtsheft() {
     set.add(ausgewaehlteWoche)
     return [...set].sort()
   }, [eintraege, ausgewaehlteWoche])
+
+  const nachweisMeta = useMemo(() => {
+    if (!profil) return null
+    const { von, bis } = wochenStartEnde(ausgewaehlteWoche)
+    const nrZahl = profil.ausbildungsbeginn
+      ? wochenNummerSeit(profil.ausbildungsbeginn, ausgewaehlteWoche)
+      : alleWochenMitEintraegen.indexOf(ausgewaehlteWoche) + 1
+    const nr = String(Math.max(1, nrZahl)).padStart(3, '0')
+    const jahr = Number(ausgewaehlteWoche.slice(0, 4))
+    return { nr, von, bis, jahr }
+  }, [profil, ausgewaehlteWoche, alleWochenMitEintraegen])
 
   const vorherigeWoche = () =>
     setAusgewaehlteWoche((w) => {
@@ -120,18 +133,31 @@ export default function Berichtsheft() {
   }
 
   const wocheExportieren = async (unterschriftDataUrl: string) => {
+    if (!nachweisMeta) return
     setExportiert(true)
     try {
-      const { von, bis } = wochenStartEnde(ausgewaehlteWoche)
-      const nrZahl = profil.ausbildungsbeginn
-        ? wochenNummerSeit(profil.ausbildungsbeginn, ausgewaehlteWoche)
-        : alleWochenMitEintraegen.indexOf(ausgewaehlteWoche) + 1
-      const nr = String(Math.max(1, nrZahl)).padStart(3, '0')
-      const jahr = Number(ausgewaehlteWoche.slice(0, 4))
-      await exportBerichtsheftPdf(profil, wocheEintraege, { nr, von, bis, jahr, unterschriftDataUrl })
+      await exportBerichtsheftPdf(profil, wocheEintraege, { ...nachweisMeta, unterschriftDataUrl })
     } finally {
       setExportiert(false)
     }
+  }
+
+  const vorschauOeffnen = () => {
+    if (!nachweisMeta) return
+    setVorschauHtml(ausbildungsnachweisVorschauHtml(profil, wocheEintraege, nachweisMeta))
+  }
+
+  const vorschauSchliessen = () => setVorschauHtml(null)
+
+  const weiterZurUnterschrift = () => {
+    vorschauSchliessen()
+    setUnterschrift(null)
+    setSignaturOffen(true)
+  }
+
+  const zurueckZurVorschau = () => {
+    setSignaturOffen(false)
+    vorschauOeffnen()
   }
 
   const signaturBestaetigen = async () => {
@@ -214,14 +240,11 @@ export default function Berichtsheft() {
               </Pressable>
             )}
             <Pressable
-              onPress={() => {
-                setUnterschrift(null)
-                setSignaturOffen(true)
-              }}
+              onPress={vorschauOeffnen}
               disabled={exportiert}
               className="ml-auto flex-row items-center gap-1.5 rounded-full border border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24] px-3 py-1.5"
             >
-              {exportiert ? <Loader2 size={14} color="#14181F" /> : <Download size={14} color="#14181F" />}
+              {exportiert ? <Loader2 size={14} color="#14181F" /> : <Eye size={14} color="#14181F" />}
               <Text className="text-xs font-semibold text-db-navy dark:text-[#EEF1F4]">Ausbildungsnachweis</Text>
             </Pressable>
           </View>
@@ -333,6 +356,51 @@ export default function Berichtsheft() {
         </Pressable>
       </Modal>
 
+      <Modal visible={!!vorschauHtml} transparent animationType="fade" onRequestClose={vorschauSchliessen}>
+        <Pressable className="flex-1 justify-end bg-black/40 sm:items-center sm:justify-center" onPress={vorschauSchliessen}>
+          <Pressable
+            className="gap-3 rounded-t-2xl bg-white dark:bg-[#171C24] p-5 sm:w-full sm:max-w-2xl sm:rounded-2xl"
+            onPress={(e) => e.stopPropagation()}
+          >
+            <View className="flex-row items-center justify-between">
+              <View>
+                <Text className="text-sm font-semibold text-db-navy dark:text-[#EEF1F4]">Vorschau · Ausbildungsnachweis</Text>
+                <Text className="text-xs text-db-navy-light dark:text-[#9AA4B0]">
+                  Woche {wochenLabel(ausgewaehlteWoche)} · {wocheEintraege.length} Einträge – noch ohne Unterschrift
+                </Text>
+              </View>
+              <Pressable onPress={vorschauSchliessen}>
+                <X size={18} color="#5C6670" />
+              </Pressable>
+            </View>
+
+            <Text className="text-xs text-db-navy-light dark:text-[#9AA4B0]">
+              Prüf die Angaben in Ruhe. Passt noch was nicht, schließ die Vorschau, korrigier den Tageseintrag über
+              den Stift und öffne die Vorschau erneut.
+            </Text>
+
+            <View
+              style={{ height: Dimensions.get('window').height * 0.55 }}
+              className="overflow-hidden rounded-lg border border-db-gray-200 dark:border-[#2A323D]"
+            >
+              {vorschauHtml && <WebView originWhitelist={['*']} source={{ html: vorschauHtml }} />}
+            </View>
+
+            <View className="flex-row gap-2">
+              <Pressable
+                onPress={vorschauSchliessen}
+                className="flex-1 items-center rounded-full border border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24] px-4 py-2.5"
+              >
+                <Text className="text-sm font-semibold text-db-navy dark:text-[#EEF1F4]">Bearbeiten</Text>
+              </Pressable>
+              <Pressable onPress={weiterZurUnterschrift} className="flex-1 items-center rounded-full bg-db-red px-4 py-2.5">
+                <Text className="text-sm font-semibold text-white">Passt · weiter zur Unterschrift</Text>
+              </Pressable>
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
+
       <Modal visible={signaturOffen} transparent animationType="fade" onRequestClose={() => setSignaturOffen(false)}>
         <Pressable className="flex-1 justify-end bg-black/40 sm:items-center sm:justify-center" onPress={() => setSignaturOffen(false)}>
           <Pressable className="gap-4 rounded-t-2xl bg-white dark:bg-[#171C24] p-5 sm:w-full sm:max-w-md sm:rounded-2xl" onPress={(e) => e.stopPropagation()}>
@@ -347,6 +415,10 @@ export default function Berichtsheft() {
                 <X size={18} color="#5C6670" />
               </Pressable>
             </View>
+
+            <Pressable onPress={zurueckZurVorschau}>
+              <Text className="text-xs font-medium text-db-navy-light dark:text-[#9AA4B0]">← Nochmal zur Vorschau</Text>
+            </Pressable>
 
             <Text className="text-xs text-db-navy-light dark:text-[#9AA4B0]">
               Mit deiner Unterschrift bestätigst du, dass die Angaben in diesem Ausbildungsnachweis richtig und
