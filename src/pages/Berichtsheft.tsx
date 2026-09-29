@@ -1,4 +1,4 @@
-import { CalendarCheck, ChevronLeft, ChevronRight, Download, Loader2, Pencil, Plus, X } from 'lucide-react'
+import { CalendarCheck, ChevronLeft, ChevronRight, Download, Eye, Loader2, Pencil, Plus, X } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
 import { BerichtStatusBadge } from '../components/Badges'
 import SignaturePad from '../components/SignaturePad'
@@ -47,6 +47,7 @@ export default function Berichtsheft() {
   const { punkteVergeben, stand: punkteStand } = usePunkte()
   const [bearbeitung, setBearbeitung] = useState<BerichtsheftEintrag | null>(null)
   const [exportiert, setExportiert] = useState(false)
+  const [vorschauUrl, setVorschauUrl] = useState<string | null>(null)
   const [signaturOffen, setSignaturOffen] = useState(false)
   const [unterschrift, setUnterschrift] = useState<string | null>(null)
   const [ausgewaehlteWoche, setAusgewaehlteWoche] = useState(() => wochenSchluessel(heuteISO()))
@@ -79,6 +80,17 @@ export default function Berichtsheft() {
     set.add(ausgewaehlteWoche)
     return [...set].sort()
   }, [eintraege, ausgewaehlteWoche])
+
+  const nachweisMeta = useMemo(() => {
+    if (!profil) return null
+    const { von, bis } = wochenStartEnde(ausgewaehlteWoche)
+    const nrZahl = profil.ausbildungsbeginn
+      ? wochenNummerSeit(profil.ausbildungsbeginn, ausgewaehlteWoche)
+      : alleWochenMitEintraegen.indexOf(ausgewaehlteWoche) + 1
+    const nr = String(Math.max(1, nrZahl)).padStart(3, '0')
+    const jahr = Number(ausgewaehlteWoche.slice(0, 4))
+    return { nr, von, bis, jahr }
+  }, [profil, ausgewaehlteWoche, alleWochenMitEintraegen])
 
   if (!profil) return null
 
@@ -122,23 +134,40 @@ export default function Berichtsheft() {
   }
 
   const wocheExportieren = async (unterschriftDataUrl: string) => {
-    if (!profil) return
+    if (!profil || !nachweisMeta) return
     setExportiert(true)
     try {
       const { exportBerichtsheftPdf } = await import('../lib/exportBerichtsheft')
-      const { von, bis } = wochenStartEnde(ausgewaehlteWoche)
-      const nrZahl = profil.ausbildungsbeginn
-        ? wochenNummerSeit(profil.ausbildungsbeginn, ausgewaehlteWoche)
-        : alleWochenMitEintraegen.indexOf(ausgewaehlteWoche) + 1
-      const nr = String(Math.max(1, nrZahl)).padStart(3, '0')
-      const jahr = Number(ausgewaehlteWoche.slice(0, 4))
-      const betreff = await exportBerichtsheftPdf(profil, wocheEintraege, { nr, von, bis, jahr, unterschriftDataUrl })
+      const betreff = await exportBerichtsheftPdf(profil, wocheEintraege, { ...nachweisMeta, unterschriftDataUrl })
       if (profil.ausbilderEmail.trim()) {
         window.location.href = `mailto:${encodeURIComponent(profil.ausbilderEmail.trim())}?subject=${encodeURIComponent(betreff)}`
       }
     } finally {
       setExportiert(false)
     }
+  }
+
+  const vorschauSchliessen = () => {
+    if (vorschauUrl) URL.revokeObjectURL(vorschauUrl)
+    setVorschauUrl(null)
+  }
+
+  const vorschauOeffnen = async () => {
+    if (!profil || !nachweisMeta) return
+    const { ausbildungsnachweisVorschauUrl } = await import('../lib/exportBerichtsheft')
+    if (vorschauUrl) URL.revokeObjectURL(vorschauUrl)
+    setVorschauUrl(ausbildungsnachweisVorschauUrl(profil, wocheEintraege, nachweisMeta))
+  }
+
+  const weiterZurUnterschrift = () => {
+    vorschauSchliessen()
+    setUnterschrift(null)
+    setSignaturOffen(true)
+  }
+
+  const zurueckZurVorschau = () => {
+    setSignaturOffen(false)
+    vorschauOeffnen()
   }
 
   const signaturBestaetigen = async () => {
@@ -283,14 +312,11 @@ export default function Berichtsheft() {
             </button>
           )}
           <button
-            onClick={() => {
-              setUnterschrift(null)
-              setSignaturOffen(true)
-            }}
+            onClick={vorschauOeffnen}
             disabled={exportiert}
             className="ml-auto flex shrink-0 items-center gap-1.5 rounded-full border border-db-gray-200 bg-db-surface px-3 py-1.5 text-xs font-semibold text-db-navy hover:border-db-navy/30 disabled:opacity-60"
           >
-            {exportiert ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
+            {exportiert ? <Loader2 size={14} className="animate-spin" /> : <Eye size={14} />}
             Ausbildungsnachweis
           </button>
         </div>
@@ -346,6 +372,52 @@ export default function Berichtsheft() {
         </div>
       </div>
 
+      {vorschauUrl && (
+        <div
+          className="fixed inset-0 z-30 flex items-end justify-center bg-black/40 p-4 sm:items-center"
+          onClick={vorschauSchliessen}
+        >
+          <div
+            className="flex max-h-full w-full max-w-2xl flex-col space-y-3 rounded-2xl bg-db-surface p-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-semibold text-db-navy">Vorschau · Ausbildungsnachweis</p>
+                <p className="text-xs text-db-navy-light">
+                  Woche {wochenLabel(ausgewaehlteWoche)} · {wocheEintraege.length} Einträge – noch ohne Unterschrift
+                </p>
+              </div>
+              <button onClick={vorschauSchliessen} className="text-db-navy-light hover:text-db-navy">
+                <X size={18} />
+              </button>
+            </div>
+
+            <p className="text-xs text-db-navy-light">
+              Prüf die Angaben in Ruhe. Passt noch was nicht, schließ die Vorschau, korrigier den Tageseintrag über
+              den Stift und öffne die Vorschau erneut.
+            </p>
+
+            <iframe title="Ausbildungsnachweis-Vorschau" src={vorschauUrl} className="h-[60vh] w-full rounded-lg border border-db-gray-200 sm:h-[65vh]" />
+
+            <div className="flex gap-2">
+              <button
+                onClick={vorschauSchliessen}
+                className="flex-1 rounded-full border border-db-gray-200 bg-db-surface px-4 py-2.5 text-sm font-semibold text-db-navy hover:border-db-navy/30"
+              >
+                Bearbeiten
+              </button>
+              <button
+                onClick={weiterZurUnterschrift}
+                className="flex-1 rounded-full bg-db-red px-4 py-2.5 text-sm font-semibold text-white hover:bg-db-red-dark"
+              >
+                Passt · weiter zur Unterschrift
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {signaturOffen && (
         <div
           className="fixed inset-0 z-30 flex items-end justify-center bg-black/40 p-4 sm:items-center"
@@ -363,6 +435,10 @@ export default function Berichtsheft() {
                 <X size={18} />
               </button>
             </div>
+
+            <button onClick={zurueckZurVorschau} className="text-xs font-medium text-db-navy-light hover:text-db-navy">
+              ← Nochmal zur Vorschau
+            </button>
 
             <p className="text-xs text-db-navy-light">
               Mit deiner Unterschrift bestätigst du, dass die Angaben in diesem Ausbildungsnachweis richtig und

@@ -12,6 +12,8 @@ interface ExportOptions {
   unterschriftDataUrl: string
 }
 
+type DocOptionen = Omit<ExportOptions, 'unterschriftDataUrl'> & { unterschriftDataUrl?: string }
+
 // Format laut betrieblicher Vorgabe: BERUF_JAHR_NR_Ausbildungsnachweis_Vorname_Nachname
 // (dient sowohl als Dateiname als auch als E-Mail-Betreff bei der Abgabe an den Ausbilder).
 export function ausbildungsnachweisBezeichnung(profil: AzubiProfil, nr: string, jahr: number): string {
@@ -63,12 +65,14 @@ async function pdfSpeichern(doc: jsPDF, dateiname: string) {
 
 // Baut das PDF im Layout des offiziellen DB-Ausbildungsnachweis-Formulars nach
 // (Kopfbereich mit Nr./Zeitraum/Ausbildungsjahr, Tagestabelle, Unterschriftenblock).
-export async function exportBerichtsheftPdf(
+// Ohne unterschriftDataUrl bleibt das Unterschriftenfeld leer – für die Vorschau vor dem
+// eigentlichen Unterschreiben.
+function baueAusbildungsnachweisDoc(
   profil: AzubiProfil,
   eintraege: BerichtsheftEintrag[],
-  optionen: ExportOptions,
-): Promise<string> {
-  const { nr, von, bis, jahr, unterschriftDataUrl } = optionen
+  optionen: DocOptionen,
+): jsPDF {
+  const { nr, von, bis, unterschriftDataUrl } = optionen
   const doc = new jsPDF({ unit: 'mm', format: 'a4' })
   const seitenbreite = doc.internal.pageSize.getWidth()
   const seitenhoehe = doc.internal.pageSize.getHeight()
@@ -213,7 +217,7 @@ export async function exportBerichtsheftPdf(
       }
     },
     didDrawCell: (data) => {
-      if (data.row.index === 2 && data.column.index === 0) {
+      if (data.row.index === 2 && data.column.index === 0 && unterschriftDataUrl) {
         const rand = 1.5
         doc.addImage(
           unterschriftDataUrl,
@@ -233,7 +237,27 @@ export async function exportBerichtsheftPdf(
   doc.setTextColor(120)
   doc.text('Seite 1/1', li, seitenhoehe - 10)
 
-  const basisname = ausbildungsnachweisBezeichnung(profil, nr, jahr)
+  return doc
+}
+
+// Für die Vorschau vor dem Unterschreiben – gleiches Layout, aber ohne Unterschrift und ohne
+// Download/Versand, damit der Azubi die Angaben erst prüfen und ggf. korrigieren kann.
+export function ausbildungsnachweisVorschauUrl(
+  profil: AzubiProfil,
+  eintraege: BerichtsheftEintrag[],
+  optionen: Omit<ExportOptions, 'unterschriftDataUrl'>,
+): string {
+  const doc = baueAusbildungsnachweisDoc(profil, eintraege, optionen)
+  return doc.output('bloburl').toString()
+}
+
+export async function exportBerichtsheftPdf(
+  profil: AzubiProfil,
+  eintraege: BerichtsheftEintrag[],
+  optionen: ExportOptions,
+): Promise<string> {
+  const doc = baueAusbildungsnachweisDoc(profil, eintraege, optionen)
+  const basisname = ausbildungsnachweisBezeichnung(profil, optionen.nr, optionen.jahr)
   await pdfSpeichern(doc, `${basisname}.pdf`)
   return basisname
 }
