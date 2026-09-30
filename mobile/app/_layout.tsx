@@ -4,6 +4,7 @@ import { View } from 'react-native'
 import '../global.css'
 import Login from '../components/Login'
 import { AuthProvider, useAuth } from '../context/AuthContext'
+import { AusbildungsplanProvider } from '../context/AusbildungsplanContext'
 import { AzubiProfilProvider } from '../context/AzubiProfilContext'
 import { BerichtsheftProvider } from '../context/BerichtsheftContext'
 import { PunkteProvider } from '../context/PunkteContext'
@@ -21,16 +22,18 @@ function Gate() {
   return (
     <AzubiProfilProvider>
       <BerichtsheftProvider>
-        <PunkteProvider>
-          <ZuordnenProvider>
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="(tabs)" />
-              <Stack.Screen name="onboarding" />
-              <Stack.Screen name="profil" options={{ headerShown: true, title: 'Profil bearbeiten', presentation: 'modal' }} />
-              <Stack.Screen name="fortschritt" options={{ headerShown: true, title: 'Fortschritt', presentation: 'modal' }} />
-            </Stack>
-          </ZuordnenProvider>
-        </PunkteProvider>
+        <AusbildungsplanProvider>
+          <PunkteProvider>
+            <ZuordnenProvider>
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="onboarding" />
+                <Stack.Screen name="profil" options={{ headerShown: true, title: 'Profil bearbeiten', presentation: 'modal' }} />
+                <Stack.Screen name="fortschritt" options={{ headerShown: true, title: 'Fortschritt', presentation: 'modal' }} />
+              </Stack>
+            </ZuordnenProvider>
+          </PunkteProvider>
+        </AusbildungsplanProvider>
       </BerichtsheftProvider>
     </AzubiProfilProvider>
   )

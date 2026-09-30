@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { GewerkBadge, PrioBadge, StatusBadge } from '../components/Badges'
 import { useAzubiProfil } from '../context/AzubiProfilContext'
-import { useAusbildungsplan } from '../hooks/useAusbildungsplan'
+import { useAusbildungsplan } from '../context/AusbildungsplanContext'
 import { useBerichtsheft } from '../context/BerichtsheftContext'
 import {
   erinnerungAktivieren,

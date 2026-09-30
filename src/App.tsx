@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout'
 import { useAuth } from './context/AuthContext'
+import { AusbildungsplanProvider } from './context/AusbildungsplanContext'
 import { AzubiProfilProvider, useAzubiProfil } from './context/AzubiProfilContext'
 import { BerichtsheftProvider } from './context/BerichtsheftContext'
 import { PunkteProvider } from './context/PunkteContext'
@@ -32,11 +33,13 @@ export default function App() {
   return (
     <AzubiProfilProvider>
       <BerichtsheftProvider>
-        <PunkteProvider>
-          <ZuordnenProvider>
-            <AppRoutes />
-          </ZuordnenProvider>
-        </PunkteProvider>
+        <AusbildungsplanProvider>
+          <PunkteProvider>
+            <ZuordnenProvider>
+              <AppRoutes />
+            </ZuordnenProvider>
+          </PunkteProvider>
+        </AusbildungsplanProvider>
       </BerichtsheftProvider>
     </AzubiProfilProvider>
   )

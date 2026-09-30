@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { ausbildungsplanVorlage, type Ausbildungsblock } from '../data/mock'
 import { cloudSchreiben } from '../lib/cloudSync'
 import { ladeGespeichert, speichere } from '../lib/storage'
@@ -7,7 +7,14 @@ const STORAGE_KEY = 'ausbildungsplan:vorlage'
 
 export type Wochenvorlage = (Ausbildungsblock | null)[]
 
-export function useAusbildungsplan() {
+interface AusbildungsplanContextValue {
+  vorlage: Wochenvorlage
+  tagSetzen: (index: number, eintrag: Ausbildungsblock | null) => void
+}
+
+const AusbildungsplanContext = createContext<AusbildungsplanContextValue | null>(null)
+
+export function AusbildungsplanProvider({ children }: { children: ReactNode }) {
   const [vorlage, setVorlage] = useState<Wochenvorlage>(ausbildungsplanVorlage)
   const [geladen, setGeladen] = useState(false)
 
@@ -29,5 +36,13 @@ export function useAusbildungsplan() {
     setVorlage((v) => v.map((e, i) => (i === index ? eintrag : e)))
   }
 
-  return { vorlage, tagSetzen }
+  return (
+    <AusbildungsplanContext.Provider value={{ vorlage, tagSetzen }}>{children}</AusbildungsplanContext.Provider>
+  )
+}
+
+export function useAusbildungsplan() {
+  const ctx = useContext(AusbildungsplanContext)
+  if (!ctx) throw new Error('useAusbildungsplan muss innerhalb von <AusbildungsplanProvider> verwendet werden')
+  return ctx
 }

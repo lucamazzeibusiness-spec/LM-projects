@@ -1,7 +1,7 @@
 import { ExternalLink, Pencil, Plus, X } from 'lucide-react'
 import { useState } from 'react'
 import { useAzubiProfil } from '../context/AzubiProfilContext'
-import { useAusbildungsplan } from '../hooks/useAusbildungsplan'
+import { useAusbildungsplan } from '../context/AusbildungsplanContext'
 import { aktuelleWochentage, heutigerWochentagIndex } from '../lib/wochen'
 import {
   curricula,

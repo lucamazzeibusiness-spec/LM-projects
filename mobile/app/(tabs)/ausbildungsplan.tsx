@@ -2,7 +2,7 @@ import { ExternalLink, Pencil, Plus, X } from 'lucide-react-native'
 import { useState } from 'react'
 import { Pressable, ScrollView, Text, TextInput, View } from 'react-native'
 import { useAzubiProfil } from '../../context/AzubiProfilContext'
-import { useAusbildungsplan } from '../../hooks/useAusbildungsplan'
+import { useAusbildungsplan } from '../../context/AusbildungsplanContext'
 import { aktuelleWochentage, heutigerWochentagIndex } from '../../lib/wochen'
 import { curricula, naechstePruefung, type Ausbildungsblock, type AusbildungsblockTyp, type LernfeldStatus } from '../../data/mock'
 
