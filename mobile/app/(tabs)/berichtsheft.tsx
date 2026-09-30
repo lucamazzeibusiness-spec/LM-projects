@@ -1,4 +1,4 @@
-import { CalendarCheck, ChevronLeft, ChevronRight, Download, Eye, Loader2, Pencil, Plus, X } from 'lucide-react-native'
+import { CalendarCheck, CheckSquare, ChevronLeft, ChevronRight, Download, Eye, Loader2, Pencil, Plus, Square, X } from 'lucide-react-native'
 import { useMemo, useRef, useState } from 'react'
 import { Dimensions, Modal, PanResponder, Pressable, ScrollView, Text, TextInput, View } from 'react-native'
 import { WebView } from 'react-native-webview'
@@ -51,6 +51,7 @@ export default function Berichtsheft() {
   const [bearbeitung, setBearbeitung] = useState<BerichtsheftEintrag | null>(null)
   const [exportiert, setExportiert] = useState(false)
   const [vorschauHtml, setVorschauHtml] = useState<string | null>(null)
+  const [geprueft, setGeprueft] = useState(false)
   const [signaturOffen, setSignaturOffen] = useState(false)
   const [unterschrift, setUnterschrift] = useState<string | null>(null)
   const [ausgewaehlteWoche, setAusgewaehlteWoche] = useState(() => wochenSchluessel(heuteISO()))
@@ -144,6 +145,7 @@ export default function Berichtsheft() {
 
   const vorschauOeffnen = () => {
     if (!nachweisMeta) return
+    setGeprueft(false)
     setVorschauHtml(ausbildungsnachweisVorschauHtml(profil, wocheEintraege, nachweisMeta))
   }
 
@@ -386,6 +388,17 @@ export default function Berichtsheft() {
               {vorschauHtml && <WebView originWhitelist={['*']} source={{ html: vorschauHtml }} />}
             </View>
 
+            <Pressable onPress={() => setGeprueft((g) => !g)} className="flex-row items-start gap-2">
+              {geprueft ? (
+                <CheckSquare size={17} color="#EC0016" />
+              ) : (
+                <Square size={17} color="#9AA4B0" />
+              )}
+              <Text className="flex-1 text-xs text-db-navy-light dark:text-[#9AA4B0]">
+                Ich habe die Angaben geprüft und bestätige, dass sie richtig und vollständig sind.
+              </Text>
+            </Pressable>
+
             <View className="flex-row gap-2">
               <Pressable
                 onPress={vorschauSchliessen}
@@ -393,8 +406,12 @@ export default function Berichtsheft() {
               >
                 <Text className="text-sm font-semibold text-db-navy dark:text-[#EEF1F4]">Bearbeiten</Text>
               </Pressable>
-              <Pressable onPress={weiterZurUnterschrift} className="flex-1 items-center rounded-full bg-db-red px-4 py-2.5">
-                <Text className="text-sm font-semibold text-white">Passt · weiter zur Unterschrift</Text>
+              <Pressable
+                onPress={weiterZurUnterschrift}
+                disabled={!geprueft}
+                className={`flex-1 items-center rounded-full bg-db-red px-4 py-2.5 ${!geprueft ? 'opacity-40' : ''}`}
+              >
+                <Text className="text-sm font-semibold text-white">Bestätigt · weiter zur Unterschrift</Text>
               </Pressable>
             </View>
           </Pressable>

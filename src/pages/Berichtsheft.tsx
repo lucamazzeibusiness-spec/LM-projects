@@ -48,6 +48,7 @@ export default function Berichtsheft() {
   const [bearbeitung, setBearbeitung] = useState<BerichtsheftEintrag | null>(null)
   const [exportiert, setExportiert] = useState(false)
   const [vorschauUrl, setVorschauUrl] = useState<string | null>(null)
+  const [geprueft, setGeprueft] = useState(false)
   const [signaturOffen, setSignaturOffen] = useState(false)
   const [unterschrift, setUnterschrift] = useState<string | null>(null)
   const [ausgewaehlteWoche, setAusgewaehlteWoche] = useState(() => wochenSchluessel(heuteISO()))
@@ -156,6 +157,7 @@ export default function Berichtsheft() {
     if (!profil || !nachweisMeta) return
     const { ausbildungsnachweisVorschauUrl } = await import('../lib/exportBerichtsheft')
     if (vorschauUrl) URL.revokeObjectURL(vorschauUrl)
+    setGeprueft(false)
     setVorschauUrl(ausbildungsnachweisVorschauUrl(profil, wocheEintraege, nachweisMeta))
   }
 
@@ -400,6 +402,16 @@ export default function Berichtsheft() {
 
             <iframe title="Ausbildungsnachweis-Vorschau" src={vorschauUrl} className="h-[60vh] w-full rounded-lg border border-db-gray-200 sm:h-[65vh]" />
 
+            <label className="flex items-start gap-2 text-xs text-db-navy-light">
+              <input
+                type="checkbox"
+                checked={geprueft}
+                onChange={(e) => setGeprueft(e.target.checked)}
+                className="mt-0.5 h-4 w-4 shrink-0 accent-db-red"
+              />
+              Ich habe die Angaben geprüft und bestätige, dass sie richtig und vollständig sind.
+            </label>
+
             <div className="flex gap-2">
               <button
                 onClick={vorschauSchliessen}
@@ -409,9 +421,10 @@ export default function Berichtsheft() {
               </button>
               <button
                 onClick={weiterZurUnterschrift}
-                className="flex-1 rounded-full bg-db-red px-4 py-2.5 text-sm font-semibold text-white hover:bg-db-red-dark"
+                disabled={!geprueft}
+                className="flex-1 rounded-full bg-db-red px-4 py-2.5 text-sm font-semibold text-white hover:bg-db-red-dark disabled:opacity-40"
               >
-                Passt · weiter zur Unterschrift
+                Bestätigt · weiter zur Unterschrift
               </button>
             </div>
           </div>
