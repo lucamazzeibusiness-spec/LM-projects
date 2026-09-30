@@ -358,7 +358,7 @@ export default function Berichtsheft() {
                     </button>
                   </div>
                 </div>
-                <p className="mt-2 text-sm text-db-navy">
+                <p className="mt-2 whitespace-pre-line text-sm text-db-navy">
                   {e.taetigkeiten || <span className="italic text-db-navy-light">Noch keine Angaben</span>}
                 </p>
                 {e.ausbilderKommentar && (
