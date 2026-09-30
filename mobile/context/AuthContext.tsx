@@ -9,15 +9,33 @@ import {
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { auth } from '../lib/firebase'
 import { cloudAllesLesen } from '../lib/cloudSync'
-import { speichere } from '../lib/storage'
+import { existiertLokal, ladeGespeichert, speichere } from '../lib/storage'
 
+// Überschreibt lokale Daten nur, wenn die Cloud-Version nachweislich neuer ist (per
+// schluessel__t-Zeitstempel, geschrieben von cloudSchreiben) – sonst würde ein noch nicht
+// abgeschlossener Cloud-Schreibvorgang aus einer vorigen Sitzung frisch gespeicherte lokale
+// Daten beim nächsten Login wieder löschen. Ohne lokalen Wert (neues Gerät) wird immer
+// übernommen, auch ohne Zeitstempel.
 async function cloudInLocalHydrieren(uid: string) {
   const daten = await cloudAllesLesen(uid)
   if (!daten) return
+  const datenSchluessel = Object.keys(daten).filter((k) => !k.endsWith('__t'))
   await Promise.all(
-    Object.entries(daten)
-      .filter(([, wert]) => wert !== undefined)
-      .map(([schluessel, wert]) => speichere(schluessel, wert)),
+    datenSchluessel.map(async (schluessel) => {
+      const wert = daten[schluessel]
+      if (wert === undefined) return
+
+      const cloudZeitRoh = daten[`${schluessel}__t`]
+      const cloudZeit = typeof cloudZeitRoh === 'number' ? cloudZeitRoh : 0
+
+      if (await existiertLokal(schluessel)) {
+        const lokaleZeit = await ladeGespeichert<number>(`${schluessel}__t`, 0)
+        if (cloudZeit <= lokaleZeit) return
+      }
+
+      await speichere(schluessel, wert)
+      await speichere(`${schluessel}__t`, cloudZeit)
+    }),
   )
 }
 

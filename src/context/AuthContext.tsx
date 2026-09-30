@@ -10,16 +10,32 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { auth } from '../lib/firebase'
 import { cloudAllesLesen } from '../lib/cloudSync'
 
+// Überschreibt lokale Daten nur, wenn die Cloud-Version nachweislich neuer ist (per
+// schluessel__t-Zeitstempel, geschrieben von cloudSchreiben) – sonst würde ein noch nicht
+// abgeschlossener Cloud-Schreibvorgang aus einer vorigen Sitzung frisch gespeicherte lokale
+// Daten beim nächsten Login wieder löschen. Ohne lokalen Wert (neues Gerät) wird immer
+// übernommen, auch ohne Zeitstempel.
 async function cloudInLocalHydrieren(uid: string) {
   const daten = await cloudAllesLesen(uid)
   if (!daten) return
-  for (const [schluessel, wert] of Object.entries(daten)) {
-    if (wert !== undefined) {
-      try {
-        localStorage.setItem(schluessel, JSON.stringify(wert))
-      } catch {
-        // localStorage evtl. voll oder blockiert – lokale Defaults bleiben bestehen.
-      }
+  const datenSchluessel = Object.keys(daten).filter((k) => !k.endsWith('__t'))
+  for (const schluessel of datenSchluessel) {
+    const wert = daten[schluessel]
+    if (wert === undefined) continue
+
+    const cloudZeitRoh = daten[`${schluessel}__t`]
+    const cloudZeit = typeof cloudZeitRoh === 'number' ? cloudZeitRoh : 0
+
+    if (localStorage.getItem(schluessel) !== null) {
+      const lokaleZeit = Number(localStorage.getItem(`${schluessel}__t`) ?? 0)
+      if (cloudZeit <= lokaleZeit) continue
+    }
+
+    try {
+      localStorage.setItem(schluessel, JSON.stringify(wert))
+      localStorage.setItem(`${schluessel}__t`, String(cloudZeit))
+    } catch {
+      // localStorage evtl. voll oder blockiert – lokale Defaults bleiben bestehen.
     }
   }
 }

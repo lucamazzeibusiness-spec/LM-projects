@@ -12,3 +12,11 @@ export async function ladeGespeichert<T>(schluessel: string, fallback: T): Promi
 export async function speichere<T>(schluessel: string, wert: T): Promise<void> {
   await AsyncStorage.setItem(schluessel, JSON.stringify(wert))
 }
+
+export async function existiertLokal(schluessel: string): Promise<boolean> {
+  try {
+    return (await AsyncStorage.getItem(schluessel)) !== null
+  } catch {
+    return false
+  }
+}

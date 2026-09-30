@@ -5,10 +5,20 @@ import { auth, db } from './firebase'
 // ein Feld pro localStorage-Schlüssel. So bleibt die Cloud-Struktur 1:1 zu dem,
 // was ohnehin schon lokal gespeichert wird.
 
+// Jeder Schlüssel bekommt einen Zeitstempel-Zwilling (schluessel__t), damit die Hydration beim
+// nächsten App-Start erkennen kann, ob die Cloud tatsächlich neuer ist als der lokale Stand –
+// sonst würde ein noch nicht abgeschlossener (oder fehlgeschlagener) Cloud-Schreibvorgang beim
+// nächsten Login frisch gespeicherte lokale Daten wieder überschreiben und so effektiv löschen.
 export function cloudSchreiben(schluessel: string, wert: unknown): void {
+  const jetzt = Date.now()
+  try {
+    localStorage.setItem(`${schluessel}__t`, String(jetzt))
+  } catch {
+    // localStorage evtl. voll oder blockiert – betrifft nur den Hydrations-Zeitstempel.
+  }
   const uid = auth.currentUser?.uid
   if (!uid) return
-  setDoc(doc(db, 'users', uid), { [schluessel]: wert }, { merge: true }).catch(() => {
+  setDoc(doc(db, 'users', uid), { [schluessel]: wert, [`${schluessel}__t`]: jetzt }, { merge: true }).catch(() => {
     // Bestbemüht: lokale Daten bleiben die verlässliche Quelle auf diesem Gerät.
   })
 }

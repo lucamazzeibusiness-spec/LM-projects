@@ -1,14 +1,23 @@
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { auth, db } from './firebase'
+import { speichere } from './storage'
 
 // Alle App-Daten eines Nutzers liegen in einem einzigen Dokument users/{uid},
 // ein Feld pro Storage-Schlüssel. So bleibt die Cloud-Struktur 1:1 zu dem,
 // was ohnehin schon lokal (AsyncStorage) gespeichert wird.
 
+// Jeder Schlüssel bekommt einen Zeitstempel-Zwilling (schluessel__t), damit die Hydration beim
+// nächsten App-Start erkennen kann, ob die Cloud tatsächlich neuer ist als der lokale Stand –
+// sonst würde ein noch nicht abgeschlossener (oder fehlgeschlagener) Cloud-Schreibvorgang beim
+// nächsten Login frisch gespeicherte lokale Daten wieder überschreiben und so effektiv löschen.
 export function cloudSchreiben(schluessel: string, wert: unknown): void {
+  const jetzt = Date.now()
+  speichere(`${schluessel}__t`, jetzt).catch(() => {
+    // Betrifft nur den Hydrations-Zeitstempel.
+  })
   const uid = auth.currentUser?.uid
   if (!uid) return
-  setDoc(doc(db, 'users', uid), { [schluessel]: wert }, { merge: true }).catch(() => {
+  setDoc(doc(db, 'users', uid), { [schluessel]: wert, [`${schluessel}__t`]: jetzt }, { merge: true }).catch(() => {
     // Bestbemüht: lokale Daten bleiben die verlässliche Quelle auf diesem Gerät.
   })
 }
