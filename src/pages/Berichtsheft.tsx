@@ -6,6 +6,7 @@ import { useAzubiProfil } from '../context/AzubiProfilContext'
 import { useBerichtsheft } from '../context/BerichtsheftContext'
 import { berichtsheftStreak, usePunkte } from '../context/PunkteContext'
 import type { BerichtsheftEintrag, BerichtsheftKategorie } from '../data/mock'
+import { bulletEingabeVerarbeiten, hatEchtenInhalt } from '../lib/stichpunkte'
 import {
   arbeitstageDerWoche,
   heuteISO,
@@ -73,7 +74,7 @@ export default function Berichtsheft() {
   const anzeigeTage = [...montagFreitag, ...zusatzTage]
 
   const wocheStunden = wocheEintraege.reduce((sum, e) => sum + e.stunden, 0)
-  const erfassteTage = montagFreitag.filter((d) => eintraegeNachDatum.get(d)?.taetigkeiten.trim()).length
+  const erfassteTage = montagFreitag.filter((d) => hatEchtenInhalt(eintraegeNachDatum.get(d)?.taetigkeiten ?? '')).length
   const wocheVollstaendig = erfassteTage === montagFreitag.length
 
   const alleWochenMitEintraegen = useMemo(() => {
@@ -98,7 +99,7 @@ export default function Berichtsheft() {
   const heuteBearbeiten = () => setBearbeitung(heutigerEintrag ?? neuerTageseintragFuer(heute))
 
   const speichern = () => {
-    if (!bearbeitung || !bearbeitung.taetigkeiten.trim()) return
+    if (!bearbeitung || !hatEchtenInhalt(bearbeitung.taetigkeiten)) return
     setEintraege((prev) => [bearbeitung, ...prev.filter((e) => e.id !== bearbeitung.id)])
 
     const ereignisId = `berichtsheft:${bearbeitung.datumISO}`
@@ -244,9 +245,19 @@ export default function Berichtsheft() {
 
             <textarea
               value={bearbeitung.taetigkeiten}
-              onChange={(e) => setBearbeitung((d) => d && { ...d, taetigkeiten: e.target.value })}
+              onChange={(e) => {
+                const el = e.target
+                const { wert, cursor } = bulletEingabeVerarbeiten(bearbeitung.taetigkeiten, el.value)
+                if (cursor !== null) {
+                  // Synchron setzen (nicht erst im nächsten Frame), sonst überholt ein schnell
+                  // getipptes nächstes Zeichen die Korrektur und landet an der falschen Stelle.
+                  el.value = wert
+                  el.selectionStart = el.selectionEnd = cursor
+                }
+                setBearbeitung((d) => d && { ...d, taetigkeiten: wert })
+              }}
               rows={4}
-              placeholder="Welche Tätigkeiten hast du heute ausgeführt oder welche Lerninhalte hattest du?"
+              placeholder="Welche Tätigkeiten hast du heute ausgeführt oder welche Lerninhalte hattest du? Jede neue Zeile wird automatisch zum Stichpunkt."
               className="w-full rounded-lg border border-db-gray-200 px-3 py-2 text-sm text-db-navy outline-none focus:border-db-red"
             />
 

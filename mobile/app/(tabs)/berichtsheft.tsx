@@ -8,6 +8,7 @@ import { useAzubiProfil } from '../../context/AzubiProfilContext'
 import { berichtsheftStreak, usePunkte } from '../../context/PunkteContext'
 import { useBerichtsheft } from '../../context/BerichtsheftContext'
 import { ausbildungsnachweisVorschauHtml, exportBerichtsheftPdf } from '../../lib/exportBerichtsheft'
+import { bulletEingabeVerarbeiten, hatEchtenInhalt } from '../../lib/stichpunkte'
 import {
   arbeitstageDerWoche,
   heuteISO,
@@ -49,6 +50,7 @@ export default function Berichtsheft() {
   const { eintraege, setEintraege } = useBerichtsheft()
   const { punkteVergeben, stand: punkteStand } = usePunkte()
   const [bearbeitung, setBearbeitung] = useState<BerichtsheftEintrag | null>(null)
+  const [taetigkeitenAuswahl, setTaetigkeitenAuswahl] = useState<{ start: number; end: number } | undefined>(undefined)
   const [exportiert, setExportiert] = useState(false)
   const [vorschauHtml, setVorschauHtml] = useState<string | null>(null)
   const [geprueft, setGeprueft] = useState(false)
@@ -76,7 +78,7 @@ export default function Berichtsheft() {
   const anzeigeTage = [...montagFreitag, ...zusatzTage]
 
   const wocheStunden = wocheEintraege.reduce((sum, e) => sum + e.stunden, 0)
-  const erfassteTage = montagFreitag.filter((d) => eintraegeNachDatum.get(d)?.taetigkeiten.trim()).length
+  const erfassteTage = montagFreitag.filter((d) => hatEchtenInhalt(eintraegeNachDatum.get(d)?.taetigkeiten ?? '')).length
   const wocheVollstaendig = erfassteTage === montagFreitag.length
 
   const alleWochenMitEintraegen = useMemo(() => {
@@ -120,7 +122,7 @@ export default function Berichtsheft() {
   const heuteBearbeiten = () => setBearbeitung(heutigerEintrag ?? neuerTageseintragFuer(heute))
 
   const speichern = () => {
-    if (!bearbeitung || !bearbeitung.taetigkeiten.trim()) return
+    if (!bearbeitung || !hatEchtenInhalt(bearbeitung.taetigkeiten)) return
     setEintraege((prev) => [bearbeitung, ...prev.filter((e) => e.id !== bearbeitung.id)])
 
     const ereignisId = `berichtsheft:${bearbeitung.datumISO}`
@@ -332,10 +334,15 @@ export default function Berichtsheft() {
 
               <TextInput
                 value={bearbeitung.taetigkeiten}
-                onChangeText={(t) => setBearbeitung((d) => d && { ...d, taetigkeiten: t })}
+                onChangeText={(t) => {
+                  const { wert, cursor } = bulletEingabeVerarbeiten(bearbeitung.taetigkeiten, t)
+                  setBearbeitung((d) => d && { ...d, taetigkeiten: wert })
+                  setTaetigkeitenAuswahl(cursor !== null ? { start: cursor, end: cursor } : undefined)
+                }}
+                selection={taetigkeitenAuswahl}
                 multiline
                 numberOfLines={4}
-                placeholder="Welche Tätigkeiten hast du heute ausgeführt oder welche Lerninhalte hattest du?"
+                placeholder="Welche Tätigkeiten hast du heute ausgeführt oder welche Lerninhalte hattest du? Jede neue Zeile wird automatisch zum Stichpunkt."
                 className="w-full rounded-lg border border-db-gray-200 dark:border-[#2A323D] px-3 py-2 text-sm text-db-navy dark:text-[#EEF1F4]"
                 style={{ minHeight: 90, textAlignVertical: 'top' }}
               />

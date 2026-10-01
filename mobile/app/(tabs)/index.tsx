@@ -7,6 +7,7 @@ import { useAzubiProfil } from '../../context/AzubiProfilContext'
 import { useAusbildungsplan } from '../../context/AusbildungsplanContext'
 import { useBerichtsheft } from '../../context/BerichtsheftContext'
 import { erinnerungAktivieren, erinnerungDeaktivieren, erinnerungIstAktiv, heuteErinnern } from '../../lib/erinnerung'
+import { hatEchtenInhalt } from '../../lib/stichpunkte'
 import { aktuelleWochentage, heuteISO, heutigerWochentagIndex } from '../../lib/wochen'
 import { lernaufgaben, naechstePruefung, type AusbildungsblockTyp } from '../../data/mock'
 
@@ -37,7 +38,7 @@ export default function Dashboard() {
   const offen = lernaufgaben.filter((a) => a.status !== 'Erledigt')
   const heute = offen.filter((a) => a.faelligkeit.startsWith('Heute'))
   const andereOffeneEntwuerfe = eintraege.filter(
-    (e) => e.status === 'Entwurf' && e.taetigkeiten.trim() && e.datumISO !== heuteISO(),
+    (e) => e.status === 'Entwurf' && hatEchtenInhalt(e.taetigkeiten) && e.datumISO !== heuteISO(),
   ).length
 
   const heuteIndex = heutigerWochentagIndex()

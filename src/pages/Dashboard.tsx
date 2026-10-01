@@ -5,6 +5,7 @@ import { GewerkBadge, PrioBadge, StatusBadge } from '../components/Badges'
 import { useAzubiProfil } from '../context/AzubiProfilContext'
 import { useAusbildungsplan } from '../context/AusbildungsplanContext'
 import { useBerichtsheft } from '../context/BerichtsheftContext'
+import { hatEchtenInhalt } from '../lib/stichpunkte'
 import {
   erinnerungAktivieren,
   erinnerungDeaktivieren,
@@ -38,7 +39,7 @@ export default function Dashboard() {
   const offen = lernaufgaben.filter((a) => a.status !== 'Erledigt')
   const heute = offen.filter((a) => a.faelligkeit.startsWith('Heute'))
   const andereOffeneEntwuerfe = eintraege.filter(
-    (e) => e.status === 'Entwurf' && e.taetigkeiten.trim() && e.datumISO !== heuteISO(),
+    (e) => e.status === 'Entwurf' && hatEchtenInhalt(e.taetigkeiten) && e.datumISO !== heuteISO(),
   ).length
 
   const heuteIndex = heutigerWochentagIndex()

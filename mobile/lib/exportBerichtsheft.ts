@@ -4,6 +4,7 @@ import * as Print from 'expo-print'
 import * as Sharing from 'expo-sharing'
 import { berufAbkuerzung, type AzubiProfil, type BerichtsheftEintrag } from '../data/mock'
 import { DB_LOGO_PNG } from './dbLogo'
+import { BULLET } from './stichpunkte'
 import { heutigesDatumVoll } from './wochen'
 
 interface ExportOptions {
@@ -36,8 +37,8 @@ function alsStichpunkte(text: string): string {
   return text
     .split('\n')
     .map((z) => z.trim())
-    .filter(Boolean)
-    .map((z) => (z.startsWith('-') ? z : `-${z}`))
+    .filter((z) => z.replace(/^-+\s*/, '').length > 0)
+    .map((z) => (z.startsWith('-') ? z : `${BULLET}${z}`))
     .join('<br/>')
 }
 
