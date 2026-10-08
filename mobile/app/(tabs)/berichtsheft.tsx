@@ -1,5 +1,5 @@
 import { CalendarCheck, CheckSquare, ChevronLeft, ChevronRight, Download, Eye, Loader2, Pencil, Plus, Square, X } from 'lucide-react-native'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Dimensions, Modal, PanResponder, Pressable, ScrollView, Text, TextInput, View } from 'react-native'
 import { WebView } from 'react-native-webview'
 import { BerichtStatusBadge } from '../../components/Badges'
@@ -116,6 +116,13 @@ export default function Berichtsheft() {
       },
     }),
   ).current
+
+  // Setzt die Cursor-Position für das Stichpunkt-Textfeld zurück, sobald ein anderer Eintrag
+  // geöffnet (oder das Modal geschlossen) wird – sonst könnte die alte Auswahl eines vorherigen,
+  // meist länger/kürzeren Textes beim neuen Eintrag an einer unpassenden Stelle landen.
+  useEffect(() => {
+    setTaetigkeitenAuswahl(undefined)
+  }, [bearbeitung?.id])
 
   if (!profil) return null
 
