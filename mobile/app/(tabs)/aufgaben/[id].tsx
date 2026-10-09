@@ -1,39 +1,21 @@
 import { useLocalSearchParams } from 'expo-router'
 import { Camera, Check, CheckCircle2, MessageSquare, Save, Target } from 'lucide-react-native'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Pressable, ScrollView, Text, TextInput, View } from 'react-native'
 import { GewerkBadge, PrioBadge, StatusBadge } from '../../../components/Badges'
-import { lernaufgaben } from '../../../data/mock'
-import { cloudSchreiben } from '../../../lib/cloudSync'
-import { ladeGespeichert, speichere } from '../../../lib/storage'
-
-interface Draft {
-  checked: Record<string, boolean>
-  notiz: string
-  erledigt: boolean
-}
-
-const leererDraft: Draft = { checked: {}, notiz: '', erledigt: false }
+import { useLernaufgaben, type LernaufgabeDraft } from '../../../context/LernaufgabenContext'
 
 export default function AufgabeDetail() {
   const { id } = useLocalSearchParams<{ id: string }>()
+  const { lernaufgaben, draftFuer, draftAktualisieren } = useLernaufgaben()
   const aufgabe = lernaufgaben.find((a) => a.id === id)
-  const storageKey = `lernaufgabe:${id}`
 
-  const [draft, setDraft] = useState<Draft>(leererDraft)
+  const draft = id ? draftFuer(id) : draftFuer('')
   const [savedHint, setSavedHint] = useState(false)
 
-  useEffect(() => {
-    ladeGespeichert<Draft>(storageKey, leererDraft).then(setDraft)
-  }, [storageKey])
-
-  const aktualisieren = (updater: (d: Draft) => Draft) => {
-    setDraft((d) => {
-      const naechster = updater(d)
-      speichere(storageKey, naechster)
-      cloudSchreiben(storageKey, naechster)
-      return naechster
-    })
+  const aktualisieren = (updater: (d: LernaufgabeDraft) => LernaufgabeDraft) => {
+    if (!id) return
+    draftAktualisieren(id, updater)
     setSavedHint(true)
     setTimeout(() => setSavedHint(false), 1200)
   }

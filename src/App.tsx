@@ -4,6 +4,7 @@ import { useAuth } from './context/AuthContext'
 import { AusbildungsplanProvider } from './context/AusbildungsplanContext'
 import { AzubiProfilProvider, useAzubiProfil } from './context/AzubiProfilContext'
 import { BerichtsheftProvider } from './context/BerichtsheftContext'
+import { LernaufgabenProvider } from './context/LernaufgabenContext'
 import { PunkteProvider } from './context/PunkteContext'
 import { ZuordnenProvider } from './context/ZuordnenContext'
 import Ausbildungsplan from './pages/Ausbildungsplan'
@@ -34,11 +35,13 @@ export default function App() {
     <AzubiProfilProvider>
       <BerichtsheftProvider>
         <AusbildungsplanProvider>
-          <PunkteProvider>
-            <ZuordnenProvider>
-              <AppRoutes />
-            </ZuordnenProvider>
-          </PunkteProvider>
+          <LernaufgabenProvider>
+            <PunkteProvider>
+              <ZuordnenProvider>
+                <AppRoutes />
+              </ZuordnenProvider>
+            </PunkteProvider>
+          </LernaufgabenProvider>
         </AusbildungsplanProvider>
       </BerichtsheftProvider>
     </AzubiProfilProvider>

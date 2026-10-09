@@ -2,38 +2,16 @@ import { Camera, Check, CheckCircle2, ChevronLeft, MessageSquare, Save, Target }
 import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { GewerkBadge, PrioBadge, StatusBadge } from '../components/Badges'
-import { lernaufgaben } from '../data/mock'
-import { cloudSchreiben } from '../lib/cloudSync'
-
-interface Draft {
-  checked: Record<string, boolean>
-  notiz: string
-  erledigt: boolean
-}
-
-const leererDraft: Draft = { checked: {}, notiz: '', erledigt: false }
-
-function ladeDraft(storageKey: string): Draft {
-  try {
-    const raw = localStorage.getItem(storageKey)
-    return raw ? JSON.parse(raw) : leererDraft
-  } catch {
-    return leererDraft
-  }
-}
+import { useLernaufgaben, type LernaufgabeDraft } from '../context/LernaufgabenContext'
 
 export default function LernaufgabeDetail() {
   const { id } = useParams()
+  const { lernaufgaben, draftFuer, draftAktualisieren } = useLernaufgaben()
   const aufgabe = lernaufgaben.find((a) => a.id === id)
-  const storageKey = `lernaufgabe:${id}`
 
-  const [draft, setDraft] = useState<Draft>(() => ladeDraft(storageKey))
+  const draft = id ? draftFuer(id) : draftFuer('')
   const [savedHint, setSavedHint] = useState(false)
   const savedHintTimeout = useRef<ReturnType<typeof setTimeout>>(undefined)
-
-  useEffect(() => {
-    setDraft(ladeDraft(storageKey))
-  }, [storageKey])
 
   useEffect(() => {
     return () => {
@@ -41,13 +19,9 @@ export default function LernaufgabeDetail() {
     }
   }, [])
 
-  const aktualisieren = (updater: (d: Draft) => Draft) => {
-    setDraft((d) => {
-      const naechster = updater(d)
-      localStorage.setItem(storageKey, JSON.stringify(naechster))
-      cloudSchreiben(storageKey, naechster)
-      return naechster
-    })
+  const aktualisieren = (updater: (d: LernaufgabeDraft) => LernaufgabeDraft) => {
+    if (!id) return
+    draftAktualisieren(id, updater)
     setSavedHint(true)
     if (savedHintTimeout.current) clearTimeout(savedHintTimeout.current)
     savedHintTimeout.current = setTimeout(() => setSavedHint(false), 1200)

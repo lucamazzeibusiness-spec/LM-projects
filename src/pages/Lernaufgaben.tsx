@@ -2,12 +2,14 @@ import { MapPin, Target } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { GewerkBadge, PrioBadge, StatusBadge } from '../components/Badges'
-import { lernaufgaben, type Gewerk, type LernaufgabeStatus } from '../data/mock'
+import { useLernaufgaben } from '../context/LernaufgabenContext'
+import type { Gewerk, LernaufgabeStatus } from '../data/mock'
 
 const gewerke: (Gewerk | 'Alle')[] = ['Alle', 'Elektrik', 'Mechanik', 'Mechatronik']
 const stati: (LernaufgabeStatus | 'Alle')[] = ['Alle', 'Offen', 'In Arbeit', 'Erledigt']
 
 export default function Lernaufgaben() {
+  const { lernaufgaben } = useLernaufgaben()
   const [gewerk, setGewerk] = useState<Gewerk | 'Alle'>('Alle')
   const [status, setStatus] = useState<LernaufgabeStatus | 'Alle'>('Alle')
 
@@ -16,7 +18,7 @@ export default function Lernaufgaben() {
       lernaufgaben.filter(
         (a) => (gewerk === 'Alle' || a.gewerk === gewerk) && (status === 'Alle' || a.status === status),
       ),
-    [gewerk, status],
+    [lernaufgaben, gewerk, status],
   )
 
   return (

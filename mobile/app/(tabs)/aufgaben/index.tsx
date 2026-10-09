@@ -3,7 +3,8 @@ import { MapPin, Target } from 'lucide-react-native'
 import { useMemo, useState } from 'react'
 import { Pressable, ScrollView, Text, View } from 'react-native'
 import { GewerkBadge, PrioBadge, StatusBadge } from '../../../components/Badges'
-import { lernaufgaben, type Gewerk, type LernaufgabeStatus } from '../../../data/mock'
+import { useLernaufgaben } from '../../../context/LernaufgabenContext'
+import type { Gewerk, LernaufgabeStatus } from '../../../data/mock'
 
 const gewerke: (Gewerk | 'Alle')[] = ['Alle', 'Elektrik', 'Mechanik', 'Mechatronik']
 const stati: (LernaufgabeStatus | 'Alle')[] = ['Alle', 'Offen', 'In Arbeit', 'Erledigt']
@@ -21,12 +22,13 @@ function FilterChip({ label, active, onPress, variant }: { label: string; active
 }
 
 export default function Aufgaben() {
+  const { lernaufgaben } = useLernaufgaben()
   const [gewerk, setGewerk] = useState<Gewerk | 'Alle'>('Alle')
   const [status, setStatus] = useState<LernaufgabeStatus | 'Alle'>('Alle')
 
   const gefiltert = useMemo(
     () => lernaufgaben.filter((a) => (gewerk === 'Alle' || a.gewerk === gewerk) && (status === 'Alle' || a.status === status)),
-    [gewerk, status],
+    [lernaufgaben, gewerk, status],
   )
 
   return (

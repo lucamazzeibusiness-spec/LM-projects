@@ -6,10 +6,11 @@ import { GewerkBadge, PrioBadge, StatusBadge } from '../../components/Badges'
 import { useAzubiProfil } from '../../context/AzubiProfilContext'
 import { useAusbildungsplan } from '../../context/AusbildungsplanContext'
 import { useBerichtsheft } from '../../context/BerichtsheftContext'
+import { useLernaufgaben } from '../../context/LernaufgabenContext'
 import { erinnerungAktivieren, erinnerungDeaktivieren, erinnerungIstAktiv, heuteErinnern } from '../../lib/erinnerung'
 import { hatEchtenInhalt } from '../../lib/stichpunkte'
 import { aktuelleWochentage, heuteISO, heutigerWochentagIndex } from '../../lib/wochen'
-import { lernaufgaben, naechstePruefung, type AusbildungsblockTyp } from '../../data/mock'
+import { naechstePruefung, type AusbildungsblockTyp } from '../../data/mock'
 
 const typStyle: Record<AusbildungsblockTyp, string> = {
   Betrieb: 'bg-blue-50 dark:bg-blue-500/15 text-blue-700 dark:text-blue-300',
@@ -21,6 +22,7 @@ export default function Dashboard() {
   const { profil } = useAzubiProfil()
   const { eintraege } = useBerichtsheft()
   const { vorlage } = useAusbildungsplan()
+  const { lernaufgaben } = useLernaufgaben()
   const [erinnerungAn, setErinnerungAn] = useState(false)
 
   const heutigerEintrag = eintraege.find((e) => e.datumISO === heuteISO())

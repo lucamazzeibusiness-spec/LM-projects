@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from '../context/AuthContext'
 import { AusbildungsplanProvider } from '../context/AusbildungsplanContext'
 import { AzubiProfilProvider } from '../context/AzubiProfilContext'
 import { BerichtsheftProvider } from '../context/BerichtsheftContext'
+import { LernaufgabenProvider } from '../context/LernaufgabenContext'
 import { PunkteProvider } from '../context/PunkteContext'
 import { ZuordnenProvider } from '../context/ZuordnenContext'
 import { themeInitialisieren } from '../lib/theme'
@@ -23,16 +24,18 @@ function Gate() {
     <AzubiProfilProvider>
       <BerichtsheftProvider>
         <AusbildungsplanProvider>
-          <PunkteProvider>
-            <ZuordnenProvider>
-              <Stack screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="(tabs)" />
-                <Stack.Screen name="onboarding" />
-                <Stack.Screen name="profil" options={{ headerShown: true, title: 'Profil bearbeiten', presentation: 'modal' }} />
-                <Stack.Screen name="fortschritt" options={{ headerShown: true, title: 'Fortschritt', presentation: 'modal' }} />
-              </Stack>
-            </ZuordnenProvider>
-          </PunkteProvider>
+          <LernaufgabenProvider>
+            <PunkteProvider>
+              <ZuordnenProvider>
+                <Stack screenOptions={{ headerShown: false }}>
+                  <Stack.Screen name="(tabs)" />
+                  <Stack.Screen name="onboarding" />
+                  <Stack.Screen name="profil" options={{ headerShown: true, title: 'Profil bearbeiten', presentation: 'modal' }} />
+                  <Stack.Screen name="fortschritt" options={{ headerShown: true, title: 'Fortschritt', presentation: 'modal' }} />
+                </Stack>
+              </ZuordnenProvider>
+            </PunkteProvider>
+          </LernaufgabenProvider>
         </AusbildungsplanProvider>
       </BerichtsheftProvider>
     </AzubiProfilProvider>
