@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Pressable, ScrollView, Text, View } from 'react-native'
 import { usePunkte } from '../context/PunkteContext'
 import { useZuordnenBestzeiten } from '../context/ZuordnenContext'
+import { eignetSichFuerKurzform } from '../lib/kurzform'
 import { dbFakten, type DBFakt, type DBFaktKategorie } from '../data/mock'
 import { formatZeit } from '../lib/zeit'
 import Flashcard from './Flashcard'
@@ -74,7 +75,10 @@ export default function DBFaktenQuiz() {
 
   const zuordnenSchluessel = `dbfakten:${kategorieFilter}`
   const zuordnenPaare = useMemo(
-    () => shuffle(gefiltert()).slice(0, 6).map((f) => ({ id: f.id, begriff: f.frage, definition: f.antwort })),
+    () =>
+      shuffle(gefiltert().filter((f) => eignetSichFuerKurzform(f.frage, f.antwort)))
+        .slice(0, 6)
+        .map((f) => ({ id: f.id, begriff: f.frage, definition: f.antwort })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [kategorieFilter, zuordnenRunde],
   )
@@ -95,7 +99,10 @@ export default function DBFaktenQuiz() {
   }
 
   const lernenPaare = useMemo(
-    () => shuffle(gefiltert()).slice(0, 10).map((f) => ({ id: f.id, begriff: f.frage, definition: f.antwort })),
+    () =>
+      shuffle(gefiltert().filter((f) => eignetSichFuerKurzform(f.frage, f.antwort)))
+        .slice(0, 10)
+        .map((f) => ({ id: f.id, begriff: f.frage, definition: f.antwort })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [kategorieFilter, lernenRunde],
   )
