@@ -6,6 +6,7 @@ import { useZuordnenBestzeiten } from '../context/ZuordnenContext'
 import { lernkarten, type Lernkarte, type Pruefungsphase, type Themenbereich } from '../data/mock'
 import { formatZeit } from '../lib/zeit'
 import Flashcard from './Flashcard'
+import Lernmodus from './Lernmodus'
 import Zuordnen from './Zuordnen'
 
 const themenbereiche: (Themenbereich | 'Alle')[] = [
@@ -38,13 +39,17 @@ function shuffle(karten: Lernkarte[]): Lernkarte[] {
 export default function LernkartenQuiz() {
   const [themaFilter, setThemaFilter] = useState<Themenbereich | 'Alle'>('Alle')
   const [teilFilter, setTeilFilter] = useState<Pruefungsphase | 'Alle'>('Alle')
-  const [modus, setModus] = useState<'karten' | 'zuordnen'>('karten')
+  const [modus, setModus] = useState<'karten' | 'zuordnen' | 'lernen'>('karten')
   const [deck, setDeck] = useState<Lernkarte[]>([])
   const [flipped, setFlipped] = useState(false)
   const [gewusst, setGewusst] = useState(0)
   const [wiederholen, setWiederholen] = useState(0)
   const [zuordnenRunde, setZuordnenRunde] = useState(0)
   const [zuordnenErgebnis, setZuordnenErgebnis] = useState<{ sekunden: number; fehler: number; neuerBest: boolean } | null>(null)
+  const [lernenRunde, setLernenRunde] = useState(0)
+  const [lernenErgebnis, setLernenErgebnis] = useState<{ ersteVersucheRichtig: number; gesamt: number; fehler: number } | null>(
+    null,
+  )
   const { punkteVergeben } = usePunkte()
   const { bestFuer, bestSetzenWennBesser } = useZuordnenBestzeiten()
 
@@ -62,6 +67,7 @@ export default function LernkartenQuiz() {
 
   useEffect(starten, [themaFilter, teilFilter])
   useEffect(() => setZuordnenErgebnis(null), [themaFilter, teilFilter])
+  useEffect(() => setLernenErgebnis(null), [themaFilter, teilFilter])
 
   const aktuell = deck[0]
   const gesamt = gefiltert().length
@@ -99,6 +105,26 @@ export default function LernkartenQuiz() {
   const neueZuordnenRunde = () => {
     setZuordnenErgebnis(null)
     setZuordnenRunde((r) => r + 1)
+  }
+
+  const lernenPaare = useMemo(
+    () => shuffle(gefiltert()).slice(0, 10).map((k) => ({ id: k.id, begriff: k.frage, definition: k.antwort })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [themaFilter, teilFilter, lernenRunde],
+  )
+
+  const lernenKarteGemeistert = (id: string) => {
+    const karte = lernkarten.find((k) => k.id === id)
+    if (karte) punkteVergeben(`karte:${id}`, 5, `Lernkarte gemeistert: ${karte.themenbereich}`)
+  }
+
+  const lernenAbschluss = (ersteVersucheRichtig: number, gesamt: number, fehler: number) => {
+    setLernenErgebnis({ ersteVersucheRichtig, gesamt, fehler })
+  }
+
+  const neueLernenRunde = () => {
+    setLernenErgebnis(null)
+    setLernenRunde((r) => r + 1)
   }
 
   return (
@@ -146,6 +172,14 @@ export default function LernkartenQuiz() {
         >
           <Text className={`text-xs font-semibold ${modus === 'zuordnen' ? 'text-db-navy dark:text-[#EEF1F4]' : 'text-db-navy-light dark:text-[#9AA4B0]'}`}>
             Zuordnen
+          </Text>
+        </Pressable>
+        <Pressable
+          onPress={() => setModus('lernen')}
+          className={`flex-1 items-center rounded-full py-1.5 ${modus === 'lernen' ? 'bg-white dark:bg-[#171C24]' : ''}`}
+        >
+          <Text className={`text-xs font-semibold ${modus === 'lernen' ? 'text-db-navy dark:text-[#EEF1F4]' : 'text-db-navy-light dark:text-[#9AA4B0]'}`}>
+            Lernen
           </Text>
         </Pressable>
       </View>
@@ -212,6 +246,35 @@ export default function LernkartenQuiz() {
             )}
             <Zuordnen key={zuordnenRunde} paare={zuordnenPaare} onAbschluss={zuordnenAbschluss} />
           </View>
+        )
+      ) : modus === 'lernen' ? (
+        lernenPaare.length < 4 ? (
+          <View className="items-center rounded-xl border border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24] p-6">
+            <Text className="text-sm text-db-navy-light dark:text-[#9AA4B0]">Zu wenige Karten für diesen Filter (mind. 4 nötig).</Text>
+          </View>
+        ) : lernenErgebnis ? (
+          <View className="items-center gap-3 rounded-xl border border-db-green/30 bg-db-green/5 p-6">
+            <Sparkles size={24} color="#1E8A3C" />
+            <Text className="text-lg font-semibold text-db-navy dark:text-[#EEF1F4]">Runde gemeistert!</Text>
+            <Text className="text-sm text-db-navy-light dark:text-[#9AA4B0]">
+              {lernenErgebnis.ersteVersucheRichtig} von {lernenErgebnis.gesamt} im ersten Versuch richtig
+              {lernenErgebnis.fehler > 0 ? ` · ${lernenErgebnis.fehler} Fehlversuche` : ''}
+            </Text>
+            <Pressable
+              onPress={neueLernenRunde}
+              className="flex-row items-center gap-1.5 rounded-full bg-db-red px-5 py-2.5"
+            >
+              <Shuffle size={15} color="#fff" />
+              <Text className="text-sm font-semibold text-white">Neue Runde</Text>
+            </Pressable>
+          </View>
+        ) : (
+          <Lernmodus
+            key={lernenRunde}
+            paare={lernenPaare}
+            onKarteGemeistert={lernenKarteGemeistert}
+            onAbschluss={lernenAbschluss}
+          />
         )
       ) : aktuell ? (
         <View className="gap-3">
