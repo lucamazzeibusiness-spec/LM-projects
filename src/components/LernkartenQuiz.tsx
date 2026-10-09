@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { lernkarten, type Lernkarte, type Pruefungsphase, type Themenbereich } from '../data/mock'
 import { usePunkte } from '../context/PunkteContext'
 import { useZuordnenBestzeiten } from '../context/ZuordnenContext'
+import { eignetSichFuerKurzform } from '../lib/kurzform'
 import { formatZeit } from '../lib/zeit'
 import Flashcard from './Flashcard'
 import Lernmodus from './Lernmodus'
@@ -88,7 +89,10 @@ export default function LernkartenQuiz() {
 
   const zuordnenSchluessel = `lernkarten:${themaFilter}:${teilFilter}`
   const zuordnenPaare = useMemo(
-    () => shuffle(gefiltert()).slice(0, 6).map((k) => ({ id: k.id, begriff: k.frage, definition: k.antwort })),
+    () =>
+      shuffle(gefiltert().filter((k) => eignetSichFuerKurzform(k.frage, k.antwort)))
+        .slice(0, 6)
+        .map((k) => ({ id: k.id, begriff: k.frage, definition: k.antwort })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [themaFilter, teilFilter, zuordnenRunde],
   )
@@ -109,7 +113,10 @@ export default function LernkartenQuiz() {
   }
 
   const lernenPaare = useMemo(
-    () => shuffle(gefiltert()).slice(0, 10).map((k) => ({ id: k.id, begriff: k.frage, definition: k.antwort })),
+    () =>
+      shuffle(gefiltert().filter((k) => eignetSichFuerKurzform(k.frage, k.antwort)))
+        .slice(0, 10)
+        .map((k) => ({ id: k.id, begriff: k.frage, definition: k.antwort })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [themaFilter, teilFilter, lernenRunde],
   )
