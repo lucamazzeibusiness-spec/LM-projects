@@ -1,6 +1,8 @@
 import { Lock } from 'lucide-react'
 import RangKarte from '../components/RangKarte'
+import { useLernstand } from '../context/LernstandContext'
 import { usePunkte } from '../context/PunkteContext'
+import { fortschrittProThema } from '../lib/lernstand'
 import { raenge, rangFuer } from '../lib/rang'
 
 function relativeZeit(iso: string): string {
@@ -17,6 +19,10 @@ function relativeZeit(iso: string): string {
 export default function Fortschritt() {
   const { stand } = usePunkte()
   const { aktuell } = rangFuer(stand.gesamt)
+  const { lernstand } = useLernstand()
+  const themen = fortschrittProThema(lernstand)
+  const sicherGesamt = themen.reduce((n, t) => n + t.sicher, 0)
+  const kartenGesamt = themen.reduce((n, t) => n + t.gesamt, 0)
 
   return (
     <div className="space-y-4">
@@ -26,6 +32,33 @@ export default function Fortschritt() {
       </div>
 
       <RangKarte />
+
+      <div className="rounded-xl border border-db-gray-200 bg-db-surface p-4">
+        <div className="flex items-baseline justify-between gap-2">
+          <h2 className="text-sm font-semibold text-db-navy">Prüfungsvorbereitung</h2>
+          <span className="text-xs text-db-navy-light">
+            {sicherGesamt} von {kartenGesamt} Karten sicher
+          </span>
+        </div>
+        <div className="mt-3 space-y-3">
+          {themen.map((t) => (
+            <div key={t.thema}>
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-medium text-db-navy">{t.thema}</span>
+                <span className="text-db-navy-light">
+                  {t.sicher}/{t.gesamt}
+                  {t.schwach > 0 && <span className="text-db-amber"> · {t.schwach} schwach</span>}
+                </span>
+              </div>
+              <div className="mt-1 flex h-1.5 w-full overflow-hidden rounded-full bg-db-gray-100">
+                <div className="h-full bg-db-green" style={{ width: `${(t.sicher / t.gesamt) * 100}%` }} />
+                <div className="h-full bg-db-amber" style={{ width: `${(t.schwach / t.gesamt) * 100}%` }} />
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="mt-3 text-xs text-db-navy-light">Üben im Wissen-Tab unter „Prüfungstraining“.</p>
+      </div>
 
       <div className="rounded-xl border border-db-gray-200 bg-db-surface p-4">
         <h2 className="text-sm font-semibold text-db-navy">Ränge</h2>
