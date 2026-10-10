@@ -94,6 +94,8 @@ export default function Berichtsheft() {
     return { nr, von, bis, jahr }
   }, [profil, ausgewaehlteWoche, alleWochenMitEintraegen])
 
+  const touchStartX = useRef<number | null>(null)
+
   if (!profil) return null
 
   const heuteBearbeiten = () => setBearbeitung(heutigerEintrag ?? neuerTageseintragFuer(heute))
@@ -121,7 +123,6 @@ export default function Berichtsheft() {
   const naechsteWoche = () => setAusgewaehlteWoche((w) => wocheVerschieben(w, 1))
   const zurAktuellenWoche = () => setAusgewaehlteWoche(heuteSchluessel)
 
-  const touchStartX = useRef<number | null>(null)
   const onTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX
   }
