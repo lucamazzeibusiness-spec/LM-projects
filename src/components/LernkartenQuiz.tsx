@@ -1,6 +1,7 @@
-import { Check, RotateCcw, Shuffle, Sparkles, Trophy } from 'lucide-react'
+import { Check, RotateCcw, Shuffle, Sparkles, Target, Trophy } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { lernkarten, type Lernkarte, type Pruefungsphase, type Themenbereich } from '../data/mock'
+import { useLernstand } from '../context/LernstandContext'
 import { usePunkte } from '../context/PunkteContext'
 import { useZuordnenBestzeiten } from '../context/ZuordnenContext'
 import { eignetSichFuerKurzform } from '../lib/kurzform'
@@ -39,8 +40,11 @@ function shuffle(karten: Lernkarte[]): Lernkarte[] {
 export default function LernkartenQuiz() {
   const [themaFilter, setThemaFilter] = useState<Themenbereich | 'Alle'>('Alle')
   const [teilFilter, setTeilFilter] = useState<Pruefungsphase | 'Alle'>('Alle')
+  const [nurSchwache, setNurSchwache] = useState(false)
   const [modus, setModus] = useState<'karten' | 'zuordnen' | 'lernen'>('karten')
   const [deck, setDeck] = useState<Lernkarte[]>([])
+  const [rundenGroesse, setRundenGroesse] = useState(0)
+  const [bewertet, setBewertet] = useState<Set<string>>(new Set())
   const [flipped, setFlipped] = useState(false)
   const [gewusst, setGewusst] = useState(0)
   const [wiederholen, setWiederholen] = useState(0)
@@ -52,49 +56,70 @@ export default function LernkartenQuiz() {
   )
   const { punkteVergeben } = usePunkte()
   const { bestFuer, bestSetzenWennBesser } = useZuordnenBestzeiten()
+  const { istSchwach, ergebnisMerken } = useLernstand()
 
-  const gefiltert = () =>
-    lernkarten.filter(
-      (k) =>
-        (themaFilter === 'Alle' || k.themenbereich === themaFilter) &&
-        (teilFilter === 'Alle' || k.pruefungsteil === teilFilter),
-    )
+  const nachThemaUndTeil = lernkarten.filter(
+    (k) =>
+      (themaFilter === 'Alle' || k.themenbereich === themaFilter) &&
+      (teilFilter === 'Alle' || k.pruefungsteil === teilFilter),
+  )
+  const anzahlSchwache = nachThemaUndTeil.filter((k) => istSchwach(k.id)).length
 
+  const gefiltert = () => (nurSchwache ? nachThemaUndTeil.filter((k) => istSchwach(k.id)) : nachThemaUndTeil)
+
+  // Die Rundengröße wird beim Start festgehalten: Im Schwächen-Modus fallen richtig beantwortete
+  // Karten sofort aus dem Filter heraus – ohne Schnappschuss würde der Fortschritt mitten in der
+  // Runde springen.
   const starten = () => {
-    setDeck(shuffle(gefiltert()))
+    const karten = gefiltert()
+    setDeck(shuffle(karten))
+    setRundenGroesse(karten.length)
+    setBewertet(new Set())
     setFlipped(false)
     setGewusst(0)
     setWiederholen(0)
   }
 
-  useEffect(starten, [themaFilter, teilFilter])
-  useEffect(() => setZuordnenErgebnis(null), [themaFilter, teilFilter])
-  useEffect(() => setLernenErgebnis(null), [themaFilter, teilFilter])
+  useEffect(starten, [themaFilter, teilFilter, nurSchwache])
+  useEffect(() => setZuordnenErgebnis(null), [themaFilter, teilFilter, nurSchwache])
+  useEffect(() => setLernenErgebnis(null), [themaFilter, teilFilter, nurSchwache])
 
   const aktuell = deck[0]
-  const gesamt = gefiltert().length
+  const gesamt = rundenGroesse
+
+  // Nur die erste Einschätzung pro Runde zählt für den Lernstand – wer eine Karte erst nach
+  // "Nochmal üben" kann, soll sie beim nächsten Mal trotzdem wieder vorgelegt bekommen.
+  const ersteBewertungMerken = (id: string, richtig: boolean) => {
+    if (bewertet.has(id)) return
+    setBewertet((b) => new Set(b).add(id))
+    ergebnisMerken(id, richtig)
+  }
 
   const kannIch = () => {
-    if (aktuell) punkteVergeben(`karte:${aktuell.id}`, 5, `Lernkarte gemeistert: ${aktuell.themenbereich}`)
+    if (aktuell) {
+      punkteVergeben(`karte:${aktuell.id}`, 5, `Lernkarte gemeistert: ${aktuell.themenbereich}`)
+      ersteBewertungMerken(aktuell.id, true)
+    }
     setDeck((d) => d.slice(1))
     setGewusst((g) => g + 1)
     setFlipped(false)
   }
 
   const nochUeben = () => {
+    if (aktuell) ersteBewertungMerken(aktuell.id, false)
     setDeck((d) => [...d.slice(1), d[0]])
     setWiederholen((w) => w + 1)
     setFlipped(false)
   }
 
-  const zuordnenSchluessel = `lernkarten:${themaFilter}:${teilFilter}`
+  const zuordnenSchluessel = `lernkarten:${themaFilter}:${teilFilter}${nurSchwache ? ':schwach' : ''}`
   const zuordnenPaare = useMemo(
     () =>
       shuffle(gefiltert().filter((k) => eignetSichFuerKurzform(k.frage, k.antwort)))
         .slice(0, 6)
         .map((k) => ({ id: k.id, begriff: k.frage, definition: k.antwort })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [themaFilter, teilFilter, zuordnenRunde],
+    [themaFilter, teilFilter, nurSchwache, zuordnenRunde],
   )
   const zuordnenBest = bestFuer(zuordnenSchluessel)
 
@@ -118,7 +143,7 @@ export default function LernkartenQuiz() {
         .slice(0, 10)
         .map((k) => ({ id: k.id, begriff: k.frage, definition: k.antwort })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [themaFilter, teilFilter, lernenRunde],
+    [themaFilter, teilFilter, nurSchwache, lernenRunde],
   )
 
   const lernenKarteGemeistert = (id: string) => {
@@ -166,6 +191,25 @@ export default function LernkartenQuiz() {
           </button>
         ))}
       </div>
+
+      {(anzahlSchwache > 0 || nurSchwache) && (
+        <button
+          onClick={() => setNurSchwache((n) => !n)}
+          className={`flex w-full items-center justify-between gap-2 rounded-lg border px-3 py-2.5 text-left text-sm transition-colors ${
+            nurSchwache
+              ? 'border-db-amber bg-db-amber/10 text-db-navy'
+              : 'border-db-gray-200 bg-db-surface text-db-navy hover:border-db-amber/40'
+          }`}
+        >
+          <span className="flex items-center gap-2">
+            <Target size={15} className="text-db-amber" />
+            {nurSchwache ? 'Nur schwache Karten' : 'Schwache Karten üben'}
+          </span>
+          <span className="text-xs font-semibold text-db-amber">
+            {nurSchwache ? 'Alle zeigen' : `${anzahlSchwache} offen`}
+          </span>
+        </button>
+      )}
 
       <div className="flex gap-1 rounded-full bg-db-gray-100 p-1">
         <button
@@ -217,7 +261,11 @@ export default function LernkartenQuiz() {
       {modus === 'zuordnen' ? (
         zuordnenPaare.length < 4 ? (
           <div className="rounded-xl border border-db-gray-200 bg-db-surface p-6 text-center">
-            <p className="text-sm text-db-navy-light">Zu wenige Karten für diesen Filter (mind. 4 nötig).</p>
+            <p className="text-sm text-db-navy-light">
+              {nurSchwache
+                ? 'Zu wenige schwache Karten für diesen Modus (mind. 4 nötig) – übe sie in den Karteikarten.'
+                : 'Zu wenige Karten für diesen Filter (mind. 4 nötig).'}
+            </p>
           </div>
         ) : zuordnenErgebnis ? (
           <div className="space-y-3 rounded-xl border border-db-green/30 bg-db-green/5 p-6 text-center">
@@ -253,7 +301,11 @@ export default function LernkartenQuiz() {
       ) : modus === 'lernen' ? (
         lernenPaare.length < 4 ? (
           <div className="rounded-xl border border-db-gray-200 bg-db-surface p-6 text-center">
-            <p className="text-sm text-db-navy-light">Zu wenige Karten für diesen Filter (mind. 4 nötig).</p>
+            <p className="text-sm text-db-navy-light">
+              {nurSchwache
+                ? 'Zu wenige schwache Karten für diesen Modus (mind. 4 nötig) – übe sie in den Karteikarten.'
+                : 'Zu wenige Karten für diesen Filter (mind. 4 nötig).'}
+            </p>
           </div>
         ) : lernenErgebnis ? (
           <div className="space-y-3 rounded-xl border border-db-green/30 bg-db-green/5 p-6 text-center">
@@ -275,6 +327,7 @@ export default function LernkartenQuiz() {
             key={lernenRunde}
             paare={lernenPaare}
             onKarteGemeistert={lernenKarteGemeistert}
+            onErsterVersuch={ergebnisMerken}
             onAbschluss={lernenAbschluss}
           />
         )
@@ -315,12 +368,19 @@ export default function LernkartenQuiz() {
         <div className="rounded-xl border border-db-gray-200 bg-db-surface p-6 text-center">
           <Sparkles size={24} className="mx-auto text-db-red" />
           <p className="mt-2 text-sm font-semibold text-db-navy">
-            {gesamt === 0 ? 'Keine Karten für diesen Filter.' : 'Runde geschafft!'}
+            {gesamt === 0
+              ? nurSchwache
+                ? 'Keine schwachen Karten mehr – alles sitzt!'
+                : 'Keine Karten für diesen Filter.'
+              : 'Runde geschafft!'}
           </p>
           {gesamt > 0 && (
             <p className="mt-1 text-xs text-db-navy-light">
               {gewusst} direkt gewusst · {wiederholen}× wiederholt
             </p>
+          )}
+          {gesamt > 0 && nurSchwache && (
+            <p className="mt-1 text-xs text-db-navy-light">Noch {anzahlSchwache} schwache Karten offen</p>
           )}
           {gesamt > 0 && (
             <button

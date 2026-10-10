@@ -10,6 +10,7 @@ export interface LernmodusPaar {
 interface LernmodusProps {
   paare: LernmodusPaar[]
   onKarteGemeistert: (id: string) => void
+  onErsterVersuch?: (id: string, richtig: boolean) => void
   onAbschluss: (ersteVersucheRichtig: number, gesamt: number, fehler: number) => void
 }
 
@@ -22,7 +23,7 @@ function shuffle<T>(arr: T[]): T[] {
   return kopie
 }
 
-export default function Lernmodus({ paare, onKarteGemeistert, onAbschluss }: LernmodusProps) {
+export default function Lernmodus({ paare, onKarteGemeistert, onErsterVersuch, onAbschluss }: LernmodusProps) {
   const [warteschlange, setWarteschlange] = useState(() => shuffle(paare))
   const [optionen, setOptionen] = useState<string[]>([])
   const [ausgewaehlt, setAusgewaehlt] = useState<string | null>(null)
@@ -49,12 +50,15 @@ export default function Lernmodus({ paare, onKarteGemeistert, onAbschluss }: Ler
   const waehlen = (option: string) => {
     if (ausgewaehlt || !aktuell) return
     setAusgewaehlt(option)
+    const ersterVersuch = !falscheKarten.has(aktuell.id)
     if (option === aktuell.definition) {
-      if (!falscheKarten.has(aktuell.id)) {
+      if (ersterVersuch) {
         setErsteVersucheRichtig((r) => r + 1)
         onKarteGemeistert(aktuell.id)
+        onErsterVersuch?.(aktuell.id, true)
       }
     } else {
+      if (ersterVersuch) onErsterVersuch?.(aktuell.id, false)
       setFehler((f) => f + 1)
       setFalscheKarten((s) => new Set(s).add(aktuell.id))
     }
