@@ -10,7 +10,8 @@ import { useLernaufgaben } from '../../context/LernaufgabenContext'
 import { erinnerungAktivieren, erinnerungDeaktivieren, erinnerungIstAktiv, heuteErinnern } from '../../lib/erinnerung'
 import { hatEchtenInhalt } from '../../lib/stichpunkte'
 import { aktuelleWochentage, heuteISO, heutigerWochentagIndex } from '../../lib/wochen'
-import { naechstePruefung, type AusbildungsblockTyp } from '../../data/mock'
+import { naechstePruefungFuer } from '../../lib/pruefung'
+import { type AusbildungsblockTyp } from '../../data/mock'
 
 const typStyle: Record<AusbildungsblockTyp, string> = {
   Betrieb: 'bg-blue-50 dark:bg-blue-500/15 text-blue-700 dark:text-blue-300',
@@ -47,9 +48,12 @@ export default function Dashboard() {
   const heutigerBlock = vorlage[heuteIndex]
   const heutigerTag = aktuelleWochentage()[heuteIndex]
 
+  const pruefung = naechstePruefungFuer(profil)
   const stats = [
-    { label: 'Offene Aufgaben', value: offen.length, Icon: ClipboardCheck, tone: 'text-db-red' },
-    { label: `Tage bis ${naechstePruefung.titel}`, value: naechstePruefung.tageVerbleibend, Icon: GraduationCap, tone: 'text-db-navy dark:text-[#EEF1F4]' },
+    { label: 'Offene Aufgaben', value: offen.length, Icon: ClipboardCheck, tone: 'text-db-red', ziel: '/aufgaben' as const },
+    pruefung
+      ? { label: `Tage bis ${pruefung.titel}`, value: pruefung.tageVerbleibend, Icon: GraduationCap, tone: 'text-db-navy dark:text-[#EEF1F4]', ziel: '/ausbildungsplan' as const }
+      : { label: 'Prüfungstermin eintragen', value: '–', Icon: GraduationCap, tone: 'text-db-navy-light', ziel: '/profil' as const },
   ]
 
   const erinnerungUmschalten = async () => {
@@ -121,12 +125,16 @@ export default function Dashboard() {
       </View>
 
       <View className="flex-row gap-3">
-        {stats.map(({ label, value, Icon, tone }) => (
-          <View key={label} className="flex-1 rounded-xl border border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24] p-4">
-            <Icon size={18} color={tone === 'text-db-red' ? '#EC0016' : '#14181F'} />
+        {stats.map(({ label, value, Icon, tone, ziel }) => (
+          <Pressable
+            key={label}
+            onPress={() => router.push(ziel)}
+            className="flex-1 rounded-xl border border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24] p-4"
+          >
+            <Icon size={18} color={tone === 'text-db-red' ? '#EC0016' : tone === 'text-db-navy-light' ? '#5C6670' : '#14181F'} />
             <Text className="mt-2 text-2xl font-semibold text-db-navy dark:text-[#EEF1F4]">{value}</Text>
             <Text className="text-xs text-db-navy-light dark:text-[#9AA4B0]">{label}</Text>
-          </View>
+          </Pressable>
         ))}
       </View>
 

@@ -1,10 +1,12 @@
 import { ExternalLink, Pencil, Plus, X } from 'lucide-react-native'
+import { router } from 'expo-router'
 import { useState } from 'react'
 import { Pressable, ScrollView, Text, TextInput, View } from 'react-native'
 import { useAzubiProfil } from '../../context/AzubiProfilContext'
 import { useAusbildungsplan } from '../../context/AusbildungsplanContext'
+import { countdownText, naechstePruefungFuer } from '../../lib/pruefung'
 import { aktuelleWochentage, heutigerWochentagIndex } from '../../lib/wochen'
-import { curricula, naechstePruefung, type Ausbildungsblock, type AusbildungsblockTyp, type LernfeldStatus } from '../../data/mock'
+import { curricula, type Ausbildungsblock, type AusbildungsblockTyp, type LernfeldStatus } from '../../data/mock'
 
 const typStyle: Record<AusbildungsblockTyp, string> = {
   Betrieb: 'bg-blue-50 dark:bg-blue-500/15 text-blue-700 dark:text-blue-300',
@@ -46,6 +48,7 @@ export default function Ausbildungsplan() {
   const [entwurf, setEntwurf] = useState<Entwurf>({ typ: 'Betrieb', thema: '', ort: '' })
 
   if (!profil) return null
+  const pruefung = naechstePruefungFuer(profil)
   const curriculum = curricula.find((c) => c.beruf === profil.ausbildungsberuf)
   const lernfeldVorschlaege = curriculum
     ? curriculum.lernfelder.filter((lf) => lf.ausbildungsjahr === profil.lehrjahr).length > 0
@@ -93,13 +96,24 @@ export default function Ausbildungsplan() {
         </Text>
       </View>
 
-      <View className="rounded-xl border border-white/10 bg-db-navy p-4 dark:bg-[#3A4453]">
-        <Text className="text-xs font-medium text-white/60">Nächster Prüfungstermin</Text>
-        <Text className="mt-1 text-lg font-semibold text-white">{naechstePruefung.titel}</Text>
-        <Text className="text-sm text-white/70">
-          {naechstePruefung.datum} · noch {naechstePruefung.tageVerbleibend} Tage
-        </Text>
-      </View>
+      {pruefung ? (
+        <View className="rounded-xl border border-white/10 bg-db-navy p-4 dark:bg-[#3A4453]">
+          <Text className="text-xs font-medium text-white/60">Nächster Prüfungstermin</Text>
+          <Text className="mt-1 text-lg font-semibold text-white">{pruefung.titel}</Text>
+          <Text className="text-sm text-white/70">
+            {pruefung.datumLabel} · {countdownText(pruefung.tageVerbleibend)}
+          </Text>
+        </View>
+      ) : (
+        <Pressable
+          onPress={() => router.push('/profil')}
+          className="rounded-xl border border-dashed border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24] p-4"
+        >
+          <Text className="text-sm text-db-navy-light dark:text-[#9AA4B0]">
+            Noch kein Prüfungstermin eingetragen – <Text className="font-medium text-db-red">im Profil eintragen</Text>
+          </Text>
+        </Pressable>
+      )}
 
       <View className="overflow-hidden rounded-xl border border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24]">
         <View className="divide-y divide-db-gray-100">

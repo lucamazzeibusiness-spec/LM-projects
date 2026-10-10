@@ -8,6 +8,7 @@ import {
   type AusbildungsberufName,
   type AzubiProfil,
 } from '../data/mock'
+import { pruefungsTitel } from '../lib/pruefung'
 
 const ausbildungsberufe: AusbildungsberufName[] = curricula.map((c) => c.beruf)
 
@@ -145,6 +146,41 @@ export default function ProfilBearbeitenForm({
               value={entwurf.ausbildungsbeginn}
               onChangeText={(t) => aktualisieren('ausbildungsbeginn', t)}
               placeholder="JJJJ-MM-TT, z. B. 2026-09-01"
+              className={inputClass}
+            />
+          </Feld>
+        </View>
+
+        <View className="gap-4 rounded-xl border border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24] p-4">
+          <View>
+            <Text className="text-sm font-semibold text-db-navy dark:text-[#EEF1F4]">Nächste Prüfung</Text>
+            <Text className="text-xs text-db-navy-light dark:text-[#9AA4B0]">Für den Countdown auf der Startseite und im Ausbildungsplan</Text>
+          </View>
+
+          <View className="flex-row gap-2">
+            {pruefungsTitel.map((titel) => {
+              const aktiv = (entwurf.pruefungTitel || pruefungsTitel[0]) === titel
+              return (
+                <Pressable
+                  key={titel}
+                  onPress={() => aktualisieren('pruefungTitel', titel)}
+                  className={`flex-1 items-center rounded-lg border px-3 py-2.5 ${
+                    aktiv ? 'border-db-red bg-db-red/5' : 'border-db-gray-200 dark:border-[#2A323D]'
+                  }`}
+                >
+                  <Text className={`text-sm font-medium ${aktiv ? 'text-db-red-dark' : 'text-db-navy dark:text-[#EEF1F4]'}`}>
+                    {titel.replace('Abschlussprüfung ', '')}
+                  </Text>
+                </Pressable>
+              )
+            })}
+          </View>
+
+          <Feld label="Prüfungstermin (optional)">
+            <TextInput
+              value={entwurf.pruefungDatum ?? ''}
+              onChangeText={(t) => aktualisieren('pruefungDatum', t)}
+              placeholder="JJJJ-MM-TT, z. B. 2027-03-10"
               className={inputClass}
             />
           </Feld>

@@ -15,6 +15,9 @@ export interface AzubiProfil {
   // ISO-Datum (YYYY-MM-DD). Bestimmt die fortlaufende Nummerierung (Nr.) des Ausbildungsnachweises:
   // Nr. 001 ist die Woche, in der die Ausbildung begonnen hat, danach zählt jede Woche eins weiter.
   ausbildungsbeginn: string
+  // Optional, weil ältere gespeicherte Profile diese Felder noch nicht haben. Datum als ISO (YYYY-MM-DD).
+  pruefungTitel?: string
+  pruefungDatum?: string
 }
 
 // Nur Vorbelegung für das Onboarding-Formular – das tatsächliche Profil trägt jede:r selbst ein.
@@ -364,18 +367,6 @@ export const berichtsheft: BerichtsheftEintrag[] = [
     status: 'Entwurf',
   },
 ]
-
-export interface Pruefung {
-  titel: string
-  datum: string
-  tageVerbleibend: number
-}
-
-export const naechstePruefung: Pruefung = {
-  titel: 'Abschlussprüfung Teil 1',
-  datum: '12. November',
-  tageVerbleibend: 63,
-}
 
 export type AusbildungsberufName = 'Elektroniker für Betriebstechnik' | 'Industriemechaniker' | 'Mechatroniker'
 export type LernfeldStatus = 'Abgeschlossen' | 'Aktuell' | 'Geplant'
