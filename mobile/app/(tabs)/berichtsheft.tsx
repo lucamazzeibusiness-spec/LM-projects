@@ -5,6 +5,7 @@ import { WebView } from 'react-native-webview'
 import { BerichtStatusBadge } from '../../components/Badges'
 import SignaturePad from '../../components/SignaturePad'
 import { useAzubiProfil } from '../../context/AzubiProfilContext'
+import { useAusbildungsplan, type Wochenvorlage } from '../../context/AusbildungsplanContext'
 import { berichtsheftStreak, usePunkte } from '../../context/PunkteContext'
 import { useBerichtsheft } from '../../context/BerichtsheftContext'
 import { ausbildungsnachweisVorschauHtml, exportBerichtsheftPdf } from '../../lib/exportBerichtsheft'
@@ -20,7 +21,7 @@ import {
   wocheVerschieben,
   wochentagIndexVon,
 } from '../../lib/wochen'
-import type { BerichtsheftEintrag, BerichtsheftKategorie } from '../../data/mock'
+import type { AusbildungsblockTyp, BerichtsheftEintrag, BerichtsheftKategorie } from '../../data/mock'
 
 const kategorien: BerichtsheftKategorie[] = ['Betrieblich', 'Berufsschule', 'DB Training']
 
@@ -32,13 +33,23 @@ function datumLabelFuer(datumISO: string): string {
   })
 }
 
-function neuerTageseintragFuer(datumISO: string): BerichtsheftEintrag {
-  const istFreitag = wochentagIndexVon(datumISO) === 4
+const kategorieFuerBlock: Record<AusbildungsblockTyp, BerichtsheftKategorie> = {
+  Betrieb: 'Betrieblich',
+  Berufsschule: 'Berufsschule',
+  'DB Training': 'DB Training',
+}
+
+// Die Kategorie wird aus dem Ausbildungsplan für diesen Wochentag vorbelegt (z. B. Berufsschultag),
+// bleibt aber im Formular änderbar.
+function neuerTageseintragFuer(datumISO: string, vorlage: Wochenvorlage): BerichtsheftEintrag {
+  const wochentag = wochentagIndexVon(datumISO)
+  const istFreitag = wochentag === 4
+  const block = vorlage[wochentag]
   return {
     id: `B-${Date.now()}`,
     datumISO,
     datum: datumLabelFuer(datumISO),
-    kategorie: 'Betrieblich',
+    kategorie: block ? kategorieFuerBlock[block.typ] : 'Betrieblich',
     taetigkeiten: '',
     stunden: istFreitag ? 6 : 8,
     status: 'Entwurf',
@@ -48,6 +59,7 @@ function neuerTageseintragFuer(datumISO: string): BerichtsheftEintrag {
 export default function Berichtsheft() {
   const { profil } = useAzubiProfil()
   const { eintraege, setEintraege } = useBerichtsheft()
+  const { vorlage } = useAusbildungsplan()
   const { punkteVergeben, stand: punkteStand } = usePunkte()
   const [bearbeitung, setBearbeitung] = useState<BerichtsheftEintrag | null>(null)
   const [taetigkeitenAuswahl, setTaetigkeitenAuswahl] = useState<{ start: number; end: number } | undefined>(undefined)
@@ -126,7 +138,7 @@ export default function Berichtsheft() {
 
   if (!profil) return null
 
-  const heuteBearbeiten = () => setBearbeitung(heutigerEintrag ?? neuerTageseintragFuer(heute))
+  const heuteBearbeiten = () => setBearbeitung(heutigerEintrag ?? neuerTageseintragFuer(heute, vorlage))
 
   const speichern = () => {
     if (!bearbeitung || !hatEchtenInhalt(bearbeitung.taetigkeiten)) return
@@ -267,7 +279,7 @@ export default function Berichtsheft() {
                 return (
                   <Pressable
                     key={datumISO}
-                    onPress={() => setBearbeitung(neuerTageseintragFuer(datumISO))}
+                    onPress={() => setBearbeitung(neuerTageseintragFuer(datumISO, vorlage))}
                     className="flex-row items-center justify-between rounded-xl border border-dashed border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24] p-4"
                   >
                     <Text className="text-sm font-medium text-db-navy-light dark:text-[#9AA4B0]">{datumLabelFuer(datumISO)}</Text>

@@ -3,9 +3,10 @@ import { useMemo, useRef, useState } from 'react'
 import { BerichtStatusBadge } from '../components/Badges'
 import SignaturePad from '../components/SignaturePad'
 import { useAzubiProfil } from '../context/AzubiProfilContext'
+import { useAusbildungsplan, type Wochenvorlage } from '../context/AusbildungsplanContext'
 import { useBerichtsheft } from '../context/BerichtsheftContext'
 import { berichtsheftStreak, usePunkte } from '../context/PunkteContext'
-import type { BerichtsheftEintrag, BerichtsheftKategorie } from '../data/mock'
+import type { AusbildungsblockTyp, BerichtsheftEintrag, BerichtsheftKategorie } from '../data/mock'
 import { bulletEingabeVerarbeiten, hatEchtenInhalt } from '../lib/stichpunkte'
 import {
   arbeitstageDerWoche,
@@ -29,13 +30,23 @@ function datumLabelFuer(datumISO: string): string {
   })
 }
 
-function neuerTageseintragFuer(datumISO: string): BerichtsheftEintrag {
-  const istFreitag = wochentagIndexVon(datumISO) === 4
+const kategorieFuerBlock: Record<AusbildungsblockTyp, BerichtsheftKategorie> = {
+  Betrieb: 'Betrieblich',
+  Berufsschule: 'Berufsschule',
+  'DB Training': 'DB Training',
+}
+
+// Die Kategorie wird aus dem Ausbildungsplan für diesen Wochentag vorbelegt (z. B. Berufsschultag),
+// bleibt aber im Formular änderbar.
+function neuerTageseintragFuer(datumISO: string, vorlage: Wochenvorlage): BerichtsheftEintrag {
+  const wochentag = wochentagIndexVon(datumISO)
+  const istFreitag = wochentag === 4
+  const block = vorlage[wochentag]
   return {
     id: `B-${Date.now()}`,
     datumISO,
     datum: datumLabelFuer(datumISO),
-    kategorie: 'Betrieblich',
+    kategorie: block ? kategorieFuerBlock[block.typ] : 'Betrieblich',
     taetigkeiten: '',
     stunden: istFreitag ? 6 : 8,
     status: 'Entwurf',
@@ -45,6 +56,7 @@ function neuerTageseintragFuer(datumISO: string): BerichtsheftEintrag {
 export default function Berichtsheft() {
   const { profil } = useAzubiProfil()
   const { eintraege, setEintraege } = useBerichtsheft()
+  const { vorlage } = useAusbildungsplan()
   const { punkteVergeben, stand: punkteStand } = usePunkte()
   const [bearbeitung, setBearbeitung] = useState<BerichtsheftEintrag | null>(null)
   const [exportiert, setExportiert] = useState(false)
@@ -98,7 +110,7 @@ export default function Berichtsheft() {
 
   if (!profil) return null
 
-  const heuteBearbeiten = () => setBearbeitung(heutigerEintrag ?? neuerTageseintragFuer(heute))
+  const heuteBearbeiten = () => setBearbeitung(heutigerEintrag ?? neuerTageseintragFuer(heute, vorlage))
 
   const speichern = () => {
     if (!bearbeitung || !hatEchtenInhalt(bearbeitung.taetigkeiten)) return
@@ -342,7 +354,7 @@ export default function Berichtsheft() {
               return (
                 <button
                   key={datumISO}
-                  onClick={() => setBearbeitung(neuerTageseintragFuer(datumISO))}
+                  onClick={() => setBearbeitung(neuerTageseintragFuer(datumISO, vorlage))}
                   className="flex w-full items-center justify-between rounded-xl border border-dashed border-db-gray-200 bg-db-surface p-4 text-left hover:border-db-red/40"
                 >
                   <span className="text-sm font-medium text-db-navy-light">{datumLabelFuer(datumISO)}</span>
