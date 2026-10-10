@@ -1,11 +1,12 @@
 import { ExternalLink, Pencil, Plus, X } from 'lucide-react'
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useAzubiProfil } from '../context/AzubiProfilContext'
 import { useAusbildungsplan } from '../context/AusbildungsplanContext'
+import { countdownText, naechstePruefungFuer } from '../lib/pruefung'
 import { aktuelleWochentage, heutigerWochentagIndex } from '../lib/wochen'
 import {
   curricula,
-  naechstePruefung,
   type Ausbildungsblock,
   type AusbildungsblockTyp,
   type LernfeldStatus,
@@ -45,6 +46,7 @@ export default function Ausbildungsplan() {
   const [entwurf, setEntwurf] = useState<Entwurf>({ typ: 'Betrieb', thema: '', ort: '' })
 
   if (!profil) return null
+  const pruefung = naechstePruefungFuer(profil)
   const curriculum = curricula.find((c) => c.beruf === profil.ausbildungsberuf)
   const lernfeldVorschlaege = curriculum
     ? curriculum.lernfelder.filter((lf) => lf.ausbildungsjahr === profil.lehrjahr).length > 0
@@ -92,13 +94,22 @@ export default function Ausbildungsplan() {
         </p>
       </div>
 
-      <div className="rounded-xl border border-white/10 bg-db-ink p-4 text-white">
-        <p className="text-xs font-medium text-white/60">Nächster Prüfungstermin</p>
-        <p className="mt-1 text-lg font-semibold">{naechstePruefung.titel}</p>
-        <p className="text-sm text-white/70">
-          {naechstePruefung.datum} · noch {naechstePruefung.tageVerbleibend} Tage
-        </p>
-      </div>
+      {pruefung ? (
+        <div className="rounded-xl border border-white/10 bg-db-ink p-4 text-white">
+          <p className="text-xs font-medium text-white/60">Nächster Prüfungstermin</p>
+          <p className="mt-1 text-lg font-semibold">{pruefung.titel}</p>
+          <p className="text-sm text-white/70">
+            {pruefung.datumLabel} · {countdownText(pruefung.tageVerbleibend)}
+          </p>
+        </div>
+      ) : (
+        <Link
+          to="/profil"
+          className="block rounded-xl border border-dashed border-db-gray-200 bg-db-surface p-4 text-sm text-db-navy-light hover:border-db-navy/30"
+        >
+          Noch kein Prüfungstermin eingetragen – <span className="font-medium text-db-red">im Profil eintragen</span>
+        </Link>
+      )}
 
       <div className="overflow-hidden rounded-xl border border-db-gray-200 bg-db-surface">
         <ul className="divide-y divide-db-gray-100">

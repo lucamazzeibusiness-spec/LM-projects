@@ -3,6 +3,7 @@ import { useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { curricula, lehrjahreGesamtFuer, type AusbildungsberufName, type AzubiProfil } from '../data/mock'
 import { useAzubiProfil } from '../context/AzubiProfilContext'
+import { pruefungsTitel } from '../lib/pruefung'
 
 const ausbildungsberufe: AusbildungsberufName[] = curricula.map((c) => c.beruf)
 
@@ -122,6 +123,36 @@ export default function ProfilBearbeiten() {
             type="date"
             value={entwurf.ausbildungsbeginn}
             onChange={(e) => aktualisieren('ausbildungsbeginn', e.target.value)}
+            className="w-full rounded-lg border border-db-gray-200 px-3 py-2.5 text-sm text-db-navy outline-none focus:border-db-red"
+          />
+        </Feld>
+      </div>
+
+      <div className="rounded-xl border border-db-gray-200 bg-db-surface p-4 space-y-4">
+        <h2 className="text-sm font-semibold text-db-navy">Nächste Prüfung</h2>
+        <p className="text-xs text-db-navy-light">Für den Countdown auf der Startseite und im Ausbildungsplan</p>
+
+        <div className="grid grid-cols-2 gap-2">
+          {pruefungsTitel.map((titel) => (
+            <button
+              key={titel}
+              onClick={() => aktualisieren('pruefungTitel', titel)}
+              className={`rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors ${
+                (entwurf.pruefungTitel || pruefungsTitel[0]) === titel
+                  ? 'border-db-red bg-db-red/5 text-db-red-dark'
+                  : 'border-db-gray-200 text-db-navy hover:border-db-navy/30'
+              }`}
+            >
+              {titel.replace('Abschlussprüfung ', '')}
+            </button>
+          ))}
+        </div>
+
+        <Feld label="Prüfungstermin (optional)">
+          <input
+            type="date"
+            value={entwurf.pruefungDatum ?? ''}
+            onChange={(e) => aktualisieren('pruefungDatum', e.target.value)}
             className="w-full rounded-lg border border-db-gray-200 px-3 py-2.5 text-sm text-db-navy outline-none focus:border-db-red"
           />
         </Feld>

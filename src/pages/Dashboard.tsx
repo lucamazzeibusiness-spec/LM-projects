@@ -15,7 +15,8 @@ import {
   heuteErinnern,
 } from '../lib/erinnerung'
 import { aktuelleWochentage, heuteISO, heutigerWochentagIndex } from '../lib/wochen'
-import { naechstePruefung, type AusbildungsblockTyp } from '../data/mock'
+import { naechstePruefungFuer } from '../lib/pruefung'
+import { type AusbildungsblockTyp } from '../data/mock'
 
 const typStyle: Record<AusbildungsblockTyp, string> = {
   Betrieb: 'bg-blue-50 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300',
@@ -48,9 +49,12 @@ export default function Dashboard() {
   const heutigerBlock = vorlage[heuteIndex]
   const heutigerTag = aktuelleWochentage()[heuteIndex]
 
+  const pruefung = naechstePruefungFuer(profil)
   const stats = [
-    { label: 'Offene Aufgaben', value: offen.length, icon: ClipboardCheck, tone: 'text-db-red' },
-    { label: `Tage bis ${naechstePruefung.titel}`, value: naechstePruefung.tageVerbleibend, icon: GraduationCap, tone: 'text-db-navy' },
+    { label: 'Offene Aufgaben', value: offen.length, icon: ClipboardCheck, tone: 'text-db-red', to: '/lernaufgaben' },
+    pruefung
+      ? { label: `Tage bis ${pruefung.titel}`, value: pruefung.tageVerbleibend, icon: GraduationCap, tone: 'text-db-navy', to: '/ausbildungsplan' }
+      : { label: 'Prüfungstermin eintragen', value: '–', icon: GraduationCap, tone: 'text-db-navy-light', to: '/profil' },
   ]
 
   const erinnerungUmschalten = async () => {
@@ -119,12 +123,12 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        {stats.map(({ label, value, icon: Icon, tone }) => (
-          <div key={label} className="rounded-xl border border-db-gray-200 bg-db-surface p-4">
+        {stats.map(({ label, value, icon: Icon, tone, to }) => (
+          <Link key={label} to={to} className="rounded-xl border border-db-gray-200 bg-db-surface p-4 hover:border-db-navy/30">
             <Icon size={18} className={tone} />
             <p className="mt-2 text-2xl font-semibold text-db-navy">{value}</p>
             <p className="text-xs text-db-navy-light">{label}</p>
-          </div>
+          </Link>
         ))}
       </div>
 
