@@ -1,7 +1,9 @@
 import { Lock } from 'lucide-react-native'
 import { ScrollView, Text, View } from 'react-native'
 import RangKarte from '../components/RangKarte'
+import { useLernstand } from '../context/LernstandContext'
 import { usePunkte } from '../context/PunkteContext'
+import { fortschrittProThema } from '../lib/lernstand'
 import { raenge, rangFuer } from '../lib/rang'
 
 function relativeZeit(iso: string): string {
@@ -18,6 +20,10 @@ function relativeZeit(iso: string): string {
 export default function Fortschritt() {
   const { stand } = usePunkte()
   const { aktuell } = rangFuer(stand.gesamt)
+  const { lernstand } = useLernstand()
+  const themen = fortschrittProThema(lernstand)
+  const sicherGesamt = themen.reduce((n, t) => n + t.sicher, 0)
+  const kartenGesamt = themen.reduce((n, t) => n + t.gesamt, 0)
 
   return (
     <ScrollView className="flex-1 bg-db-gray-50 dark:bg-[#10141B]" contentContainerClassName="gap-4 p-4">
@@ -29,6 +35,33 @@ export default function Fortschritt() {
       </View>
 
       <RangKarte />
+
+      <View className="rounded-xl border border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24] p-4">
+        <View className="flex-row items-baseline justify-between gap-2">
+          <Text className="text-sm font-semibold text-db-navy dark:text-[#EEF1F4]">Prüfungsvorbereitung</Text>
+          <Text className="text-xs text-db-navy-light dark:text-[#9AA4B0]">
+            {sicherGesamt} von {kartenGesamt} Karten sicher
+          </Text>
+        </View>
+        <View className="mt-3 gap-3">
+          {themen.map((t) => (
+            <View key={t.thema}>
+              <View className="flex-row items-center justify-between">
+                <Text className="text-xs font-medium text-db-navy dark:text-[#EEF1F4]">{t.thema}</Text>
+                <Text className="text-xs text-db-navy-light dark:text-[#9AA4B0]">
+                  {t.sicher}/{t.gesamt}
+                  {t.schwach > 0 && <Text className="text-db-amber"> · {t.schwach} schwach</Text>}
+                </Text>
+              </View>
+              <View className="mt-1 h-1.5 w-full flex-row overflow-hidden rounded-full bg-db-gray-100 dark:bg-[#1A2029]">
+                <View className="h-full bg-db-green" style={{ width: `${(t.sicher / t.gesamt) * 100}%` }} />
+                <View className="h-full bg-db-amber" style={{ width: `${(t.schwach / t.gesamt) * 100}%` }} />
+              </View>
+            </View>
+          ))}
+        </View>
+        <Text className="mt-3 text-xs text-db-navy-light dark:text-[#9AA4B0]">Üben im Wissen-Tab unter „Prüfungstraining“.</Text>
+      </View>
 
       <View className="rounded-xl border border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24] p-4">
         <Text className="text-sm font-semibold text-db-navy dark:text-[#EEF1F4]">Ränge</Text>
