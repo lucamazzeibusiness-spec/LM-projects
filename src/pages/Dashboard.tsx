@@ -40,7 +40,6 @@ export default function Dashboard() {
   if (!profil) return null
 
   const offen = lernaufgaben.filter((a) => a.status !== 'Erledigt')
-  const heute = offen.filter((a) => a.faelligkeit.startsWith('Heute'))
   const andereOffeneEntwuerfe = eintraege.filter(
     (e) => e.status === 'Entwurf' && hatEchtenInhalt(e.taetigkeiten) && e.datumISO !== heuteISO(),
   ).length
@@ -110,15 +109,6 @@ export default function Dashboard() {
             </span>
             <ArrowRight size={14} />
           </Link>
-          {heute.length > 0 && (
-            <Link to="/lernaufgaben" className="flex items-center justify-between text-sm text-db-navy">
-              <span className="flex items-center gap-1.5">
-                <ClipboardCheck size={15} className="text-db-amber" />
-                {heute.length} {heute.length === 1 ? 'Aufgabe' : 'Aufgaben'} heute fällig
-              </span>
-              <ArrowRight size={14} />
-            </Link>
-          )}
         </div>
       </div>
 

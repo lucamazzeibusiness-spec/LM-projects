@@ -39,7 +39,6 @@ export default function Dashboard() {
   if (!profil) return null
 
   const offen = lernaufgaben.filter((a) => a.status !== 'Erledigt')
-  const heute = offen.filter((a) => a.faelligkeit.startsWith('Heute'))
   const andereOffeneEntwuerfe = eintraege.filter(
     (e) => e.status === 'Entwurf' && hatEchtenInhalt(e.taetigkeiten) && e.datumISO !== heuteISO(),
   ).length
@@ -110,17 +109,6 @@ export default function Dashboard() {
             </View>
             <ArrowRight size={14} color="#5C6670" />
           </Pressable>
-          {heute.length > 0 && (
-            <Pressable onPress={() => router.push('/aufgaben')} className="flex-row items-center justify-between">
-              <View className="flex-row items-center gap-1.5">
-                <ClipboardCheck size={15} color="#D98600" />
-                <Text className="text-sm text-db-navy dark:text-[#EEF1F4]">
-                  {heute.length} {heute.length === 1 ? 'Aufgabe' : 'Aufgaben'} heute fällig
-                </Text>
-              </View>
-              <ArrowRight size={14} color="#5C6670" />
-            </Pressable>
-          )}
         </View>
       </View>
 
