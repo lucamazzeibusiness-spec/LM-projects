@@ -22,6 +22,8 @@ import {
 } from '../lib/wochen'
 
 const kategorien: BerichtsheftKategorie[] = ['Betrieblich', 'Berufsschule', 'DB Training']
+// Schnellauswahl für Tage ohne Ausbildungsinhalt – auch die gehören als Eintrag in den Nachweis.
+const abwesenheiten = ['Urlaub', 'Krank', 'Feiertag']
 
 function datumLabelFuer(datumISO: string): string {
   return new Date(`${datumISO}T00:00:00`).toLocaleDateString('de-DE', {
@@ -89,6 +91,10 @@ export default function Berichtsheft() {
   const wocheStunden = wocheEintraege.reduce((sum, e) => sum + e.stunden, 0)
   const erfassteTage = montagFreitag.filter((d) => hatEchtenInhalt(eintraegeNachDatum.get(d)?.taetigkeiten ?? '')).length
   const wocheVollstaendig = erfassteTage === montagFreitag.length
+  const fehlendeTage = montagFreitag.filter((d) => !hatEchtenInhalt(eintraegeNachDatum.get(d)?.taetigkeiten ?? ''))
+  const fehlendeTageText = fehlendeTage
+    .map((d) => new Date(`${d}T00:00:00`).toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: '2-digit' }))
+    .join(', ')
 
   const alleWochenMitEintraegen = useMemo(() => {
     const set = new Set(eintraege.map((e) => wochenSchluessel(e.datumISO)))
@@ -256,6 +262,21 @@ export default function Berichtsheft() {
                 </button>
               ))}
             </div>
+
+            {!hatEchtenInhalt(bearbeitung.taetigkeiten) && (
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs text-db-navy-light">Kein Ausbildungstag?</span>
+                {abwesenheiten.map((a) => (
+                  <button
+                    key={a}
+                    onClick={() => setBearbeitung((d) => d && { ...d, taetigkeiten: `- ${a}` })}
+                    className="rounded-full border border-dashed border-db-gray-200 bg-db-surface px-3 py-1.5 text-xs font-medium text-db-navy-light hover:border-db-navy/30"
+                  >
+                    {a}
+                  </button>
+                ))}
+              </div>
+            )}
 
             <textarea
               value={bearbeitung.taetigkeiten}
@@ -426,6 +447,14 @@ export default function Berichtsheft() {
                 <X size={18} />
               </button>
             </div>
+
+            {fehlendeTage.length > 0 && (
+              <p className="rounded-lg border border-db-amber/30 bg-db-amber/5 p-2.5 text-xs text-db-navy">
+                <span className="font-semibold text-db-amber">Noch leer: </span>
+                {fehlendeTageText}. Trag die Tage vor dem Unterschreiben ein – auch Urlaub, Krankheit oder Feiertag
+                gehören als Eintrag in den Nachweis.
+              </p>
+            )}
 
             <p className="text-xs text-db-navy-light">
               Prüf die Angaben in Ruhe. Passt noch was nicht, schließ die Vorschau, korrigier den Tageseintrag über
