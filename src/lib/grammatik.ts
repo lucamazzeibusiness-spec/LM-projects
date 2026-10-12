@@ -48,12 +48,18 @@ export function fundeAusAntwort(text: string, matches: LanguageToolMatch[]): Gra
 }
 
 export async function textPruefen(text: string): Promise<GrammatikFund[]> {
-  const body = new URLSearchParams({ text, language: 'de-DE' })
-  const res = await fetch(API_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded', Accept: 'application/json' },
-    body: body.toString(),
-  })
+  // Bewusst ohne URLSearchParams: dessen React-Native-Variante ist unvollständig.
+  const body = `text=${encodeURIComponent(text)}&language=de-DE`
+  let res: Response
+  try {
+    res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', Accept: 'application/json' },
+      body,
+    })
+  } catch {
+    throw new Error('Keine Verbindung zur Prüfung – bist du online?')
+  }
   if (res.status === 429) throw new Error('Zu viele Prüfungen in kurzer Zeit – bitte kurz warten und nochmal versuchen.')
   if (!res.ok) throw new Error('Die Prüfung hat gerade nicht geklappt. Bitte später nochmal versuchen.')
   const daten = (await res.json()) as { matches: LanguageToolMatch[] }
