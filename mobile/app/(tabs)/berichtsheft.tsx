@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Dimensions, Modal, PanResponder, Pressable, ScrollView, Text, TextInput, View } from 'react-native'
 import { WebView } from 'react-native-webview'
 import { BerichtStatusBadge } from '../../components/Badges'
+import GrammatikPruefung from '../../components/GrammatikPruefung'
 import SignaturePad from '../../components/SignaturePad'
 import { useAzubiProfil } from '../../context/AzubiProfilContext'
 import { useAusbildungsplan, type Wochenvorlage } from '../../context/AusbildungsplanContext'
@@ -361,9 +362,19 @@ export default function Berichtsheft() {
                 selection={taetigkeitenAuswahl}
                 multiline
                 numberOfLines={4}
+                spellCheck
+                autoCorrect
                 placeholder="Welche Tätigkeiten hast du heute ausgeführt oder welche Lerninhalte hattest du? Jede neue Zeile wird automatisch zum Stichpunkt."
                 className="w-full rounded-lg border border-db-gray-200 dark:border-[#2A323D] px-3 py-2 text-sm text-db-navy dark:text-[#EEF1F4]"
                 style={{ minHeight: 90, textAlignVertical: 'top' }}
+              />
+
+              <GrammatikPruefung
+                text={bearbeitung.taetigkeiten}
+                onTextChange={(t) => {
+                  setBearbeitung((d) => d && { ...d, taetigkeiten: t })
+                  setTaetigkeitenAuswahl(undefined)
+                }}
               />
 
               <View className="flex-row items-center gap-2">
