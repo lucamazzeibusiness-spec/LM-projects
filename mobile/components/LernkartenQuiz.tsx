@@ -9,6 +9,7 @@ import { lernkarten, type Lernkarte, type Pruefungsphase, type Themenbereich } f
 import { formatZeit } from '../lib/zeit'
 import Flashcard from './Flashcard'
 import Lernmodus from './Lernmodus'
+import Probepruefung from './Probepruefung'
 import Zuordnen from './Zuordnen'
 
 const themenbereiche: (Themenbereich | 'Alle')[] = [
@@ -43,7 +44,7 @@ export default function LernkartenQuiz() {
   const [themaFilter, setThemaFilter] = useState<Themenbereich | 'Alle'>('Alle')
   const [teilFilter, setTeilFilter] = useState<Pruefungsphase | 'Alle'>('Alle')
   const [nurSchwache, setNurSchwache] = useState(false)
-  const [modus, setModus] = useState<'karten' | 'zuordnen' | 'lernen'>('karten')
+  const [modus, setModus] = useState<'karten' | 'zuordnen' | 'lernen' | 'pruefung'>('karten')
   const [deck, setDeck] = useState<Lernkarte[]>([])
   const [rundenGroesse, setRundenGroesse] = useState(0)
   const [bewertet, setBewertet] = useState<Set<string>>(new Set())
@@ -146,6 +147,16 @@ export default function LernkartenQuiz() {
     [themaFilter, teilFilter, nurSchwache, lernenRunde],
   )
 
+  const pruefungsPool = useMemo(
+    () => gefiltert().filter((k) => eignetSichFuerKurzform(k.frage, k.antwort)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [themaFilter, teilFilter, nurSchwache],
+  )
+
+  const pruefungAbgeschlossen = (richtig: number, gesamt: number) => {
+    if (richtig > 0) punkteVergeben(`probe:${Date.now()}`, richtig * 2, `Probeprüfung: ${richtig} von ${gesamt} richtig`)
+  }
+
   const lernenKarteGemeistert = (id: string) => {
     const karte = lernkarten.find((k) => k.id === id)
     if (karte) punkteVergeben(`karte:${id}`, 5, `Lernkarte gemeistert: ${karte.themenbereich}`)
@@ -228,6 +239,14 @@ export default function LernkartenQuiz() {
         >
           <Text className={`text-xs font-semibold ${modus === 'lernen' ? 'text-db-navy dark:text-[#EEF1F4]' : 'text-db-navy-light dark:text-[#9AA4B0]'}`}>
             Lernen
+          </Text>
+        </Pressable>
+        <Pressable
+          onPress={() => setModus('pruefung')}
+          className={`flex-1 items-center rounded-full py-1.5 ${modus === 'pruefung' ? 'bg-white dark:bg-[#171C24]' : ''}`}
+        >
+          <Text className={`text-xs font-semibold ${modus === 'pruefung' ? 'text-db-navy dark:text-[#EEF1F4]' : 'text-db-navy-light dark:text-[#9AA4B0]'}`}>
+            Prüfung
           </Text>
         </Pressable>
       </View>
@@ -333,6 +352,13 @@ export default function LernkartenQuiz() {
             onAbschluss={lernenAbschluss}
           />
         )
+      ) : modus === 'pruefung' ? (
+        <Probepruefung
+          key={`${themaFilter}-${teilFilter}-${nurSchwache}`}
+          pool={pruefungsPool}
+          onKarteBeantwortet={ergebnisMerken}
+          onAbgeschlossen={pruefungAbgeschlossen}
+        />
       ) : aktuell ? (
         <View className="gap-3">
           <View className="flex-row flex-wrap items-center gap-2">
