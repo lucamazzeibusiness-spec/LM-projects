@@ -72,6 +72,8 @@ export default function Berichtsheft() {
 
   const heute = heuteISO()
   const heutigerEintrag = eintraege.find((e) => e.datumISO === heute)
+  // Laut Ausbildungsplan freier Tag (standardmäßig Sa/So): Eintragen geht, wird aber nicht angemahnt.
+  const heuteFrei = !vorlage[wochentagIndexVon(heute)]
   const heuteSchluessel = wochenSchluessel(heute)
   const istAktuelleWoche = ausgewaehlteWoche === heuteSchluessel
   const beginnSchluessel = profil?.ausbildungsbeginn ? wochenSchluessel(profil.ausbildungsbeginn) : null
@@ -217,7 +219,19 @@ export default function Berichtsheft() {
         </p>
       </div>
 
-      {!heutigerEintrag ? (
+      {!heutigerEintrag && heuteFrei ? (
+        <button
+          onClick={heuteBearbeiten}
+          className="flex w-full items-center justify-between rounded-xl border border-db-gray-200 bg-db-surface px-4 py-3.5 text-left"
+        >
+          <span className="flex items-center gap-2 text-sm font-semibold text-db-navy-light">
+            <CalendarCheck size={18} /> Heute frei ({heutigesDatumLabel()}) – kein Eintrag nötig
+          </span>
+          <span className="flex items-center gap-1 text-xs font-medium text-db-navy-light">
+            <Plus size={13} /> Trotzdem
+          </span>
+        </button>
+      ) : !heutigerEintrag ? (
         <button
           onClick={heuteBearbeiten}
           className="flex w-full items-center justify-between rounded-xl border border-db-red/30 bg-db-red/5 px-4 py-3.5 text-left"
