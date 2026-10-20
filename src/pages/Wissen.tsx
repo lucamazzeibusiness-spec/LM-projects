@@ -1,6 +1,7 @@
-import { AlertCircle, AlertTriangle, Search, Star, TrainFront, Wrench } from 'lucide-react'
+import { AlertCircle, AlertTriangle, Brain, Search, Star, TrainFront, Wrench } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { GewerkBadge } from '../components/Badges'
+import BaureihenQuiz from '../components/BaureihenQuiz'
 import DBFaktenQuiz from '../components/DBFaktenQuiz'
 import LernkartenQuiz from '../components/LernkartenQuiz'
 import RangKarte from '../components/RangKarte'
@@ -40,6 +41,7 @@ export default function Wissen() {
   const [tab, setTab] = useState<Tab>('fehlerdiagnose')
   const [query, setQuery] = useState('')
   const [gewerk, setGewerk] = useState<Gewerk | 'Alle'>('Alle')
+  const [quizOffen, setQuizOffen] = useState(false)
   const [auswahl, setAuswahl] = useState<BaureihenAuswahl>(() => (meineBaureihen.length > 0 ? 'meine' : 'alle'))
 
   const gespeicherteBaureihen = profil?.baureihen
@@ -127,7 +129,7 @@ export default function Wissen() {
       {tab === 'pruefung' && <LernkartenQuiz />}
       {tab === 'dbfakten' && <DBFaktenQuiz />}
 
-      {(mitFilter || tab === 'fahrzeuge') && (
+      {(mitFilter || (tab === 'fahrzeuge' && !quizOffen)) && (
         <div className="relative">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-db-navy-light" />
           <input
@@ -282,8 +284,19 @@ export default function Wissen() {
         </div>
       )}
 
-      {tab === 'fahrzeuge' && (
+      {tab === 'fahrzeuge' && quizOffen && <BaureihenQuiz onSchliessen={() => setQuizOffen(false)} />}
+
+      {tab === 'fahrzeuge' && !quizOffen && (
         <div className="space-y-5">
+          <button
+            onClick={() => setQuizOffen(true)}
+            className="flex w-full items-center justify-between rounded-xl border border-db-red/30 bg-db-red/5 px-4 py-3 text-left"
+          >
+            <span className="flex items-center gap-2 text-sm font-semibold text-db-red-dark">
+              <Brain size={16} /> Baureihen-Quiz: Erkennst du die Fahrzeuge?
+            </span>
+            <span className="rounded-full bg-db-red px-3 py-1.5 text-xs font-semibold text-white">Start</span>
+          </button>
           <p className="text-xs text-db-navy-light">
             Echte Baureihen der Deutschen Bahn. Markier mit ☆ die, an denen du arbeitest – Fehlerdiagnose und
             Bauteil-Lexikon zeigen dir dann zuerst die passenden Einträge.
