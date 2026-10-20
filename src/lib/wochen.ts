@@ -104,3 +104,27 @@ export function tagVerschieben(datumISO: string, deltaTage: number): string {
   d.setDate(d.getDate() + deltaTage)
   return isoDatum(d)
 }
+
+// Ausbildungsjahr, in dem eine (auch vergangene) Woche lag – für den Ausbildungsnachweis.
+// Ausgangspunkt ist das aktuelle Lehrjahr aus dem Profil (so bleibt auch eine verkürzte
+// Ausbildung richtig); für jeden Jahrestag des Ausbildungsbeginns zwischen der Woche und heute
+// wird ein Jahr ab- bzw. (bei zukünftigen Wochen) aufgeschlagen.
+export function ausbildungsjahrFuerWoche(
+  aktuellesLehrjahr: number,
+  lehrjahreGesamt: number,
+  beginnISO: string,
+  schluessel: string,
+  heute: string = heuteISO(),
+): number {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(beginnISO)) return aktuellesLehrjahr
+  const beginnJahr = Number(beginnISO.slice(0, 4))
+  const monatTag = beginnISO.slice(4)
+  const [frueher, spaeter] = schluessel < heute ? [schluessel, heute] : [heute, schluessel]
+  let jahrestage = 0
+  for (let jahr = beginnJahr + 1; jahr <= Number(spaeter.slice(0, 4)); jahr++) {
+    const jahrestag = `${jahr}${monatTag}`
+    if (jahrestag > frueher && jahrestag <= spaeter) jahrestage++
+  }
+  const ergebnis = schluessel < heute ? aktuellesLehrjahr - jahrestage : aktuellesLehrjahr + jahrestage
+  return Math.min(Math.max(1, ergebnis), Math.max(1, lehrjahreGesamt))
+}

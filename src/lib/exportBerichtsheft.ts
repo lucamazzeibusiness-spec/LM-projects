@@ -10,6 +10,8 @@ interface ExportOptions {
   von: string
   bis: string
   jahr: number
+  // Ausbildungsjahr der exportierten Woche (nicht zwingend das aktuelle Lehrjahr).
+  ausbildungsjahr: number
   unterschriftDataUrl: string
 }
 
@@ -73,7 +75,7 @@ function baueAusbildungsnachweisDoc(
   eintraege: BerichtsheftEintrag[],
   optionen: DocOptionen,
 ): jsPDF {
-  const { nr, von, bis, unterschriftDataUrl } = optionen
+  const { nr, von, bis, ausbildungsjahr, unterschriftDataUrl } = optionen
   const doc = new jsPDF({ unit: 'mm', format: 'a4' })
   const seitenbreite = doc.internal.pageSize.getWidth()
   const seitenhoehe = doc.internal.pageSize.getHeight()
@@ -116,7 +118,7 @@ function baueAusbildungsnachweisDoc(
     [nr, 'Nr.', 92, 12],
     [von, 'Ausbildungswoche vom', 108, 22],
     [bis, 'bis', 134, 22],
-    [String(profil.lehrjahr), 'Ausbildungsjahr', 178, 18],
+    [String(ausbildungsjahr), 'Ausbildungsjahr', 178, 18],
   ]
   for (const [wert, label, x, breite] of formFelder) {
     doc.setFont('helvetica', 'bold')
