@@ -2,6 +2,7 @@ import { ArrowRight, Bell, BellOff, CalendarCheck, ClipboardCheck, GraduationCap
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { GewerkBadge, PrioBadge, StatusBadge } from '../components/Badges'
+import KarteDesTages from '../components/KarteDesTages'
 import { useAzubiProfil } from '../context/AzubiProfilContext'
 import { useAusbildungsplan } from '../context/AusbildungsplanContext'
 import { useBerichtsheft } from '../context/BerichtsheftContext'
@@ -120,6 +121,8 @@ export default function Dashboard() {
           </Link>
         </div>
       </div>
+
+      <KarteDesTages />
 
       <div className="grid grid-cols-2 gap-3">
         {stats.map(({ label, value, icon: Icon, tone, to }) => (
