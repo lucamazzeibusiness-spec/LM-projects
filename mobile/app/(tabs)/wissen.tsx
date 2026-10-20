@@ -1,8 +1,9 @@
-import { AlertCircle, AlertTriangle, Search, Star, TrainFront, Wrench } from 'lucide-react-native'
+import { AlertCircle, AlertTriangle, Brain, Search, Star, TrainFront, Wrench } from 'lucide-react-native'
 import { useMemo, useState } from 'react'
 import { ScrollView, Text, TextInput, View } from 'react-native'
 import { Pressable } from 'react-native'
 import { GewerkBadge } from '../../components/Badges'
+import BaureihenQuiz from '../../components/BaureihenQuiz'
 import DBFaktenQuiz from '../../components/DBFaktenQuiz'
 import LernkartenQuiz from '../../components/LernkartenQuiz'
 import RangKarte from '../../components/RangKarte'
@@ -49,6 +50,7 @@ export default function Wissen() {
   const [tab, setTab] = useState<Tab>('fehlerdiagnose')
   const [query, setQuery] = useState('')
   const [gewerk, setGewerk] = useState<Gewerk | 'Alle'>('Alle')
+  const [quizOffen, setQuizOffen] = useState(false)
   const [auswahl, setAuswahl] = useState<BaureihenAuswahl>(() => (meineBaureihen.length > 0 ? 'meine' : 'alle'))
 
   const gespeicherteBaureihen = profil?.baureihen
@@ -134,7 +136,7 @@ export default function Wissen() {
       {tab === 'pruefung' && <LernkartenQuiz />}
       {tab === 'dbfakten' && <DBFaktenQuiz />}
 
-      {(mitFilter || tab === 'fahrzeuge') && (
+      {(mitFilter || (tab === 'fahrzeuge' && !quizOffen)) && (
         <View className="relative justify-center">
           <Search size={16} color="#5C6670" style={{ position: 'absolute', left: 12, zIndex: 1 }} />
           <TextInput
@@ -261,8 +263,20 @@ export default function Wissen() {
         </View>
       )}
 
-      {tab === 'fahrzeuge' && (
+      {tab === 'fahrzeuge' && quizOffen && <BaureihenQuiz onSchliessen={() => setQuizOffen(false)} />}
+
+      {tab === 'fahrzeuge' && !quizOffen && (
         <View className="gap-5">
+          <Pressable
+            onPress={() => setQuizOffen(true)}
+            className="flex-row items-center justify-between rounded-xl border border-db-red/30 bg-db-red/5 px-4 py-3"
+          >
+            <View className="flex-1 flex-row items-center gap-2">
+              <Brain size={16} color="#C40012" />
+              <Text className="flex-1 text-sm font-semibold text-db-red-dark">Baureihen-Quiz: Erkennst du die Fahrzeuge?</Text>
+            </View>
+            <Text className="overflow-hidden rounded-full bg-db-red px-3 py-1.5 text-xs font-semibold text-white">Start</Text>
+          </Pressable>
           <Text className="text-xs text-db-navy-light dark:text-[#9AA4B0]">
             Echte Baureihen der Deutschen Bahn. Markier mit ☆ die, an denen du arbeitest – Fehlerdiagnose und Bauteil-Lexikon
             zeigen dir dann zuerst die passenden Einträge.
