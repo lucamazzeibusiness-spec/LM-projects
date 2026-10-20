@@ -8,6 +8,7 @@ import { eignetSichFuerKurzform } from '../lib/kurzform'
 import { formatZeit } from '../lib/zeit'
 import Flashcard from './Flashcard'
 import Lernmodus from './Lernmodus'
+import Probepruefung from './Probepruefung'
 import Zuordnen from './Zuordnen'
 
 const themenbereiche: (Themenbereich | 'Alle')[] = [
@@ -42,7 +43,7 @@ export default function LernkartenQuiz() {
   const [themaFilter, setThemaFilter] = useState<Themenbereich | 'Alle'>('Alle')
   const [teilFilter, setTeilFilter] = useState<Pruefungsphase | 'Alle'>('Alle')
   const [nurSchwache, setNurSchwache] = useState(false)
-  const [modus, setModus] = useState<'karten' | 'zuordnen' | 'lernen'>('karten')
+  const [modus, setModus] = useState<'karten' | 'zuordnen' | 'lernen' | 'pruefung'>('karten')
   const [deck, setDeck] = useState<Lernkarte[]>([])
   const [rundenGroesse, setRundenGroesse] = useState(0)
   const [bewertet, setBewertet] = useState<Set<string>>(new Set())
@@ -147,6 +148,16 @@ export default function LernkartenQuiz() {
     [themaFilter, teilFilter, nurSchwache, lernenRunde],
   )
 
+  const pruefungsPool = useMemo(
+    () => gefiltert().filter((k) => eignetSichFuerKurzform(k.frage, k.antwort)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [themaFilter, teilFilter, nurSchwache],
+  )
+
+  const pruefungAbgeschlossen = (richtig: number, gesamt: number) => {
+    if (richtig > 0) punkteVergeben(`probe:${Date.now()}`, richtig * 2, `Probeprüfung: ${richtig} von ${gesamt} richtig`)
+  }
+
   const lernenKarteGemeistert = (id: string) => {
     const karte = lernkarten.find((k) => k.id === id)
     if (karte) punkteVergeben(`karte:${id}`, 5, `Lernkarte gemeistert: ${karte.themenbereich}`)
@@ -236,6 +247,14 @@ export default function LernkartenQuiz() {
           }`}
         >
           Lernen
+        </button>
+        <button
+          onClick={() => setModus('pruefung')}
+          className={`flex-1 rounded-full py-1.5 text-xs font-semibold ${
+            modus === 'pruefung' ? 'bg-db-surface text-db-navy shadow-sm' : 'text-db-navy-light'
+          }`}
+        >
+          Prüfung
         </button>
       </div>
 
@@ -332,6 +351,13 @@ export default function LernkartenQuiz() {
             onAbschluss={lernenAbschluss}
           />
         )
+      ) : modus === 'pruefung' ? (
+        <Probepruefung
+          key={`${themaFilter}-${teilFilter}-${nurSchwache}`}
+          pool={pruefungsPool}
+          onKarteBeantwortet={ergebnisMerken}
+          onAbgeschlossen={pruefungAbgeschlossen}
+        />
       ) : aktuell ? (
         <div className="space-y-3">
           <div className="flex flex-wrap items-center gap-2">
