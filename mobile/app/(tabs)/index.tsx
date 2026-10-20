@@ -27,14 +27,17 @@ export default function Dashboard() {
   const [erinnerungAn, setErinnerungAn] = useState(false)
 
   const heutigerEintrag = eintraege.find((e) => e.datumISO === heuteISO())
+  // Tage ohne Block im Ausbildungsplan (standardmäßig Sa/So) gelten als frei – dort wird
+  // weder erinnert noch ein fehlender Eintrag angemahnt.
+  const heuteFrei = !vorlage[heutigerWochentagIndex()]
 
   useEffect(() => {
     erinnerungIstAktiv().then(setErinnerungAn)
   }, [])
 
   useEffect(() => {
-    if (!heutigerEintrag) heuteErinnern('Dein Berichtsheft-Eintrag für heute fehlt noch.')
-  }, [heutigerEintrag])
+    if (!heutigerEintrag && !heuteFrei) heuteErinnern('Dein Berichtsheft-Eintrag für heute fehlt noch.')
+  }, [heutigerEintrag, heuteFrei])
 
   if (!profil) return null
 
@@ -62,7 +65,7 @@ export default function Dashboard() {
     } else {
       const ok = await erinnerungAktivieren()
       setErinnerungAn(ok)
-      if (ok && !heutigerEintrag) heuteErinnern('Dein Berichtsheft-Eintrag für heute fehlt noch.')
+      if (ok && !heutigerEintrag && !heuteFrei) heuteErinnern('Dein Berichtsheft-Eintrag für heute fehlt noch.')
     }
   }
 
@@ -102,9 +105,17 @@ export default function Dashboard() {
         <View className="mt-3 gap-2 border-t border-db-gray-100 pt-3">
           <Pressable onPress={() => router.push('/berichtsheft')} className="flex-row items-center justify-between">
             <View className="flex-row items-center gap-1.5">
-              <CalendarCheck size={15} color={heutigerEintrag ? '#1E8A3C' : '#EC0016'} />
-              <Text className={`text-sm ${heutigerEintrag ? 'text-db-green' : 'font-semibold text-db-red'}`}>
-                {heutigerEintrag ? 'Berichtsheft heute eingetragen' : 'Berichtsheft-Eintrag fehlt noch'}
+              <CalendarCheck size={15} color={heutigerEintrag ? '#1E8A3C' : heuteFrei ? '#5C6670' : '#EC0016'} />
+              <Text
+                className={`text-sm ${
+                  heutigerEintrag ? 'text-db-green' : heuteFrei ? 'text-db-navy-light dark:text-[#9AA4B0]' : 'font-semibold text-db-red'
+                }`}
+              >
+                {heutigerEintrag
+                  ? 'Berichtsheft heute eingetragen'
+                  : heuteFrei
+                    ? 'Heute frei – kein Eintrag nötig'
+                    : 'Berichtsheft-Eintrag fehlt noch'}
               </Text>
             </View>
             <ArrowRight size={14} color="#5C6670" />
