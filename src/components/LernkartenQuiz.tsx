@@ -19,6 +19,7 @@ const themenbereiche: (Themenbereich | 'Alle')[] = [
   'Steuerungstechnik',
   'Wirtschaft & Soziales',
   'Ausbildung',
+  'Fahrzeugtechnik',
 ]
 
 const pruefungsteile: (Pruefungsphase | 'Alle')[] = ['Alle', 'AP1', 'AP2']
