@@ -25,7 +25,7 @@ export default function BaureihenQuiz({ fotos, onSchliessen }: { fotos: Fahrzeug
   // Foto-Modus nur, wenn genug Fotos geladen sind (sonst z. B. offline): mind. 4 für die Antwortoptionen.
   const mitFoto = baureihen.filter((b) => fotos[b.id])
   const fotosMoeglich = mitFoto.length >= 4
-  const [modus, setModus] = useState<Modus>(fotosMoeglich ? 'fotos' : 'namen')
+  const [modus, setModus] = useState<Modus>('fotos')
   const aktiverModus: Modus = modus === 'fotos' && fotosMoeglich ? 'fotos' : 'namen'
   const [runde, setRunde] = useState(0)
   const [ergebnis, setErgebnis] = useState<{ richtig: number; gesamt: number } | null>(null)
