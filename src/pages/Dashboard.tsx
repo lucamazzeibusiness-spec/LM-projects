@@ -32,10 +32,13 @@ export default function Dashboard() {
   const [erinnerungAn, setErinnerungAn] = useState(erinnerungIstAktiv)
 
   const heutigerEintrag = eintraege.find((e) => e.datumISO === heuteISO())
+  // Tage ohne Block im Ausbildungsplan (standardmäßig Sa/So) gelten als frei – dort wird
+  // weder erinnert noch ein fehlender Eintrag angemahnt.
+  const heuteFrei = !vorlage[heutigerWochentagIndex()]
 
   useEffect(() => {
-    if (!heutigerEintrag) heuteErinnern('Dein Berichtsheft-Eintrag für heute fehlt noch.')
-  }, [heutigerEintrag])
+    if (!heutigerEintrag && !heuteFrei) heuteErinnern('Dein Berichtsheft-Eintrag für heute fehlt noch.')
+  }, [heutigerEintrag, heuteFrei])
 
   if (!profil) return null
 
@@ -63,7 +66,7 @@ export default function Dashboard() {
     } else {
       const ok = await erinnerungAktivieren()
       setErinnerungAn(ok)
-      if (ok && !heutigerEintrag) heuteErinnern('Dein Berichtsheft-Eintrag für heute fehlt noch.')
+      if (ok && !heutigerEintrag && !heuteFrei) heuteErinnern('Dein Berichtsheft-Eintrag für heute fehlt noch.')
     }
   }
 
@@ -101,11 +104,17 @@ export default function Dashboard() {
         <div className="mt-3 flex flex-col gap-2 border-t border-db-gray-100 pt-3">
           <Link
             to="/berichtsheft"
-            className={`flex items-center justify-between text-sm ${heutigerEintrag ? 'text-db-green' : 'font-semibold text-db-red'}`}
+            className={`flex items-center justify-between text-sm ${
+              heutigerEintrag ? 'text-db-green' : heuteFrei ? 'text-db-navy-light' : 'font-semibold text-db-red'
+            }`}
           >
             <span className="flex items-center gap-1.5">
               <CalendarCheck size={15} />
-              {heutigerEintrag ? 'Berichtsheft heute eingetragen' : 'Berichtsheft-Eintrag fehlt noch'}
+              {heutigerEintrag
+                ? 'Berichtsheft heute eingetragen'
+                : heuteFrei
+                  ? 'Heute frei – kein Eintrag nötig'
+                  : 'Berichtsheft-Eintrag fehlt noch'}
             </span>
             <ArrowRight size={14} />
           </Link>
