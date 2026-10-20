@@ -3,6 +3,7 @@ import { ArrowRight, Bell, BellOff, CalendarCheck, ClipboardCheck, GraduationCap
 import { useEffect, useState } from 'react'
 import { Pressable, ScrollView, Text, View } from 'react-native'
 import { GewerkBadge, PrioBadge, StatusBadge } from '../../components/Badges'
+import KarteDesTages from '../../components/KarteDesTages'
 import { useAzubiProfil } from '../../context/AzubiProfilContext'
 import { useAusbildungsplan } from '../../context/AusbildungsplanContext'
 import { useBerichtsheft } from '../../context/BerichtsheftContext'
@@ -122,6 +123,8 @@ export default function Dashboard() {
           </Pressable>
         </View>
       </View>
+
+      <KarteDesTages />
 
       <View className="flex-row gap-3">
         {stats.map(({ label, value, Icon, tone, ziel }) => (

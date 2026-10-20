@@ -19,6 +19,8 @@ const leererLernstand: Lernstand = {}
 
 interface LernstandContextValue {
   lernstand: Lernstand
+  // true, sobald der gespeicherte Lernstand aus AsyncStorage geladen ist.
+  geladen: boolean
   istSchwach: (id: string) => boolean
   ergebnisMerken: (id: string, richtig: boolean) => void
 }
@@ -61,7 +63,7 @@ export function LernstandProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <LernstandContext.Provider value={{ lernstand, istSchwach, ergebnisMerken }}>{children}</LernstandContext.Provider>
+    <LernstandContext.Provider value={{ lernstand, geladen, istSchwach, ergebnisMerken }}>{children}</LernstandContext.Provider>
   )
 }
 

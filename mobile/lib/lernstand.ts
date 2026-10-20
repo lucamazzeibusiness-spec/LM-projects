@@ -1,5 +1,5 @@
 import type { Lernstand } from '../context/LernstandContext'
-import { lernkarten, type Themenbereich } from '../data/mock'
+import { lernkarten, type Lernkarte, type Themenbereich } from '../data/mock'
 
 export interface ThemenFortschritt {
   thema: Themenbereich
@@ -21,4 +21,19 @@ export function fortschrittProThema(lernstand: Lernstand): ThemenFortschritt[] {
     proThema.set(karte.themenbereich, eintrag)
   }
   return [...proThema.values()]
+}
+
+function zahlAus(text: string): number {
+  let h = 0
+  for (const zeichen of text) h = (h * 31 + zeichen.charCodeAt(0)) >>> 0
+  return h
+}
+
+// Karte des Tages: bevorzugt eine schwache Karte, sonst eine noch nie geübte, sonst irgendeine –
+// innerhalb der Gruppe fest pro Datum, damit am selben Tag dieselbe Karte kommt.
+export function karteDesTagesWaehlen(datumISO: string, lernstand: Lernstand): Lernkarte {
+  const schwach = lernkarten.filter((k) => lernstand[k.id]?.letztesErgebnis === 'falsch')
+  const neu = lernkarten.filter((k) => !lernstand[k.id])
+  const pool = schwach.length > 0 ? schwach : neu.length > 0 ? neu : lernkarten
+  return pool[zahlAus(datumISO) % pool.length]
 }
