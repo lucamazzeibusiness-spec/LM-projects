@@ -28,6 +28,8 @@ export interface Baureihe {
   vmax: number
   leistung?: string
   hinweis?: string
+  // Titel des deutschen Wikipedia-Artikels – daraus lädt die App das Titelfoto (Wikimedia Commons).
+  wikipedia?: string
 }
 
 export const fahrzeugarten: Fahrzeugart[] = [
@@ -42,46 +44,46 @@ export const fahrzeugarten: Fahrzeugart[] = [
 
 export const baureihen: Baureihe[] = [
   // --- E-Loks ---
-  { id: '101', name: 'BR 101', art: 'E-Lok', einsatz: 'Fernverkehr (IC)', hersteller: 'Adtranz', baujahre: '1996–1999', vmax: 220, leistung: '6,4 MW', hinweis: 'Wird schrittweise durch neuere Fahrzeuge ersetzt.' },
-  { id: '111', name: 'BR 111', art: 'E-Lok', einsatz: 'Regionalverkehr', hersteller: 'Krauss-Maffei, Krupp, Henschel (Elektrik: AEG, BBC, Siemens)', baujahre: '1974–1984', vmax: 160, leistung: '3,7 MW' },
-  { id: '143', name: 'BR 143', art: 'E-Lok', einsatz: 'Regionalverkehr (ehemals DR-Baureihe 243)', hersteller: 'LEW Hennigsdorf', baujahre: '1984–1991', vmax: 120, leistung: '3,7 MW', hinweis: 'Bei DB Regio inzwischen weitgehend ausgemustert.' },
-  { id: '146', name: 'BR 146', spitzname: 'TRAXX P160 AC', art: 'E-Lok', einsatz: 'Regionalverkehr und Intercity', hersteller: 'Bombardier', baujahre: '2001–2015', vmax: 160, leistung: '5,6 MW' },
-  { id: '147', name: 'BR 147', spitzname: 'TRAXX AC3', art: 'E-Lok', einsatz: 'Intercity 2 (Doppelstock) und Regionalverkehr', hersteller: 'Bombardier (heute Alstom)', baujahre: 'ab 2015', vmax: 160, leistung: '5,6 MW' },
-  { id: '152', name: 'BR 152', spitzname: 'EuroSprinter', art: 'E-Lok', einsatz: 'Güterverkehr (DB Cargo)', hersteller: 'Siemens', baujahre: '1996–2001', vmax: 140, leistung: '6,4 MW' },
-  { id: '185', name: 'BR 185', spitzname: 'TRAXX F140 AC', art: 'E-Lok', einsatz: 'Güterverkehr (DB Cargo), Zweisystem', hersteller: 'Bombardier', baujahre: '2000–2010', vmax: 140, leistung: '5,6 MW' },
-  { id: '187', name: 'BR 187', spitzname: 'TRAXX AC3 LM', art: 'E-Lok', einsatz: 'Güterverkehr (DB Cargo), mit Last-Mile-Dieselmotor für nicht elektrifizierte Anschlüsse', hersteller: 'Bombardier (heute Alstom)', baujahre: 'ab 2016', vmax: 140, leistung: '5,6 MW' },
-  { id: '189', name: 'BR 189', spitzname: 'EuroSprinter ES64F4', art: 'E-Lok', einsatz: 'Grenzüberschreitender Güterverkehr, Mehrsystem', hersteller: 'Siemens', baujahre: '2002–2004', vmax: 140, leistung: '6,4 MW' },
-  { id: '193', name: 'BR 193', spitzname: 'Vectron', art: 'E-Lok', einsatz: 'Güterverkehr (DB Cargo), Mehrsystem', hersteller: 'Siemens', baujahre: 'ab 2010er-Jahre', vmax: 160, leistung: '6,4 MW' },
+  { id: '101', wikipedia: 'DB-Baureihe 101', name: 'BR 101', art: 'E-Lok', einsatz: 'Fernverkehr (IC)', hersteller: 'Adtranz', baujahre: '1996–1999', vmax: 220, leistung: '6,4 MW', hinweis: 'Wird schrittweise durch neuere Fahrzeuge ersetzt.' },
+  { id: '111', wikipedia: 'DB-Baureihe 111', name: 'BR 111', art: 'E-Lok', einsatz: 'Regionalverkehr', hersteller: 'Krauss-Maffei, Krupp, Henschel (Elektrik: AEG, BBC, Siemens)', baujahre: '1974–1984', vmax: 160, leistung: '3,7 MW' },
+  { id: '143', wikipedia: 'DR-Baureihe 243', name: 'BR 143', art: 'E-Lok', einsatz: 'Regionalverkehr (ehemals DR-Baureihe 243)', hersteller: 'LEW Hennigsdorf', baujahre: '1984–1991', vmax: 120, leistung: '3,7 MW', hinweis: 'Bei DB Regio inzwischen weitgehend ausgemustert.' },
+  { id: '146', wikipedia: 'DB-Baureihe 146', name: 'BR 146', spitzname: 'TRAXX P160 AC', art: 'E-Lok', einsatz: 'Regionalverkehr und Intercity', hersteller: 'Bombardier', baujahre: '2001–2015', vmax: 160, leistung: '5,6 MW' },
+  { id: '147', wikipedia: 'DB-Baureihe 147', name: 'BR 147', spitzname: 'TRAXX AC3', art: 'E-Lok', einsatz: 'Intercity 2 (Doppelstock) und Regionalverkehr', hersteller: 'Bombardier (heute Alstom)', baujahre: 'ab 2015', vmax: 160, leistung: '5,6 MW' },
+  { id: '152', wikipedia: 'DB-Baureihe 152', name: 'BR 152', spitzname: 'EuroSprinter', art: 'E-Lok', einsatz: 'Güterverkehr (DB Cargo)', hersteller: 'Siemens', baujahre: '1996–2001', vmax: 140, leistung: '6,4 MW' },
+  { id: '185', wikipedia: 'DB-Baureihe 185', name: 'BR 185', spitzname: 'TRAXX F140 AC', art: 'E-Lok', einsatz: 'Güterverkehr (DB Cargo), Zweisystem', hersteller: 'Bombardier', baujahre: '2000–2010', vmax: 140, leistung: '5,6 MW' },
+  { id: '187', wikipedia: 'DB-Baureihe 187', name: 'BR 187', spitzname: 'TRAXX AC3 LM', art: 'E-Lok', einsatz: 'Güterverkehr (DB Cargo), mit Last-Mile-Dieselmotor für nicht elektrifizierte Anschlüsse', hersteller: 'Bombardier (heute Alstom)', baujahre: 'ab 2016', vmax: 140, leistung: '5,6 MW' },
+  { id: '189', wikipedia: 'DB-Baureihe 189', name: 'BR 189', spitzname: 'EuroSprinter ES64F4', art: 'E-Lok', einsatz: 'Grenzüberschreitender Güterverkehr, Mehrsystem', hersteller: 'Siemens', baujahre: '2002–2004', vmax: 140, leistung: '6,4 MW' },
+  { id: '193', wikipedia: 'Siemens Vectron', name: 'BR 193', spitzname: 'Vectron', art: 'E-Lok', einsatz: 'Güterverkehr (DB Cargo), Mehrsystem', hersteller: 'Siemens', baujahre: 'ab 2010er-Jahre', vmax: 160, leistung: '6,4 MW' },
   // --- Dieselloks ---
-  { id: '218', name: 'BR 218', art: 'Diesellok', einsatz: 'Regionalverkehr, Rangier- und Hilfsdienst (z. B. Abschleppen liegengebliebener Züge)', hersteller: 'Krupp, Henschel, Krauss-Maffei, MaK', baujahre: '1968–1979', vmax: 140, leistung: 'ca. 1,8–2 MW', hinweis: 'Diesel-hydraulisch.' },
-  { id: '232', name: 'BR 232/233', spitzname: 'Ludmilla', art: 'Diesellok', einsatz: 'Güterverkehr (DB Cargo)', hersteller: 'Lokomotivfabrik Luhansk (damals Woroschilowgrad)', baujahre: '1973–1982', vmax: 120, leistung: 'ca. 2,2 MW', hinweis: 'Diesel-elektrisch, ursprünglich für die Deutsche Reichsbahn gebaut.' },
-  { id: '245', name: 'BR 245', spitzname: 'TRAXX P160 DE ME', art: 'Diesellok', einsatz: 'Regionalverkehr auf nicht elektrifizierten Strecken', hersteller: 'Bombardier (heute Alstom)', baujahre: 'ab 2013', vmax: 160, leistung: 'ca. 2,2 MW', hinweis: 'Diesel-elektrisch mit vier kleineren Motoren statt einem großen.' },
-  { id: '261', name: 'BR 261', spitzname: 'Gravita', art: 'Diesellok', einsatz: 'Rangier- und Übergabedienst (DB Cargo)', hersteller: 'Voith', baujahre: '2010–2013', vmax: 100, leistung: 'ca. 1 MW', hinweis: 'Diesel-hydraulisch.' },
-  { id: '294', name: 'BR 294/295', art: 'Diesellok', einsatz: 'Rangierdienst', hersteller: 'MaK, Henschel, Deutz u. a. (Bauart V 90)', baujahre: '1964–1974', vmax: 80, hinweis: 'Diesel-hydraulisch, viele mit Funkfernsteuerung umgebaut.' },
+  { id: '218', wikipedia: 'DB-Baureihe 218', name: 'BR 218', art: 'Diesellok', einsatz: 'Regionalverkehr, Rangier- und Hilfsdienst (z. B. Abschleppen liegengebliebener Züge)', hersteller: 'Krupp, Henschel, Krauss-Maffei, MaK', baujahre: '1968–1979', vmax: 140, leistung: 'ca. 1,8–2 MW', hinweis: 'Diesel-hydraulisch.' },
+  { id: '232', wikipedia: 'DR-Baureihe 132', name: 'BR 232/233', spitzname: 'Ludmilla', art: 'Diesellok', einsatz: 'Güterverkehr (DB Cargo)', hersteller: 'Lokomotivfabrik Luhansk (damals Woroschilowgrad)', baujahre: '1973–1982', vmax: 120, leistung: 'ca. 2,2 MW', hinweis: 'Diesel-elektrisch, ursprünglich für die Deutsche Reichsbahn gebaut.' },
+  { id: '245', wikipedia: 'DB-Baureihe 245', name: 'BR 245', spitzname: 'TRAXX P160 DE ME', art: 'Diesellok', einsatz: 'Regionalverkehr auf nicht elektrifizierten Strecken', hersteller: 'Bombardier (heute Alstom)', baujahre: 'ab 2013', vmax: 160, leistung: 'ca. 2,2 MW', hinweis: 'Diesel-elektrisch mit vier kleineren Motoren statt einem großen.' },
+  { id: '261', wikipedia: 'Voith Gravita', name: 'BR 261', spitzname: 'Gravita', art: 'Diesellok', einsatz: 'Rangier- und Übergabedienst (DB Cargo)', hersteller: 'Voith', baujahre: '2010–2013', vmax: 100, leistung: 'ca. 1 MW', hinweis: 'Diesel-hydraulisch.' },
+  { id: '294', wikipedia: 'DB-Baureihe V 90', name: 'BR 294/295', art: 'Diesellok', einsatz: 'Rangierdienst', hersteller: 'MaK, Henschel, Deutz u. a. (Bauart V 90)', baujahre: '1964–1974', vmax: 80, hinweis: 'Diesel-hydraulisch, viele mit Funkfernsteuerung umgebaut.' },
   // --- ICE ---
-  { id: '401', name: 'BR 401', spitzname: 'ICE 1', art: 'Hochgeschwindigkeitszug', einsatz: 'Fernverkehr', hersteller: 'Konsortium u. a. Siemens, AEG, Krupp, Thyssen-Henschel', baujahre: '1989–1993', vmax: 280, hinweis: 'Zwei Triebköpfe mit Mittelwagen dazwischen.' },
-  { id: '402', name: 'BR 402', spitzname: 'ICE 2', art: 'Hochgeschwindigkeitszug', einsatz: 'Fernverkehr', hersteller: 'Siemens, Adtranz u. a.', baujahre: '1995–1997', vmax: 280, hinweis: 'Ein Triebkopf und ein Steuerwagen, zwei Halbzüge kuppelbar.' },
-  { id: '403', name: 'BR 403/406', spitzname: 'ICE 3 / ICE 3M', art: 'Hochgeschwindigkeitszug', einsatz: 'Fernverkehr, BR 406 als Mehrsystemzug auch ins Ausland', hersteller: 'Siemens, Adtranz', baujahre: '1999–2001', vmax: 300, hinweis: 'Verteilter Antrieb unter dem ganzen Zug, Wirbelstrombremse.' },
-  { id: '407', name: 'BR 407', spitzname: 'ICE 3 (Velaro D)', art: 'Hochgeschwindigkeitszug', einsatz: 'Fernverkehr, Mehrsystem (u. a. Frankreich)', hersteller: 'Siemens', baujahre: 'ab 2011', vmax: 320 },
-  { id: '408', name: 'BR 408', spitzname: 'ICE 3neo', art: 'Hochgeschwindigkeitszug', einsatz: 'Fernverkehr', hersteller: 'Siemens', baujahre: 'ab 2022', vmax: 320 },
-  { id: '411', name: 'BR 411/415', spitzname: 'ICE T', art: 'Hochgeschwindigkeitszug', einsatz: 'Fernverkehr auf kurvenreichen Strecken', hersteller: 'Siemens, Adtranz, Fiat u. a.', baujahre: '1999–2005', vmax: 230, hinweis: 'Mit Neigetechnik ausgelegt.' },
-  { id: '412', name: 'BR 412', spitzname: 'ICE 4', art: 'Hochgeschwindigkeitszug', einsatz: 'Fernverkehr – die größte ICE-Flotte', hersteller: 'Siemens mit Bombardier', baujahre: 'ab 2017', vmax: 250, hinweis: 'Je nach Variante bis 265 km/h zugelassen.' },
+  { id: '401', wikipedia: 'ICE 1', name: 'BR 401', spitzname: 'ICE 1', art: 'Hochgeschwindigkeitszug', einsatz: 'Fernverkehr', hersteller: 'Konsortium u. a. Siemens, AEG, Krupp, Thyssen-Henschel', baujahre: '1989–1993', vmax: 280, hinweis: 'Zwei Triebköpfe mit Mittelwagen dazwischen.' },
+  { id: '402', wikipedia: 'ICE 2', name: 'BR 402', spitzname: 'ICE 2', art: 'Hochgeschwindigkeitszug', einsatz: 'Fernverkehr', hersteller: 'Siemens, Adtranz u. a.', baujahre: '1995–1997', vmax: 280, hinweis: 'Ein Triebkopf und ein Steuerwagen, zwei Halbzüge kuppelbar.' },
+  { id: '403', wikipedia: 'ICE 3', name: 'BR 403/406', spitzname: 'ICE 3 / ICE 3M', art: 'Hochgeschwindigkeitszug', einsatz: 'Fernverkehr, BR 406 als Mehrsystemzug auch ins Ausland', hersteller: 'Siemens, Adtranz', baujahre: '1999–2001', vmax: 300, hinweis: 'Verteilter Antrieb unter dem ganzen Zug, Wirbelstrombremse.' },
+  { id: '407', wikipedia: 'DB-Baureihe 407', name: 'BR 407', spitzname: 'ICE 3 (Velaro D)', art: 'Hochgeschwindigkeitszug', einsatz: 'Fernverkehr, Mehrsystem (u. a. Frankreich)', hersteller: 'Siemens', baujahre: 'ab 2011', vmax: 320 },
+  { id: '408', wikipedia: 'DB-Baureihe 408', name: 'BR 408', spitzname: 'ICE 3neo', art: 'Hochgeschwindigkeitszug', einsatz: 'Fernverkehr', hersteller: 'Siemens', baujahre: 'ab 2022', vmax: 320 },
+  { id: '411', wikipedia: 'ICE T', name: 'BR 411/415', spitzname: 'ICE T', art: 'Hochgeschwindigkeitszug', einsatz: 'Fernverkehr auf kurvenreichen Strecken', hersteller: 'Siemens, Adtranz, Fiat u. a.', baujahre: '1999–2005', vmax: 230, hinweis: 'Mit Neigetechnik ausgelegt.' },
+  { id: '412', wikipedia: 'ICE 4', name: 'BR 412', spitzname: 'ICE 4', art: 'Hochgeschwindigkeitszug', einsatz: 'Fernverkehr – die größte ICE-Flotte', hersteller: 'Siemens mit Bombardier', baujahre: 'ab 2017', vmax: 250, hinweis: 'Je nach Variante bis 265 km/h zugelassen.' },
   // --- Elektrotriebzüge Regionalverkehr ---
-  { id: '425', name: 'BR 425/426', art: 'Elektrotriebzug', einsatz: 'Regionalverkehr', hersteller: 'Bombardier, Siemens u. a.', baujahre: '1999–2008', vmax: 160 },
-  { id: '440', name: 'BR 440', spitzname: 'Coradia Continental', art: 'Elektrotriebzug', einsatz: 'Regionalverkehr', hersteller: 'Alstom', baujahre: 'ab 2008', vmax: 160 },
-  { id: '442', name: 'BR 442', spitzname: 'Talent 2', art: 'Elektrotriebzug', einsatz: 'Regionalverkehr', hersteller: 'Bombardier', baujahre: 'ab 2008', vmax: 160 },
-  { id: '445', name: 'BR 445', spitzname: 'Twindexx Vario', art: 'Elektrotriebzug', einsatz: 'Regionalverkehr (Doppelstock-Triebzug)', hersteller: 'Bombardier', baujahre: 'ab 2010er-Jahre', vmax: 160 },
-  { id: '463', name: 'BR 463', spitzname: 'Mireo', art: 'Elektrotriebzug', einsatz: 'Regionalverkehr', hersteller: 'Siemens', baujahre: 'ab 2019', vmax: 160 },
+  { id: '425', wikipedia: 'DB-Baureihe 425', name: 'BR 425/426', art: 'Elektrotriebzug', einsatz: 'Regionalverkehr', hersteller: 'Bombardier, Siemens u. a.', baujahre: '1999–2008', vmax: 160 },
+  { id: '440', wikipedia: 'Alstom Coradia Continental', name: 'BR 440', spitzname: 'Coradia Continental', art: 'Elektrotriebzug', einsatz: 'Regionalverkehr', hersteller: 'Alstom', baujahre: 'ab 2008', vmax: 160 },
+  { id: '442', wikipedia: 'Bombardier Talent 2', name: 'BR 442', spitzname: 'Talent 2', art: 'Elektrotriebzug', einsatz: 'Regionalverkehr', hersteller: 'Bombardier', baujahre: 'ab 2008', vmax: 160 },
+  { id: '445', wikipedia: 'Bombardier Twindexx Vario', name: 'BR 445', spitzname: 'Twindexx Vario', art: 'Elektrotriebzug', einsatz: 'Regionalverkehr (Doppelstock-Triebzug)', hersteller: 'Bombardier', baujahre: 'ab 2010er-Jahre', vmax: 160 },
+  { id: '463', wikipedia: 'Siemens Mireo', name: 'BR 463', spitzname: 'Mireo', art: 'Elektrotriebzug', einsatz: 'Regionalverkehr', hersteller: 'Siemens', baujahre: 'ab 2019', vmax: 160 },
   // --- S-Bahn ---
-  { id: '423', name: 'BR 423', art: 'S-Bahn', einsatz: 'S-Bahn u. a. München, Stuttgart, Frankfurt, Köln', hersteller: 'Adtranz, Alstom, Bombardier', baujahre: '1998–2008', vmax: 140 },
-  { id: '430', name: 'BR 430', art: 'S-Bahn', einsatz: 'S-Bahn u. a. Stuttgart, Frankfurt, Rhein-Ruhr', hersteller: 'Bombardier, Alstom', baujahre: 'ab 2012', vmax: 140 },
-  { id: '481', name: 'BR 480/481', art: 'S-Bahn', einsatz: 'S-Bahn Berlin', hersteller: 'AEG, Adtranz, Bombardier', baujahre: '1986–2004', vmax: 100, hinweis: 'Stromschiene 750 V Gleichspannung statt Oberleitung.' },
-  { id: '483', name: 'BR 483/484', art: 'S-Bahn', einsatz: 'S-Bahn Berlin', hersteller: 'Stadler, Siemens', baujahre: 'ab 2020', vmax: 100, hinweis: 'Stromschiene 750 V Gleichspannung.' },
-  { id: '490', name: 'BR 490', art: 'S-Bahn', einsatz: 'S-Bahn Hamburg', hersteller: 'Bombardier (heute Alstom)', baujahre: 'ab 2016', vmax: 100, hinweis: 'Stromschiene 1200 V Gleichspannung, teils zusätzlich für Oberleitung 15 kV.' },
+  { id: '423', wikipedia: 'DB-Baureihe 423', name: 'BR 423', art: 'S-Bahn', einsatz: 'S-Bahn u. a. München, Stuttgart, Frankfurt, Köln', hersteller: 'Adtranz, Alstom, Bombardier', baujahre: '1998–2008', vmax: 140 },
+  { id: '430', wikipedia: 'DB-Baureihe 430', name: 'BR 430', art: 'S-Bahn', einsatz: 'S-Bahn u. a. Stuttgart, Frankfurt, Rhein-Ruhr', hersteller: 'Bombardier, Alstom', baujahre: 'ab 2012', vmax: 140 },
+  { id: '481', wikipedia: 'DB-Baureihe 481', name: 'BR 480/481', art: 'S-Bahn', einsatz: 'S-Bahn Berlin', hersteller: 'AEG, Adtranz, Bombardier', baujahre: '1986–2004', vmax: 100, hinweis: 'Stromschiene 750 V Gleichspannung statt Oberleitung.' },
+  { id: '483', wikipedia: 'DB-Baureihe 483', name: 'BR 483/484', art: 'S-Bahn', einsatz: 'S-Bahn Berlin', hersteller: 'Stadler, Siemens', baujahre: 'ab 2020', vmax: 100, hinweis: 'Stromschiene 750 V Gleichspannung.' },
+  { id: '490', wikipedia: 'DB-Baureihe 490', name: 'BR 490', art: 'S-Bahn', einsatz: 'S-Bahn Hamburg', hersteller: 'Bombardier (heute Alstom)', baujahre: 'ab 2016', vmax: 100, hinweis: 'Stromschiene 1200 V Gleichspannung, teils zusätzlich für Oberleitung 15 kV.' },
   // --- Dieseltriebzüge ---
-  { id: '628', name: 'BR 628', art: 'Dieseltriebzug', einsatz: 'Regionalverkehr', hersteller: 'Duewag, LHB u. a.', baujahre: '1974–1996', vmax: 120 },
-  { id: '642', name: 'BR 642', spitzname: 'Desiro Classic', art: 'Dieseltriebzug', einsatz: 'Regionalverkehr', hersteller: 'Siemens', baujahre: '1999–2008', vmax: 120 },
-  { id: '648', name: 'BR 648', spitzname: 'Coradia LINT 41', art: 'Dieseltriebzug', einsatz: 'Regionalverkehr', hersteller: 'Alstom (vorher LHB)', baujahre: 'ab 2000', vmax: 120 },
+  { id: '628', wikipedia: 'DB-Baureihe 628', name: 'BR 628', art: 'Dieseltriebzug', einsatz: 'Regionalverkehr', hersteller: 'Duewag, LHB u. a.', baujahre: '1974–1996', vmax: 120 },
+  { id: '642', wikipedia: 'Siemens Desiro Classic', name: 'BR 642', spitzname: 'Desiro Classic', art: 'Dieseltriebzug', einsatz: 'Regionalverkehr', hersteller: 'Siemens', baujahre: '1999–2008', vmax: 120 },
+  { id: '648', wikipedia: 'Alstom Coradia LINT', name: 'BR 648', spitzname: 'Coradia LINT 41', art: 'Dieseltriebzug', einsatz: 'Regionalverkehr', hersteller: 'Alstom (vorher LHB)', baujahre: 'ab 2000', vmax: 120 },
   // --- Wagen ---
   { id: 'dosto', name: 'Doppelstockwagen', art: 'Reisezugwagen', einsatz: 'Regionalverkehr (lokbespannt, mit Steuerwagen)', hersteller: 'Waggonbau Görlitz, später Bombardier', baujahre: 'ab den 1990er-Jahren', vmax: 160 },
 ]

@@ -1,11 +1,14 @@
 import { Check, Sparkles, X } from 'lucide-react-native'
 import { useEffect, useState } from 'react'
-import { Pressable, Text, View } from 'react-native'
+import { Image, Pressable, Text, View } from 'react-native'
 
 export interface LernmodusPaar {
   id: string
   begriff: string
   definition: string
+  // Optional: Foto statt bzw. zusätzlich zum Begriff (z. B. Baureihen-Quiz), mit Bildnachweis.
+  bild?: string
+  bildNachweis?: string
 }
 
 interface LernmodusProps {
@@ -104,7 +107,13 @@ export default function Lernmodus({ paare, onKarteGemeistert, onErsterVersuch, o
       </View>
 
       <View className="rounded-xl border border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24] p-5">
+        {aktuell.bild && (
+          <Image source={{ uri: aktuell.bild }} className="mb-3 w-full rounded-lg bg-db-gray-100" style={{ aspectRatio: 4 / 3 }} resizeMode="cover" />
+        )}
         <Text className="text-center text-base font-semibold text-db-navy dark:text-[#EEF1F4]">{aktuell.begriff}</Text>
+        {aktuell.bildNachweis && (
+          <Text className="mt-1 text-center text-[10px] text-db-navy-light dark:text-[#9AA4B0]">{aktuell.bildNachweis}</Text>
+        )}
       </View>
 
       <View className="gap-2">

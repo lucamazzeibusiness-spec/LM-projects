@@ -1,12 +1,13 @@
 import { AlertCircle, AlertTriangle, Brain, Search, Star, TrainFront, Wrench } from 'lucide-react-native'
 import { useMemo, useState } from 'react'
-import { ScrollView, Text, TextInput, View } from 'react-native'
+import { Image, Linking, ScrollView, Text, TextInput, View } from 'react-native'
 import { Pressable } from 'react-native'
 import { GewerkBadge } from '../../components/Badges'
 import BaureihenQuiz from '../../components/BaureihenQuiz'
 import DBFaktenQuiz from '../../components/DBFaktenQuiz'
 import LernkartenQuiz from '../../components/LernkartenQuiz'
 import RangKarte from '../../components/RangKarte'
+import { useFahrzeugFotos } from '../../lib/useFahrzeugFotos'
 import { useAzubiProfil } from '../../context/AzubiProfilContext'
 import { bauteile, baureihen, baureihenText, fahrzeugarten, fehlerfaelle, passtZuBaureihen } from '../../data/fahrzeuge'
 import type { Gewerk } from '../../data/mock'
@@ -51,6 +52,7 @@ export default function Wissen() {
   const [query, setQuery] = useState('')
   const [gewerk, setGewerk] = useState<Gewerk | 'Alle'>('Alle')
   const [quizOffen, setQuizOffen] = useState(false)
+  const { fotos } = useFahrzeugFotos()
   const [auswahl, setAuswahl] = useState<BaureihenAuswahl>(() => (meineBaureihen.length > 0 ? 'meine' : 'alle'))
 
   const gespeicherteBaureihen = profil?.baureihen
@@ -263,7 +265,7 @@ export default function Wissen() {
         </View>
       )}
 
-      {tab === 'fahrzeuge' && quizOffen && <BaureihenQuiz onSchliessen={() => setQuizOffen(false)} />}
+      {tab === 'fahrzeuge' && quizOffen && <BaureihenQuiz fotos={fotos} onSchliessen={() => setQuizOffen(false)} />}
 
       {tab === 'fahrzeuge' && !quizOffen && (
         <View className="gap-5">
@@ -290,8 +292,25 @@ export default function Wissen() {
                 {liste.map((b) => {
                   const meine = meineBaureihen.includes(b.id)
                   const anzahlFaelle = fehlerfaelle.filter((f) => f.baureihen.includes(b.id)).length
+                  const foto = fotos[b.id]
                   return (
                     <View key={b.id} className={karte}>
+                      {foto && (
+                        <View className="-mx-4 -mt-4 mb-3">
+                          <Image
+                            source={{ uri: foto.url }}
+                            accessibilityLabel={b.name}
+                            className="w-full rounded-t-xl bg-db-gray-100"
+                            style={{ aspectRatio: 16 / 9 }}
+                            resizeMode="cover"
+                          />
+                          <Pressable onPress={() => Linking.openURL(foto.quelleUrl)} className="px-4 pt-1">
+                            <Text className="text-[10px] text-db-navy-light dark:text-[#9AA4B0]">
+                              Foto: {foto.urheber} · {foto.lizenz} · Wikimedia Commons
+                            </Text>
+                          </Pressable>
+                        </View>
+                      )}
                       <View className="flex-row items-start justify-between gap-3">
                         <View className="flex-1 flex-row items-start gap-2">
                           <TrainFront size={16} color="#EC0016" />
