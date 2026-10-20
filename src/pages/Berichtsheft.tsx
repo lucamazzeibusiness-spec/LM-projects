@@ -8,7 +8,7 @@ import { useAusbildungsplan, type Wochenvorlage } from '../context/Ausbildungspl
 import { useBerichtsheft } from '../context/BerichtsheftContext'
 import { berichtsheftStreak, usePunkte } from '../context/PunkteContext'
 import type { AusbildungsblockTyp, BerichtsheftEintrag, BerichtsheftKategorie } from '../data/mock'
-import { bulletEingabeVerarbeiten, hatEchtenInhalt } from '../lib/stichpunkte'
+import { bulletEingabeVerarbeiten, haeufigeStichpunkte, hatEchtenInhalt, stichpunktAnhaengen } from '../lib/stichpunkte'
 import {
   arbeitstageDerWoche,
   ausbildungsjahrFuerWoche,
@@ -74,6 +74,17 @@ export default function Berichtsheft() {
   const heutigerEintrag = eintraege.find((e) => e.datumISO === heute)
   // Laut Ausbildungsplan freier Tag (standardmäßig Sa/So): Eintragen geht, wird aber nicht angemahnt.
   const heuteFrei = !vorlage[wochentagIndexVon(heute)]
+
+  // Eigene, oft verwendete Stichpunkte aus früheren Tagen (neueste zuerst) als Schnellauswahl.
+  const fruehereTexte = useMemo(
+    () =>
+      [...eintraege]
+        .filter((e) => e.id !== bearbeitung?.id)
+        .sort((a, b) => b.datumISO.localeCompare(a.datumISO))
+        .map((e) => e.taetigkeiten),
+    [eintraege, bearbeitung?.id],
+  )
+  const vorschlaege = bearbeitung ? haeufigeStichpunkte(fruehereTexte, bearbeitung.taetigkeiten) : []
   const heuteSchluessel = wochenSchluessel(heute)
   const istAktuelleWoche = ausgewaehlteWoche === heuteSchluessel
   const beginnSchluessel = profil?.ausbildungsbeginn ? wochenSchluessel(profil.ausbildungsbeginn) : null
@@ -318,6 +329,23 @@ export default function Berichtsheft() {
               placeholder="Welche Tätigkeiten hast du heute ausgeführt oder welche Lerninhalte hattest du? Jede neue Zeile wird automatisch zum Stichpunkt."
               className="w-full rounded-lg border border-db-gray-200 px-3 py-2 text-sm text-db-navy outline-none focus:border-db-red"
             />
+
+            {vorschlaege.length > 0 && (
+              <div className="space-y-1.5">
+                <p className="text-xs text-db-navy-light">Oft von dir eingetragen – antippen zum Übernehmen:</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {vorschlaege.map((v) => (
+                    <button
+                      key={v}
+                      onClick={() => setBearbeitung((d) => d && { ...d, taetigkeiten: stichpunktAnhaengen(d.taetigkeiten, v) })}
+                      className="flex items-center gap-1 rounded-full border border-db-gray-200 bg-db-surface px-2.5 py-1 text-left text-xs text-db-navy hover:border-db-navy/30"
+                    >
+                      <Plus size={12} className="shrink-0 text-db-navy-light" /> {v}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <GrammatikPruefung
               text={bearbeitung.taetigkeiten}

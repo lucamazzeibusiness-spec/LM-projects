@@ -48,3 +48,38 @@ export function bulletEingabeVerarbeiten(alt: string, neu: string): BulletVerarb
 export function hatEchtenInhalt(text: string): boolean {
   return text.split('\n').some((zeile) => zeile.replace(/^-+\s*/, '').trim() !== '')
 }
+
+function ohneBullet(zeile: string): string {
+  return zeile.replace(/^-+\s*/, '').trim()
+}
+
+const ABWESENHEITEN = new Set(['urlaub', 'krank', 'feiertag'])
+
+// Die häufigsten eigenen Stichpunkte aus früheren Einträgen (neueste zuerst übergeben), als
+// Vorschläge zum schnellen Wiederverwenden. Was schon im aktuellen Text steht, fällt heraus.
+export function haeufigeStichpunkte(fruehereTexte: string[], aktuellerText: string, max = 6): string[] {
+  const vorhanden = new Set(aktuellerText.split('\n').map((z) => ohneBullet(z).toLowerCase()))
+  const zaehler = new Map<string, { text: string; anzahl: number; zuerst: number }>()
+  fruehereTexte.slice(0, 30).forEach((text, index) => {
+    for (const roh of text.split('\n')) {
+      const zeile = ohneBullet(roh)
+      const schluessel = zeile.toLowerCase()
+      if (!zeile || zeile.length > 70 || ABWESENHEITEN.has(schluessel) || vorhanden.has(schluessel)) continue
+      const bisher = zaehler.get(schluessel)
+      if (bisher) bisher.anzahl++
+      else zaehler.set(schluessel, { text: zeile, anzahl: 1, zuerst: index })
+    }
+  })
+  return [...zaehler.values()]
+    .sort((a, b) => b.anzahl - a.anzahl || a.zuerst - b.zuerst)
+    .slice(0, max)
+    .map((e) => e.text)
+}
+
+// Hängt einen Stichpunkt als neue Zeile an; leere "- "-Zeilen am Ende werden dabei ersetzt.
+export function stichpunktAnhaengen(text: string, zeile: string): string {
+  const zeilen = text.split('\n')
+  while (zeilen.length > 0 && ohneBullet(zeilen[zeilen.length - 1]) === '') zeilen.pop()
+  zeilen.push(`${BULLET}${zeile}`)
+  return zeilen.join('\n')
+}
