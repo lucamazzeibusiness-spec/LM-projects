@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { cloudSchreiben } from '../lib/cloudSync'
 import { ladeGespeichert, speichere } from '../lib/storage'
-import { heuteISO } from '../lib/wochen'
+import { heuteISO, tagVerschieben } from '../lib/wochen'
 
 export interface PunkteEreignis {
   id: string
@@ -19,22 +19,16 @@ const STORAGE_KEY = 'punkte:stand'
 const leererStand: PunkteStand = { gesamt: 0, verlauf: [] }
 const MAX_VERLAUF = 200
 
-function tageZurueck(datumISO: string, anzahl: number): string {
-  const d = new Date(`${datumISO}T00:00:00`)
-  d.setDate(d.getDate() - anzahl)
-  return d.toISOString().slice(0, 10)
-}
-
 export function berichtsheftStreak(verlauf: PunkteEreignis[]): number {
   const kreditierteTage = new Set(
     verlauf.filter((e) => e.id.startsWith('berichtsheft:')).map((e) => e.id.slice('berichtsheft:'.length)),
   )
   const heute = heuteISO()
-  let start = kreditierteTage.has(heute) ? heute : tageZurueck(heute, 1)
+  let start = kreditierteTage.has(heute) ? heute : tagVerschieben(heute, -1)
   let streak = 0
   while (kreditierteTage.has(start)) {
     streak++
-    start = tageZurueck(start, 1)
+    start = tagVerschieben(start, -1)
   }
   return streak
 }

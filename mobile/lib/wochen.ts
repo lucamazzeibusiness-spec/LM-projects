@@ -96,3 +96,11 @@ export function wochenNummerSeit(beginnISO: string, schluessel: string): number 
   const diffTage = Math.round((zielMontag.getTime() - beginnMontag.getTime()) / 86400000)
   return Math.floor(diffTage / 7) + 1
 }
+
+// Verschiebt ein ISO-Datum um ganze Tage (negativ = zurück) in lokaler Zeit – bewusst ohne
+// toISOString(), das in UTC rechnet und in Deutschland nach Mitternacht beim Vortag landet.
+export function tagVerschieben(datumISO: string, deltaTage: number): string {
+  const d = new Date(`${datumISO}T00:00:00`)
+  d.setDate(d.getDate() + deltaTage)
+  return isoDatum(d)
+}
