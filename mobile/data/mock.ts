@@ -18,6 +18,9 @@ export interface AzubiProfil {
   // Optional, weil ältere gespeicherte Profile diese Felder noch nicht haben. Datum als ISO (YYYY-MM-DD).
   pruefungTitel?: string
   pruefungDatum?: string
+  // Baureihen-IDs aus data/fahrzeuge.ts, an denen der Azubi arbeitet – filtert Fehlerdiagnose
+  // und Bauteil-Lexikon. Optional wie die Prüfungsfelder.
+  baureihen?: string[]
 }
 
 // Nur Vorbelegung für das Onboarding-Formular – das tatsächliche Profil trägt jede:r selbst ein.
@@ -165,132 +168,6 @@ export const lernaufgaben: Lernaufgabe[] = [
 ]
 
 export type FehlerfallSchwierigkeit = 'Grundlagen' | 'Fortgeschritten'
-
-export interface Fehlerfall {
-  id: string
-  code: string
-  titel: string
-  gewerk: Gewerk
-  baureihe: string
-  schwierigkeit: FehlerfallSchwierigkeit
-  symptome: string[]
-  ursache: string
-  loesung: string[]
-  merksatz: string
-  haeufigkeit: 'Häufig' | 'Gelegentlich' | 'Selten'
-}
-
-export const fehlerfaelle: Fehlerfall[] = [
-  {
-    id: 'F-001',
-    code: 'E-4471',
-    titel: 'Türsteuergerät Timeout',
-    gewerk: 'Elektrik',
-    baureihe: 'DBpza / Doppelstockwagen',
-    schwierigkeit: 'Grundlagen',
-    symptome: ['Tür schließt nicht vollständig', 'Steuergerät zeigt Timeout-Fehler'],
-    ursache: 'Meist verschmutzte oder dejustierte Lichtschranke, seltener Wackelkontakt am Türantrieb.',
-    loesung: [
-      'Lichtschranke mit trockenem Tuch reinigen',
-      'Justierung nach Werksvorgabe prüfen (±2mm)',
-      'Steckverbinder am Türantrieb auf Sitz prüfen',
-      'Fehlerspeicher zurücksetzen und 10 Testzyklen fahren',
-    ],
-    merksatz: 'Bei Sensorfehlern immer zuerst „sauber, fest, dicht" prüfen, bevor du Bauteile tauschst.',
-    haeufigkeit: 'Häufig',
-  },
-  {
-    id: 'F-002',
-    code: 'M-2210',
-    titel: 'Radsatzlager Übertemperatur',
-    gewerk: 'Mechanik',
-    baureihe: 'BR 412 / ICE 4',
-    schwierigkeit: 'Fortgeschritten',
-    symptome: ['Heißläuferortung löst aus', 'Erhöhte Temperatur an Radsatzlager'],
-    ursache: 'Schmierstoffmangel oder beginnender Lagerschaden.',
-    loesung: [
-      'Lager auf Laufgeräusche und Spiel prüfen',
-      'Schmierstoff nach Vorgabe nachfüllen/erneuern',
-      'Bei Spiel > Grenzwert: Radsatz tauschen',
-      'Nachkontrolle nach 200 km',
-    ],
-    merksatz: 'Wärme + Geräusch = Reibung. Frag dich immer: wo reibt hier etwas, das nicht reiben soll?',
-    haeufigkeit: 'Gelegentlich',
-  },
-  {
-    id: 'F-003',
-    code: 'K-1187',
-    titel: 'Klimakompressor Kurzabschaltung',
-    gewerk: 'Mechatronik',
-    baureihe: 'BR 442 / Talent 2',
-    schwierigkeit: 'Grundlagen',
-    symptome: ['Kompressor läuft an und schaltet nach Minuten ab', 'Fahrgastraum wird nicht gekühlt'],
-    ursache: 'Kältemittelmangel löst Druckwächter (Niederdruck) aus.',
-    loesung: [
-      'Kältemittelstand am Schauglas prüfen',
-      'Anlage auf Leckage prüfen (UV-Zusatz/Lecksuchgerät)',
-      'Kältemittel nach Herstellervorgabe auffüllen',
-      'Probelauf mind. 30 Minuten überwachen',
-    ],
-    merksatz: 'Der Druckwächter schützt den Kompressor – er ist meist der Melder, nicht die Ursache.',
-    haeufigkeit: 'Gelegentlich',
-  },
-  {
-    id: 'F-004',
-    code: 'E-3305',
-    titel: 'Hauptschalter löst spontan aus',
-    gewerk: 'Elektrik',
-    baureihe: 'BR 185 / E-Lok',
-    schwierigkeit: 'Fortgeschritten',
-    symptome: ['Hauptschalter fällt ohne erkennbaren Grund', 'Keine Fehlermeldung im Display'],
-    ursache: 'Meist Isolationsfehler im Dachstromkreis oder Überspannung bei Fahrdrahtübergängen.',
-    loesung: [
-      'Isolationsmessung Dachstromkreis durchführen',
-      'Überspannungsableiter prüfen',
-      'Stromabnehmer-Schleifleisten auf Verschleiß prüfen',
-      'Bei Normalwert: Software-Log auswerten (Systemtechnik)',
-    ],
-    merksatz: 'Ohne Fehlermeldung heißt nicht „kein Fehler" – manche Schutzfunktionen lösen stumm aus.',
-    haeufigkeit: 'Selten',
-  },
-  {
-    id: 'F-005',
-    code: 'W-0912',
-    titel: 'Weichenheizung ohne Funktion',
-    gewerk: 'Mechatronik',
-    baureihe: 'Weichenantrieb allgemein',
-    schwierigkeit: 'Grundlagen',
-    symptome: ['Heizung startet nicht bei Frost', 'Automatikbetrieb reagiert nicht'],
-    ursache: 'Defekter Temperaturfühler oder Feuchtigkeit im Steuerschrank.',
-    loesung: [
-      'Temperaturfühler-Widerstand messen und vergleichen',
-      'Steuerschrank auf Kondenswasser prüfen, trocknen',
-      'Sicherungen und Schütze prüfen',
-      'Manuellen Testlauf auslösen',
-    ],
-    merksatz: 'Feuchtigkeit ist einer der häufigsten Gründe für „spinnende" Elektronik im Freien.',
-    haeufigkeit: 'Häufig',
-  },
-]
-
-export interface Ersatzteil {
-  id: string
-  name: string
-  nummer: string
-  kategorie: Gewerk | 'Allgemein'
-  lagerort: string
-  funktion: string
-}
-
-export const ersatzteile: Ersatzteil[] = [
-  { id: 'ET-1', name: 'Bremsbelag ICE 4 (Satz)', nummer: '412-BR-3391', kategorie: 'Mechanik', lagerort: 'Halle 2, Regal C3', funktion: 'Erzeugt durch Reibung an der Bremsscheibe die Bremskraft.' },
-  { id: 'ET-2', name: 'Türsteuergerät DBpza', nummer: 'DB-TS-2207', kategorie: 'Elektrik', lagerort: 'Halle 1, Regal A1', funktion: 'Steuert Öffnen/Schließen und wertet Sicherheitssensoren der Tür aus.' },
-  { id: 'ET-3', name: 'Lichtschranke Türantrieb', nummer: 'LS-4471-C', kategorie: 'Elektrik', lagerort: 'Halle 1, Regal A2', funktion: 'Erkennt Hindernisse im Türspalt, verhindert Einklemmen.' },
-  { id: 'ET-4', name: 'Kältemittel R134a (Flasche)', nummer: 'KM-R134-10', kategorie: 'Mechatronik', lagerort: 'Halle 3, Gefahrstofflager', funktion: 'Arbeitsmedium des Kältekreislaufs der Klimaanlage.' },
-  { id: 'ET-5', name: 'Hauptschalter BR 185', nummer: 'HS-185-09', kategorie: 'Elektrik', lagerort: 'Halle 1, Regal B4', funktion: 'Trennt das Fahrzeug im Fehlerfall komplett von der Fahrleitung.' },
-  { id: 'ET-6', name: 'Radsatzlager komplett', nummer: 'RSL-412-11', kategorie: 'Mechanik', lagerort: 'Halle 2, Regal D1', funktion: 'Lagert die Achse drehbar im Drehgestellrahmen.' },
-  { id: 'ET-7', name: 'Temperaturfühler Weiche', nummer: 'TF-W-0912', kategorie: 'Mechatronik', lagerort: 'Halle 3, Regal E2', funktion: 'Meldet der Steuerung die Außentemperatur zum Zuschalten der Heizung.' },
-]
 
 export type AusbildungsblockTyp = 'Betrieb' | 'Berufsschule' | 'DB Training'
 
@@ -529,6 +406,7 @@ export type Themenbereich =
   | 'Steuerungstechnik'
   | 'Wirtschaft & Soziales'
   | 'Ausbildung'
+  | 'Fahrzeugtechnik'
 
 export type Pruefungsphase = 'AP1' | 'AP2'
 
@@ -1181,6 +1059,199 @@ export const lernkarten: Lernkarte[] = [
     antwort:
       '2) Bohrerdurchmesser, Werkstoff, Schneidstoff. Die Drehzahl ergibt sich aus n = vc / (π · d) – die zulässige Schnittgeschwindigkeit vc hängt von der Werkstoff-Schneidstoff-Paarung ab, d ist der Bohrerdurchmesser.',
   },
+  // --- Fahrzeugtechnik und Bahnpraxis ---
+  {
+    id: 'LK-F1',
+    themenbereich: 'Fahrzeugtechnik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Welchen Regeldruck hat die Hauptluftleitung (HL) der indirekten Druckluftbremse, und was passiert, wenn der Druck sinkt?',
+    antwort: '5 bar. Sinkt der Druck in der HL, bremsen die Fahrzeuge; steigt er wieder auf 5 bar, lösen sie.',
+  },
+  {
+    id: 'LK-F2',
+    themenbereich: 'Fahrzeugtechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage: 'Warum ist die Druckluftbremse im Zug „indirekt" gebaut und warum ist das sicher?',
+    antwort: 'Gebremst wird durch Absenken des Leitungsdrucks. Reißt der Zug auseinander oder platzt ein Schlauch, entweicht die Luft und alle Fahrzeuge bremsen automatisch.',
+  },
+  {
+    id: 'LK-F3',
+    themenbereich: 'Fahrzeugtechnik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Wozu dient der Hauptluftbehälter (HB)?',
+    antwort: 'Er speichert die vom Kompressor erzeugte Druckluft (deutlich über 5 bar) als Vorrat für Bremse, Stromabnehmer, Sanden, Türen und Luftfedern.',
+  },
+  {
+    id: 'LK-F4',
+    themenbereich: 'Fahrzeugtechnik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Wie funktioniert eine Federspeicherbremse?',
+    antwort: 'Eine Feder legt die Bremse an, Druckluft löst sie. Fällt der Druck weg, bleibt das Fahrzeug gebremst – deshalb dient sie als Feststellbremse.',
+  },
+  {
+    id: 'LK-F5',
+    themenbereich: 'Fahrzeugtechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage: 'Was ist die elektrische Bremse (E-Bremse) einer E-Lok?',
+    antwort: 'Die Fahrmotoren arbeiten beim Bremsen als Generatoren. Die Energie wird ins Netz zurückgespeist (Netzbremse) oder in Widerständen in Wärme umgewandelt – ohne Verschleiß an Belägen.',
+  },
+  {
+    id: 'LK-F6',
+    themenbereich: 'Fahrzeugtechnik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Warum ist eine Flachstelle am Rad gefährlich?',
+    antwort: 'Sie verursacht bei jeder Umdrehung Schläge, die Radsatzlager, Drehgestell und Gleis schädigen und zu Rissen führen können.',
+  },
+  {
+    id: 'LK-F7',
+    themenbereich: 'Fahrzeugtechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage: 'Welche Maße werden bei einer Radsatzmessung typischerweise geprüft?',
+    antwort: 'Spurkranzhöhe, Spurkranzdicke, qR-Maß (Flankensteilheit) und Laufkreisdurchmesser – jeweils gegen die Grenzmaße.',
+  },
+  {
+    id: 'LK-F8',
+    themenbereich: 'Fahrzeugtechnik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Was ist der Unterschied zwischen Primär- und Sekundärfederung?',
+    antwort: 'Die Primärfederung sitzt zwischen Radsatz und Drehgestellrahmen, die Sekundärfederung (oft Luftfedern) zwischen Drehgestell und Wagenkasten.',
+  },
+  {
+    id: 'LK-F9',
+    themenbereich: 'Fahrzeugtechnik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Wozu dient die Spurkranzschmierung?',
+    antwort: 'Sie bringt in Bögen Schmierstoff an die Spurkranzflanke und verringert so Verschleiß an Rad und Schiene sowie das Quietschen.',
+  },
+  {
+    id: 'LK-F10',
+    themenbereich: 'Fahrzeugtechnik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Wozu dient die Sandstreueinrichtung?',
+    antwort: 'Sie streut beim Anfahren und Bremsen trockenen Sand zwischen Rad und Schiene und verbessert so die Haftung, z. B. bei Nässe oder Laub.',
+  },
+  {
+    id: 'LK-F11',
+    themenbereich: 'Fahrzeugtechnik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Was bedeutet PZB und wie reagiert sie auf einen 1000-Hz-Gleismagneten?',
+    antwort: 'Punktförmige Zugbeeinflussung. Bei 1000 Hz muss der Tf innerhalb von 4 Sekunden die Wachsamkeitstaste betätigen, sonst folgt eine Zwangsbremsung.',
+  },
+  {
+    id: 'LK-F12',
+    themenbereich: 'Fahrzeugtechnik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Was macht die Sicherheitsfahrschaltung (Sifa)?',
+    antwort: 'Sie prüft, ob der Tf handlungsfähig ist: Er muss regelmäßig Taster oder Pedal loslassen und wieder betätigen. Reagiert er nicht auf Leuchtmelder und Summer, wird zwangsgebremst.',
+  },
+  {
+    id: 'LK-F13',
+    themenbereich: 'Fahrzeugtechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage: 'Welche Aufgabe hat der Traktionsstromrichter in einer modernen E-Lok?',
+    antwort: 'Er formt die Spannung vom Transformator über einen Gleichspannungs-Zwischenkreis in Drehstrom mit veränderlicher Spannung und Frequenz um, damit die Asynchron-Fahrmotoren stufenlos geregelt werden können.',
+  },
+  {
+    id: 'LK-F14',
+    themenbereich: 'Fahrzeugtechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage: 'Warum musst du vor Arbeiten am Stromrichter eine Wartezeit einhalten?',
+    antwort: 'Die Kondensatoren im Zwischenkreis speichern auch nach dem Abschalten noch gefährlich hohe Spannung. Erst nach der Entladezeit und gemessener Spannungsfreiheit darf gearbeitet werden.',
+  },
+  {
+    id: 'LK-F15',
+    themenbereich: 'Fahrzeugtechnik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Was macht der Hauptschalter einer E-Lok?',
+    antwort: 'Er schaltet die Hochspannung von der Oberleitung zum Transformator ein und trennt das Fahrzeug bei Überstrom oder Erdschluss sofort ab.',
+  },
+  {
+    id: 'LK-F16',
+    themenbereich: 'Fahrzeugtechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage: 'Was ist die Zugsammelschiene (ZS)?',
+    antwort: 'Die Energieleitung durch einen lokbespannten Zug, über die die Lok die Wagen mit Strom für Licht, Heizung und Klima versorgt (aus der Oberleitung 1000 V).',
+  },
+  {
+    id: 'LK-F17',
+    themenbereich: 'Fahrzeugtechnik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Was sagt die erste Ziffer einer Baureihennummer bei der DB aus?',
+    antwort: 'Die Fahrzeugart: 1 = Elektrolok, 2 = Diesellok, 3 = Kleinlok, 4 = Elektrotriebwagen, 6 = Dieseltriebwagen, 7 = Nebenfahrzeug.',
+  },
+  {
+    id: 'LK-F18',
+    themenbereich: 'Fahrzeugtechnik',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Was ist eine Scharfenbergkupplung?',
+    antwort: 'Eine automatische Mittelpufferkupplung, die Fahrzeuge in einem Schritt mechanisch und oft auch pneumatisch und elektrisch verbindet – typisch bei Triebzügen.',
+  },
+  {
+    id: 'LK-F19',
+    themenbereich: 'Fahrzeugtechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage: 'Was ist der Unterschied zwischen Magnetschienenbremse und Wirbelstrombremse?',
+    antwort: 'Die Magnetschienenbremse liegt beim Bremsen auf der Schiene auf und bremst durch Reibung. Die Wirbelstrombremse bremst berührungslos über Wirbelströme in der Schiene, ohne Verschleiß.',
+  },
+  {
+    id: 'LK-F20',
+    themenbereich: 'Fahrzeugtechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage: 'Was bedeutet laufleistungsabhängige und zeitabhängige Instandhaltung bei Schienenfahrzeugen?',
+    antwort: 'Prüfungen werden nach gefahrenen Kilometern oder nach Zeitfristen fällig – je nachdem, was zuerst erreicht wird. So werden Verschleiß und Alterung gleichermaßen erfasst.',
+  },
+  {
+    id: 'LK-S11',
+    themenbereich: 'Sicherheit',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Was bedeutet „Bahnerden" und wann ist es nötig?',
+    antwort: 'Die abgeschaltete Oberleitung wird von befugtem Personal mit Erdungsvorrichtungen mit der Schiene verbunden. Erst dann darf z. B. auf dem Fahrzeugdach gearbeitet werden.',
+  },
+  {
+    id: 'LK-S12',
+    themenbereich: 'Sicherheit',
+    pruefungsteil: 'AP1',
+    schwierigkeit: 'Grundlagen',
+    frage: 'Wie sicherst du ein abgestelltes Fahrzeug gegen Wegrollen?',
+    antwort: 'Mit der Feststellbremse und zusätzlich mit Hemmschuhen bzw. Radvorlegern nach Vorschrift – besonders vor Arbeiten an der Bremse.',
+  },
+  {
+    id: 'LK-E11',
+    themenbereich: 'Elektrotechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage: 'Was ist der Unterschied zwischen Kurzschluss und Erdschluss?',
+    antwort: 'Beim Kurzschluss berühren sich zwei aktive Leiter unterschiedlichen Potenzials direkt. Beim Erdschluss bekommt ein aktiver Leiter Verbindung zur Erde bzw. zum Fahrzeugkasten.',
+  },
+  {
+    id: 'LK-E12',
+    themenbereich: 'Elektrotechnik',
+    pruefungsteil: 'AP2',
+    schwierigkeit: 'Fortgeschritten',
+    frage: 'Wozu dient eine Isolationsmessung und womit wird sie durchgeführt?',
+    antwort: 'Sie prüft, ob der Isolationswiderstand zwischen aktiven Leitern und Erde groß genug ist. Gemessen wird mit einem Isolationsmessgerät mit erhöhter Gleichspannung an der freigeschalteten Anlage.',
+  },
 ]
 
 export type DBFaktKategorie = 'Geschichte' | 'Unternehmen' | 'Fahrzeuge & Technik' | 'Netz & Strecken' | 'Rekorde & Zahlen'
@@ -1349,6 +1420,102 @@ export const dbFakten: DBFakt[] = [
     id: 'DBF-24',
     kategorie: 'Rekorde & Zahlen',
     frage: 'Was zeigt das DB-Logo?',
-    antwort: 'Die weißen Buchstaben „DB" auf rotem Grund mit weißem Rahmen – eines der bekanntesten Markenzeichen Deutschlands.',
+    antwort: 'Die roten Buchstaben „DB" in einem roten Rahmen auf weißem Grund – eines der bekanntesten Markenzeichen Deutschlands.',
+  },
+  {
+    id: 'DBF-25',
+    kategorie: 'Geschichte',
+    frage: 'Wo fuhr die erste elektrische Lokomotive der Welt?',
+    antwort: '1879 auf der Berliner Gewerbeausstellung – gebaut von Siemens & Halske.',
+  },
+  {
+    id: 'DBF-26',
+    kategorie: 'Geschichte',
+    frage: 'Was war der „Fliegende Hamburger"?',
+    antwort: 'Ein Schnelltriebwagen, der ab 1933 zwischen Berlin und Hamburg fuhr und damals eine der schnellsten Zugverbindungen der Welt war.',
+  },
+  {
+    id: 'DBF-27',
+    kategorie: 'Geschichte',
+    frage: 'Welche Schnellfahrstrecken gingen 1991 mit dem Start des ICE in Betrieb?',
+    antwort: 'Hannover–Würzburg und Mannheim–Stuttgart – die ersten Neubaustrecken für den Hochgeschwindigkeitsverkehr in Deutschland.',
+  },
+  {
+    id: 'DBF-28',
+    kategorie: 'Geschichte',
+    frage: 'Seit wann gibt es die BahnCard?',
+    antwort: 'Seit 1992.',
+  },
+  {
+    id: 'DBF-29',
+    kategorie: 'Unternehmen',
+    frage: 'Seit wann gibt es das Deutschlandticket?',
+    antwort: 'Seit dem 1. Mai 2023 – ein Monatsabo für den gesamten Nahverkehr in Deutschland.',
+  },
+  {
+    id: 'DBF-30',
+    kategorie: 'Fahrzeuge & Technik',
+    frage: 'Welche Baureihe ist die größte ICE-Flotte der DB?',
+    antwort: 'Der ICE 4 (Baureihe 412), gebaut von Siemens mit Bombardier.',
+  },
+  {
+    id: 'DBF-31',
+    kategorie: 'Fahrzeuge & Technik',
+    frage: 'Was ist ein „Vectron"?',
+    antwort: 'Eine Lokomotiv-Plattform von Siemens. Bei DB Cargo fährt sie als Baureihe 193 – als Mehrsystemlok auch grenzüberschreitend.',
+  },
+  {
+    id: 'DBF-32',
+    kategorie: 'Fahrzeuge & Technik',
+    frage: 'Was bedeutet die erste Ziffer einer DB-Baureihennummer?',
+    antwort: 'Die Fahrzeugart: 1 Elektrolok, 2 Diesellok, 3 Kleinlok, 4 Elektrotriebwagen, 6 Dieseltriebwagen, 7 Nebenfahrzeug. Die BR 101 ist also eine E-Lok, die BR 218 eine Diesellok.',
+  },
+  {
+    id: 'DBF-33',
+    kategorie: 'Fahrzeuge & Technik',
+    frage: 'Warum fahren die S-Bahnen in Berlin und Hamburg ohne Oberleitung?',
+    antwort: 'Sie beziehen ihren Strom aus einer seitlichen Stromschiene: Berlin mit 750 Volt, Hamburg mit 1200 Volt Gleichspannung.',
+  },
+  {
+    id: 'DBF-34',
+    kategorie: 'Fahrzeuge & Technik',
+    frage: 'Wofür steht „LZB" und wann ist sie nötig?',
+    antwort: 'Linienzugbeeinflussung – eine kontinuierliche Zugbeeinflussung. In Deutschland ist für Geschwindigkeiten über 160 km/h LZB oder ETCS vorgeschrieben.',
+  },
+  {
+    id: 'DBF-35',
+    kategorie: 'Fahrzeuge & Technik',
+    frage: 'Was ist eine UIC-Fahrzeugnummer?',
+    antwort: 'Die zwölfstellige europäische Fahrzeugnummer an jedem Fahrzeug. Die letzte Ziffer ist eine Prüfziffer gegen Tippfehler.',
+  },
+  {
+    id: 'DBF-36',
+    kategorie: 'Netz & Strecken',
+    frage: 'Welcher ist der längste Eisenbahntunnel Deutschlands?',
+    antwort: 'Der Landrückentunnel auf der Schnellfahrstrecke Hannover–Würzburg mit rund 10,8 km.',
+  },
+  {
+    id: 'DBF-37',
+    kategorie: 'Netz & Strecken',
+    frage: 'Wie schnell darf in Deutschland höchstens gefahren werden?',
+    antwort: '300 km/h – z. B. auf den Schnellfahrstrecken Köln–Rhein/Main und Nürnberg–Ingolstadt.',
+  },
+  {
+    id: 'DBF-38',
+    kategorie: 'Netz & Strecken',
+    frage: 'Wann wurde der Berliner Hauptbahnhof eröffnet?',
+    antwort: '2006, kurz vor der Fußball-Weltmeisterschaft in Deutschland.',
+  },
+  {
+    id: 'DBF-39',
+    kategorie: 'Rekorde & Zahlen',
+    frage: 'Welcher ist der meistfrequentierte Bahnhof Deutschlands?',
+    antwort: 'Hamburg Hauptbahnhof – mit mehreren hunderttausend Reisenden und Besuchern am Tag.',
+  },
+  {
+    id: 'DBF-40',
+    kategorie: 'Rekorde & Zahlen',
+    frage: 'Welcher Bahnhof gilt nach Grundfläche als größter Kopfbahnhof Europas?',
+    antwort: 'Der Leipziger Hauptbahnhof.',
   },
 ]
