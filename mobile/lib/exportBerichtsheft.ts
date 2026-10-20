@@ -12,6 +12,8 @@ interface ExportOptions {
   von: string
   bis: string
   jahr: number
+  // Ausbildungsjahr der exportierten Woche (nicht zwingend das aktuelle Lehrjahr).
+  ausbildungsjahr: number
   unterschriftDataUrl: string
 }
 
@@ -47,7 +49,7 @@ function escapeHtml(text: string): string {
 }
 
 function baueHtml(profil: AzubiProfil, eintraege: BerichtsheftEintrag[], optionen: HtmlOptionen): string {
-  const { nr, von, bis, unterschriftDataUrl } = optionen
+  const { nr, von, bis, ausbildungsjahr, unterschriftDataUrl } = optionen
 
   const nachTag = new Map<number, BerichtsheftEintrag>()
   for (const e of eintraege) nachTag.set(montagIndex(e.datumISO), e)
@@ -133,7 +135,7 @@ function baueHtml(profil: AzubiProfil, eintraege: BerichtsheftEintrag[], optione
       <div class="feld"><span class="wert">${nr}</span><span class="label">Nr.</span></div>
       <div class="feld"><span class="wert">${von}</span><span class="label">Ausbildungswoche vom</span></div>
       <div class="feld"><span class="wert">${bis}</span><span class="label">bis</span></div>
-      <div class="feld" style="margin-left:auto"><span class="wert">${profil.lehrjahr}</span><span class="label">Ausbildungsjahr</span></div>
+      <div class="feld" style="margin-left:auto"><span class="wert">${ausbildungsjahr}</span><span class="label">Ausbildungsjahr</span></div>
     </div>
 
     <table class="haupt">

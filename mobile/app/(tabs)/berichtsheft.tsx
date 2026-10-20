@@ -13,6 +13,7 @@ import { ausbildungsnachweisVorschauHtml, exportBerichtsheftPdf } from '../../li
 import { bulletEingabeVerarbeiten, hatEchtenInhalt } from '../../lib/stichpunkte'
 import {
   arbeitstageDerWoche,
+  ausbildungsjahrFuerWoche,
   heuteISO,
   heutigesDatumLabel,
   wochenLabel,
@@ -114,7 +115,13 @@ export default function Berichtsheft() {
       : alleWochenMitEintraegen.indexOf(ausgewaehlteWoche) + 1
     const nr = String(Math.max(1, nrZahl)).padStart(3, '0')
     const jahr = Number(ausgewaehlteWoche.slice(0, 4))
-    return { nr, von, bis, jahr }
+    const ausbildungsjahr = ausbildungsjahrFuerWoche(
+      profil.lehrjahr,
+      profil.lehrjahreGesamt,
+      profil.ausbildungsbeginn,
+      ausgewaehlteWoche,
+    )
+    return { nr, von, bis, jahr, ausbildungsjahr }
   }, [profil, ausgewaehlteWoche, alleWochenMitEintraegen])
 
   const vorherigeWoche = () =>
