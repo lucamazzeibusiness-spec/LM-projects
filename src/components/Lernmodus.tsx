@@ -5,6 +5,9 @@ export interface LernmodusPaar {
   id: string
   begriff: string
   definition: string
+  // Optional: Foto statt bzw. zusätzlich zum Begriff (z. B. Baureihen-Quiz), mit Bildnachweis.
+  bild?: string
+  bildNachweis?: string
 }
 
 interface LernmodusProps {
@@ -106,7 +109,11 @@ export default function Lernmodus({ paare, onKarteGemeistert, onErsterVersuch, o
       </div>
 
       <div className="rounded-xl border border-db-gray-200 bg-db-surface p-5 text-center">
+        {aktuell.bild && (
+          <img src={aktuell.bild} alt="" className="mb-3 aspect-[4/3] w-full rounded-lg bg-db-gray-100 object-cover" />
+        )}
         <p className="text-base font-semibold text-db-navy">{aktuell.begriff}</p>
+        {aktuell.bildNachweis && <p className="mt-1 text-[10px] text-db-navy-light">{aktuell.bildNachweis}</p>}
       </div>
 
       <div className="space-y-2">

@@ -5,6 +5,7 @@ import BaureihenQuiz from '../components/BaureihenQuiz'
 import DBFaktenQuiz from '../components/DBFaktenQuiz'
 import LernkartenQuiz from '../components/LernkartenQuiz'
 import RangKarte from '../components/RangKarte'
+import { useFahrzeugFotos } from '../lib/useFahrzeugFotos'
 import { useAzubiProfil } from '../context/AzubiProfilContext'
 import {
   bauteile,
@@ -42,6 +43,7 @@ export default function Wissen() {
   const [query, setQuery] = useState('')
   const [gewerk, setGewerk] = useState<Gewerk | 'Alle'>('Alle')
   const [quizOffen, setQuizOffen] = useState(false)
+  const { fotos } = useFahrzeugFotos()
   const [auswahl, setAuswahl] = useState<BaureihenAuswahl>(() => (meineBaureihen.length > 0 ? 'meine' : 'alle'))
 
   const gespeicherteBaureihen = profil?.baureihen
@@ -284,7 +286,7 @@ export default function Wissen() {
         </div>
       )}
 
-      {tab === 'fahrzeuge' && quizOffen && <BaureihenQuiz onSchliessen={() => setQuizOffen(false)} />}
+      {tab === 'fahrzeuge' && quizOffen && <BaureihenQuiz fotos={fotos} onSchliessen={() => setQuizOffen(false)} />}
 
       {tab === 'fahrzeuge' && !quizOffen && (
         <div className="space-y-5">
@@ -310,8 +312,27 @@ export default function Wissen() {
                 {liste.map((b) => {
                   const meine = meineBaureihen.includes(b.id)
                   const anzahlFaelle = fehlerfaelle.filter((f) => f.baureihen.includes(b.id)).length
+                  const foto = fotos[b.id]
                   return (
                     <div key={b.id} className="rounded-xl border border-db-gray-200 bg-db-surface p-4">
+                      {foto && (
+                        <div className="-mx-4 -mt-4 mb-3">
+                          <img
+                            src={foto.url}
+                            alt={b.name}
+                            loading="lazy"
+                            className="aspect-[16/9] w-full rounded-t-xl bg-db-gray-100 object-cover"
+                          />
+                          <a
+                            href={foto.quelleUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="block px-4 pt-1 text-[10px] text-db-navy-light hover:underline"
+                          >
+                            Foto: {foto.urheber} · {foto.lizenz} · Wikimedia Commons
+                          </a>
+                        </div>
+                      )}
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex items-start gap-2">
                           <TrainFront size={16} className="mt-0.5 shrink-0 text-db-red" />
