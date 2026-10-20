@@ -76,6 +76,8 @@ export default function Berichtsheft() {
 
   const heute = heuteISO()
   const heutigerEintrag = eintraege.find((e) => e.datumISO === heute)
+  // Laut Ausbildungsplan freier Tag (standardmäßig Sa/So): Eintragen geht, wird aber nicht angemahnt.
+  const heuteFrei = !vorlage[wochentagIndexVon(heute)]
   const heuteSchluessel = wochenSchluessel(heute)
   const istAktuelleWoche = ausgewaehlteWoche === heuteSchluessel
   const beginnSchluessel = profil?.ausbildungsbeginn ? wochenSchluessel(profil.ausbildungsbeginn) : null
@@ -218,19 +220,36 @@ export default function Berichtsheft() {
         <Pressable
           onPress={heuteBearbeiten}
           className={`flex-row items-center justify-between rounded-xl border px-4 py-3.5 ${
-            heutigerEintrag ? 'border-db-green/30 bg-db-green/5' : 'border-db-red/30 bg-db-red/5'
+            heutigerEintrag
+              ? 'border-db-green/30 bg-db-green/5'
+              : heuteFrei
+                ? 'border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24]'
+                : 'border-db-red/30 bg-db-red/5'
           }`}
         >
           <View className="flex-row items-center gap-2">
-            <CalendarCheck size={18} color={heutigerEintrag ? '#1E8A3C' : '#C40012'} />
-            <Text className={`text-sm font-semibold ${heutigerEintrag ? 'text-db-green' : 'text-db-red-dark'}`}>
-              {heutigerEintrag ? `Heute schon erfasst (${heutigesDatumLabel()})` : `Heutigen Eintrag ausfüllen (${heutigesDatumLabel()})`}
+            <CalendarCheck size={18} color={heutigerEintrag ? '#1E8A3C' : heuteFrei ? '#5C6670' : '#C40012'} />
+            <Text
+              className={`shrink text-sm font-semibold ${
+                heutigerEintrag ? 'text-db-green' : heuteFrei ? 'text-db-navy-light dark:text-[#9AA4B0]' : 'text-db-red-dark'
+              }`}
+            >
+              {heutigerEintrag
+                ? `Heute schon erfasst (${heutigesDatumLabel()})`
+                : heuteFrei
+                  ? `Heute frei (${heutigesDatumLabel()}) – kein Eintrag nötig`
+                  : `Heutigen Eintrag ausfüllen (${heutigesDatumLabel()})`}
             </Text>
           </View>
           {heutigerEintrag ? (
             <View className="flex-row items-center gap-1">
               <Pencil size={13} color="#5C6670" />
               <Text className="text-xs font-medium text-db-navy-light dark:text-[#9AA4B0]">Bearbeiten</Text>
+            </View>
+          ) : heuteFrei ? (
+            <View className="flex-row items-center gap-1">
+              <Plus size={13} color="#5C6670" />
+              <Text className="text-xs font-medium text-db-navy-light dark:text-[#9AA4B0]">Trotzdem</Text>
             </View>
           ) : (
             <Text className="overflow-hidden rounded-full bg-db-red px-3 py-1.5 text-xs font-semibold text-white">Jetzt</Text>
