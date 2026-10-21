@@ -10,7 +10,7 @@ import { useBerichtsheft } from '../../context/BerichtsheftContext'
 import { useLernaufgaben } from '../../context/LernaufgabenContext'
 import { erinnerungAktivieren, erinnerungDeaktivieren, erinnerungIstAktiv, heuteErinnern } from '../../lib/erinnerung'
 import { hatEchtenInhalt } from '../../lib/stichpunkte'
-import { aktuelleWochentage, heuteISO, heutigerWochentagIndex } from '../../lib/wochen'
+import { aktuelleWochentage, heuteISO, heutigerWochentagIndex, wochenSchluessel } from '../../lib/wochen'
 import { naechstePruefungFuer } from '../../lib/pruefung'
 import { type AusbildungsblockTyp } from '../../data/mock'
 
@@ -43,9 +43,15 @@ export default function Dashboard() {
   if (!profil) return null
 
   const offen = lernaufgaben.filter((a) => a.status !== 'Erledigt')
-  const andereOffeneEntwuerfe = eintraege.filter(
-    (e) => e.status === 'Entwurf' && hatEchtenInhalt(e.taetigkeiten) && e.datumISO !== heuteISO(),
-  ).length
+  // Vergangene Wochen mit Einträgen, deren Ausbildungsnachweis noch nicht unterschrieben und
+  // exportiert wurde – die laufende Woche zählt nicht, die ist ja noch in Arbeit.
+  const dieseWoche = wochenSchluessel(heuteISO())
+  const offeneWochen = new Set(
+    eintraege
+      .filter((e) => e.status === 'Entwurf' && hatEchtenInhalt(e.taetigkeiten))
+      .map((e) => wochenSchluessel(e.datumISO))
+      .filter((w) => w < dieseWoche),
+  ).size
 
   const heuteIndex = heutigerWochentagIndex()
   const heutigerBlock = vorlage[heuteIndex]
@@ -153,14 +159,14 @@ export default function Dashboard() {
         <Text className="text-xs font-medium text-db-red">{erinnerungAn ? 'Deaktivieren' : 'Aktivieren'}</Text>
       </Pressable>
 
-      {andereOffeneEntwuerfe > 0 && (
+      {offeneWochen > 0 && (
         <Pressable
           onPress={() => router.push('/berichtsheft')}
           className="flex-row items-center justify-between rounded-xl border border-db-amber/30 bg-db-amber/5 px-4 py-3"
         >
           <Text className="text-sm font-medium text-db-amber">
-            {andereOffeneEntwuerfe} älterer Berichtsheft-Eintrag {andereOffeneEntwuerfe === 1 ? 'wartet' : 'warten'} noch
-            auf Einreichung
+            {offeneWochen === 1 ? '1 vergangene Woche' : `${offeneWochen} vergangene Wochen`} noch nicht als
+            Ausbildungsnachweis eingereicht
           </Text>
           <ArrowRight size={16} color="#D98600" />
         </Pressable>
