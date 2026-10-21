@@ -141,7 +141,15 @@ export default function Berichtsheft() {
 
   const speichern = () => {
     if (!bearbeitung || !hatEchtenInhalt(bearbeitung.taetigkeiten)) return
-    setEintraege((prev) => [bearbeitung, ...prev.filter((e) => e.id !== bearbeitung.id)])
+    // Wird ein schon eingereichter Tag inhaltlich geändert, muss die Woche neu eingereicht werden.
+    const vorher = eintraege.find((e) => e.id === bearbeitung.id)
+    const geaendert =
+      !vorher ||
+      vorher.taetigkeiten !== bearbeitung.taetigkeiten ||
+      vorher.stunden !== bearbeitung.stunden ||
+      vorher.kategorie !== bearbeitung.kategorie
+    const gespeichert = geaendert ? { ...bearbeitung, status: 'Entwurf' as const } : bearbeitung
+    setEintraege((prev) => [gespeichert, ...prev.filter((e) => e.id !== bearbeitung.id)])
 
     const ereignisId = `berichtsheft:${bearbeitung.datumISO}`
     const neueStreak = berichtsheftStreak([ereignisId, ...vergebeneIds(punkteStand)])
@@ -181,6 +189,10 @@ export default function Berichtsheft() {
     try {
       const { exportBerichtsheftPdf } = await import('../lib/exportBerichtsheft')
       const betreff = await exportBerichtsheftPdf(profil, wocheEintraege, { ...nachweisMeta, unterschriftDataUrl })
+      // Nach dem Unterschreiben und Exportieren gilt die Woche als eingereicht.
+      setEintraege((prev) =>
+        prev.map((e) => (wochenSchluessel(e.datumISO) === ausgewaehlteWoche ? { ...e, status: 'Eingereicht' as const } : e)),
+      )
       if (profil.ausbilderEmail.trim()) {
         window.location.href = `mailto:${encodeURIComponent(profil.ausbilderEmail.trim())}?subject=${encodeURIComponent(betreff)}`
       }
