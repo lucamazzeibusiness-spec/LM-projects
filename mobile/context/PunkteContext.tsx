@@ -13,15 +13,23 @@ export interface PunkteEreignis {
 export interface PunkteStand {
   gesamt: number
   verlauf: PunkteEreignis[]
+  // Alle jemals vergebenen Ereignis-IDs. Der Verlauf ist auf MAX_VERLAUF gekürzt – würde man nur
+  // dort nachsehen, gäbe es für ältere Ereignisse erneut Punkte und die Berichtsheft-Serie bräche
+  // ab, sobald genug andere Ereignisse dazukommen. Optional, weil ältere Stände sie noch nicht haben.
+  vergeben?: string[]
 }
 
 const STORAGE_KEY = 'punkte:stand'
 const leererStand: PunkteStand = { gesamt: 0, verlauf: [] }
 const MAX_VERLAUF = 200
 
-export function berichtsheftStreak(verlauf: PunkteEreignis[]): number {
+export function vergebeneIds(stand: PunkteStand): string[] {
+  return stand.vergeben ?? stand.verlauf.map((e) => e.id)
+}
+
+export function berichtsheftStreak(ereignisIds: string[]): number {
   const kreditierteTage = new Set(
-    verlauf.filter((e) => e.id.startsWith('berichtsheft:')).map((e) => e.id.slice('berichtsheft:'.length)),
+    ereignisIds.filter((id) => id.startsWith('berichtsheft:')).map((id) => id.slice('berichtsheft:'.length)),
   )
   const heute = heuteISO()
   let start = kreditierteTage.has(heute) ? heute : tagVerschieben(heute, -1)
@@ -62,18 +70,20 @@ export function PunkteProvider({ children }: { children: ReactNode }) {
   const punkteVergeben = (id: string, betrag: number, grund: string) => {
     let vergeben = false
     setStand((s) => {
-      if (s.verlauf.some((e) => e.id === id)) return s
+      const bisher = vergebeneIds(s)
+      if (bisher.includes(id)) return s
       vergeben = true
       return {
         gesamt: s.gesamt + betrag,
         verlauf: [{ id, betrag, grund, datum: new Date().toISOString() }, ...s.verlauf].slice(0, MAX_VERLAUF),
+        vergeben: [...bisher, id],
       }
     })
     return vergeben
   }
 
   return (
-    <PunkteContext.Provider value={{ stand, streak: berichtsheftStreak(stand.verlauf), punkteVergeben }}>
+    <PunkteContext.Provider value={{ stand, streak: berichtsheftStreak(vergebeneIds(stand)), punkteVergeben }}>
       {children}
     </PunkteContext.Provider>
   )
