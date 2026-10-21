@@ -6,7 +6,7 @@ import SignaturePad from '../components/SignaturePad'
 import { useAzubiProfil } from '../context/AzubiProfilContext'
 import { useAusbildungsplan, type Wochenvorlage } from '../context/AusbildungsplanContext'
 import { useBerichtsheft } from '../context/BerichtsheftContext'
-import { berichtsheftStreak, usePunkte } from '../context/PunkteContext'
+import { berichtsheftStreak, usePunkte, vergebeneIds } from '../context/PunkteContext'
 import type { AusbildungsblockTyp, BerichtsheftEintrag, BerichtsheftKategorie } from '../data/mock'
 import { bulletEingabeVerarbeiten, haeufigeStichpunkte, hatEchtenInhalt, stichpunktAnhaengen } from '../lib/stichpunkte'
 import {
@@ -144,7 +144,7 @@ export default function Berichtsheft() {
     setEintraege((prev) => [bearbeitung, ...prev.filter((e) => e.id !== bearbeitung.id)])
 
     const ereignisId = `berichtsheft:${bearbeitung.datumISO}`
-    const neueStreak = berichtsheftStreak([{ id: ereignisId, betrag: 0, grund: '', datum: '' }, ...punkteStand.verlauf])
+    const neueStreak = berichtsheftStreak([ereignisId, ...vergebeneIds(punkteStand)])
     const bonus = Math.min(neueStreak, 10) * 2
     const grund =
       neueStreak > 1 ? `Berichtsheft: ${bearbeitung.datum} (🔥 ${neueStreak} Tage in Folge)` : `Berichtsheft: ${bearbeitung.datum}`
