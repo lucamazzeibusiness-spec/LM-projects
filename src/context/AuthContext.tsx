@@ -9,6 +9,7 @@ import {
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { auth } from '../lib/firebase'
 import { cloudAllesLesen } from '../lib/cloudSync'
+import { lokaleDatenNutzerZuordnen } from '../lib/nutzerDaten'
 
 // Überschreibt lokale Daten nur, wenn die Cloud-Version nachweislich neuer ist (per
 // schluessel__t-Zeitstempel, geschrieben von cloudSchreiben) – sonst würde ein noch nicht
@@ -57,6 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (u) => {
       if (u) {
+        lokaleDatenNutzerZuordnen(u.uid)
         await cloudInLocalHydrieren(u.uid)
       }
       setUser(u)
