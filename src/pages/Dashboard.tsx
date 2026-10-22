@@ -101,7 +101,13 @@ export default function Dashboard() {
               <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${typStyle[heutigerBlock.typ]}`}>
                 {heutigerBlock.typ}
               </span>
-              <span className="truncate text-sm text-db-navy">{heutigerBlock.thema}</span>
+              {heutigerBlock.thema ? (
+                <span className="truncate text-sm text-db-navy">{heutigerBlock.thema}</span>
+              ) : (
+                <Link to="/ausbildungsplan" className="truncate text-sm italic text-db-navy-light hover:underline">
+                  Noch kein Thema eingetragen
+                </Link>
+              )}
             </>
           ) : (
             <span className="text-sm italic text-db-navy-light">Kein Ausbildungsplan-Eintrag für heute</span>

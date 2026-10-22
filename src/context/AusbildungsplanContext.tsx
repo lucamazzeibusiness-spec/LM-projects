@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
-import { ausbildungsplanVorlage, type Ausbildungsblock } from '../data/mock'
+import { ausbildungsplanStandard, vorlageBereinigen, type Ausbildungsblock } from '../data/mock'
 import { cloudSchreiben } from '../lib/cloudSync'
 
 const STORAGE_KEY = 'ausbildungsplan:vorlage'
@@ -9,9 +9,9 @@ export type Wochenvorlage = (Ausbildungsblock | null)[]
 function geladeneVorlage(): Wochenvorlage {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? JSON.parse(raw) : ausbildungsplanVorlage
+    return raw ? vorlageBereinigen(JSON.parse(raw)) : ausbildungsplanStandard
   } catch {
-    return ausbildungsplanVorlage
+    return ausbildungsplanStandard
   }
 }
 

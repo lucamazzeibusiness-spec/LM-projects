@@ -178,8 +178,21 @@ export interface Ausbildungsblock {
 }
 
 // Wochentag-Vorlage (Mo–So), wiederholt sich jede Woche. Ein Tag ohne Eintrag (null) gilt als frei.
-// Das ist nur eine Beispielvorlage – jede:r Azubi trägt in der App den eigenen echten Rhythmus ein.
-export const ausbildungsplanVorlage: (Ausbildungsblock | null)[] = [
+// Neue Azubis starten neutral: Mo–Fr Betrieb ohne Thema/Ort, Sa/So frei. Eingetragen wird der
+// eigene echte Rhythmus (z. B. Berufsschultage) – keine erfundenen Themen, Werke oder Schulen.
+export const ausbildungsplanStandard: (Ausbildungsblock | null)[] = [
+  { typ: 'Betrieb', thema: '', ort: '' },
+  { typ: 'Betrieb', thema: '', ort: '' },
+  { typ: 'Betrieb', thema: '', ort: '' },
+  { typ: 'Betrieb', thema: '', ort: '' },
+  { typ: 'Betrieb', thema: '', ort: '' },
+  null,
+  null,
+]
+
+// Frühere Beispielvorlage, die neuen Nutzern bis Oktober 2026 als eigener Plan vorbelegt wurde.
+// Wer sie nie geändert hat, bekommt stattdessen die neutrale Vorlage (siehe vorlageBereinigen).
+const ausbildungsplanAltesBeispiel: (Ausbildungsblock | null)[] = [
   { typ: 'Betrieb', thema: 'Fahrzeuginstandhaltung – Elektrik', ort: 'Werk Rummelsburg' },
   { typ: 'Betrieb', thema: 'Fahrzeuginstandhaltung – Elektrik', ort: 'Werk Rummelsburg' },
   { typ: 'Berufsschule', thema: 'LF6: Anlagen und Geräte analysieren und prüfen', ort: 'OSZ Gustav-Meyer' },
@@ -188,6 +201,10 @@ export const ausbildungsplanVorlage: (Ausbildungsblock | null)[] = [
   null,
   null,
 ]
+
+export function vorlageBereinigen(vorlage: (Ausbildungsblock | null)[]): (Ausbildungsblock | null)[] {
+  return JSON.stringify(vorlage) === JSON.stringify(ausbildungsplanAltesBeispiel) ? ausbildungsplanStandard : vorlage
+}
 
 export type BerichtsheftStatus = 'Entwurf' | 'Eingereicht' | 'Freigegeben'
 export type BerichtsheftKategorie = 'Betrieblich' | 'Berufsschule' | 'DB Training'
