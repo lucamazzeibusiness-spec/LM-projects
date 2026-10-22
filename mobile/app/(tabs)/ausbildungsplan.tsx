@@ -49,6 +49,8 @@ export default function Ausbildungsplan() {
 
   if (!profil) return null
   const pruefung = naechstePruefungFuer(profil)
+  // Noch die neutrale Startvorlage (Mo–Fr Betrieb ohne Thema/Ort) – dann um echte Angaben bitten.
+  const nochNichtEingerichtet = vorlage.every((b) => !b || (b.typ === 'Betrieb' && !b.thema && !b.ort))
   const curriculum = curricula.find((c) => c.beruf === profil.ausbildungsberuf)
   const lernfeldVorschlaege = curriculum
     ? curriculum.lernfelder.filter((lf) => lf.ausbildungsjahr === profil.lehrjahr).length > 0
@@ -95,6 +97,14 @@ export default function Ausbildungsplan() {
           Dein eigener Rhythmus · trag hier ein, wann Betrieb, Berufsschule oder DB Training ist
         </Text>
       </View>
+
+      {nochNichtEingerichtet && (
+        <Text className="rounded-xl border border-db-amber/30 bg-db-amber/5 p-3 text-sm text-db-navy dark:text-[#EEF1F4]">
+          Trag hier deinen echten Wochenrhythmus ein – vor allem deine <Text className="font-semibold">Berufsschultage</Text>.
+          Danach richtet sich die Startseite, die Erinnerung und die Kategorie neuer Berichtsheft-Einträge. Tipp auf einen
+          Tag zum Bearbeiten.
+        </Text>
+      )}
 
       {pruefung ? (
         <View className="rounded-xl border border-white/10 bg-db-navy p-4 dark:bg-[#3A4453]">

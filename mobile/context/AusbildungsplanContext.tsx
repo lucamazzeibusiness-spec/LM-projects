@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
-import { ausbildungsplanVorlage, type Ausbildungsblock } from '../data/mock'
+import { ausbildungsplanStandard, vorlageBereinigen, type Ausbildungsblock } from '../data/mock'
 import { cloudSchreiben } from '../lib/cloudSync'
 import { ladeGespeichert, speichere } from '../lib/storage'
 
@@ -15,12 +15,12 @@ interface AusbildungsplanContextValue {
 const AusbildungsplanContext = createContext<AusbildungsplanContextValue | null>(null)
 
 export function AusbildungsplanProvider({ children }: { children: ReactNode }) {
-  const [vorlage, setVorlage] = useState<Wochenvorlage>(ausbildungsplanVorlage)
+  const [vorlage, setVorlage] = useState<Wochenvorlage>(ausbildungsplanStandard)
   const [geladen, setGeladen] = useState(false)
 
   useEffect(() => {
-    ladeGespeichert<Wochenvorlage>(STORAGE_KEY, ausbildungsplanVorlage).then((v) => {
-      setVorlage(v)
+    ladeGespeichert<Wochenvorlage>(STORAGE_KEY, ausbildungsplanStandard).then((v) => {
+      setVorlage(vorlageBereinigen(v))
       setGeladen(true)
     })
   }, [])

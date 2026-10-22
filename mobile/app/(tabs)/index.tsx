@@ -100,9 +100,17 @@ export default function Dashboard() {
               <Text className={`shrink-0 overflow-hidden rounded-full px-2.5 py-1 text-xs font-medium ${typStyle[heutigerBlock.typ]}`}>
                 {heutigerBlock.typ}
               </Text>
-              <Text className="flex-1 text-sm text-db-navy dark:text-[#EEF1F4]" numberOfLines={1}>
-                {heutigerBlock.thema}
-              </Text>
+              {heutigerBlock.thema ? (
+                <Text className="flex-1 text-sm text-db-navy dark:text-[#EEF1F4]" numberOfLines={1}>
+                  {heutigerBlock.thema}
+                </Text>
+              ) : (
+                <Pressable onPress={() => router.push('/ausbildungsplan')} className="flex-1">
+                  <Text className="text-sm italic text-db-navy-light dark:text-[#9AA4B0]" numberOfLines={1}>
+                    Noch kein Thema eingetragen
+                  </Text>
+                </Pressable>
+              )}
             </>
           ) : (
             <Text className="text-sm italic text-db-navy-light dark:text-[#9AA4B0]">Kein Ausbildungsplan-Eintrag für heute</Text>
