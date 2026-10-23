@@ -9,6 +9,7 @@ import {
   curricula,
   type Ausbildungsblock,
   type AusbildungsblockTyp,
+  lernfeldStatus,
   type LernfeldStatus,
 } from '../data/mock'
 
@@ -248,7 +249,7 @@ export default function Ausbildungsplan() {
           <div className="rounded-xl border border-db-gray-200 bg-db-surface p-4">
             <h2 className="text-sm font-semibold text-db-navy">Lernfelder · {curriculum.beruf}</h2>
             <p className="mt-1 text-xs text-db-navy-light">
-              Rahmenlehrplan der Berufsschule – zeigt, wo du im Vergleich zum Lehrplan stehst.
+              Rahmenlehrplan der Berufsschule – der Status richtet sich nach deinem Lehrjahr im Profil.
             </p>
             <ul className="mt-3 space-y-2">
               {curriculum.lernfelder.map((lf) => (
@@ -265,9 +266,9 @@ export default function Ausbildungsplan() {
                     </p>
                   </div>
                   <span
-                    className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${lernfeldStyle[lf.status]}`}
+                    className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${lernfeldStyle[lernfeldStatus(lf, profil.lehrjahr)]}`}
                   >
-                    {lf.status}
+                    {lernfeldStatus(lf, profil.lehrjahr)}
                   </span>
                 </li>
               ))}
