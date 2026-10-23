@@ -6,7 +6,7 @@ import { useAzubiProfil } from '../../context/AzubiProfilContext'
 import { useAusbildungsplan } from '../../context/AusbildungsplanContext'
 import { countdownText, naechstePruefungFuer } from '../../lib/pruefung'
 import { aktuelleWochentage, heutigerWochentagIndex } from '../../lib/wochen'
-import { curricula, type Ausbildungsblock, type AusbildungsblockTyp, type LernfeldStatus } from '../../data/mock'
+import { curricula, type Ausbildungsblock, type AusbildungsblockTyp, lernfeldStatus, type LernfeldStatus } from '../../data/mock'
 
 const typStyle: Record<AusbildungsblockTyp, string> = {
   Betrieb: 'bg-blue-50 dark:bg-blue-500/15 text-blue-700 dark:text-blue-300',
@@ -255,7 +255,7 @@ export default function Ausbildungsplan() {
           <View className="rounded-xl border border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24] p-4">
             <Text className="text-sm font-semibold text-db-navy dark:text-[#EEF1F4]">Lernfelder · {curriculum.beruf}</Text>
             <Text className="mt-1 text-xs text-db-navy-light dark:text-[#9AA4B0]">
-              Rahmenlehrplan der Berufsschule – zeigt, wo du im Vergleich zum Lehrplan stehst.
+              Rahmenlehrplan der Berufsschule – der Status richtet sich nach deinem Lehrjahr im Profil.
             </Text>
             <View className="mt-3 gap-2">
               {curriculum.lernfelder.map((lf) => (
@@ -272,8 +272,8 @@ export default function Ausbildungsplan() {
                       {lf.ausbildungsjahr}. Ausbildungsjahr · {lf.stunden} Std.
                     </Text>
                   </View>
-                  <Text className={`shrink-0 overflow-hidden rounded-full px-2.5 py-1 text-xs font-medium ${lernfeldStyle[lf.status]}`}>
-                    {lf.status}
+                  <Text className={`shrink-0 overflow-hidden rounded-full px-2.5 py-1 text-xs font-medium ${lernfeldStyle[lernfeldStatus(lf, profil.lehrjahr)]}`}>
+                    {lernfeldStatus(lf, profil.lehrjahr)}
                   </Text>
                 </View>
               ))}
