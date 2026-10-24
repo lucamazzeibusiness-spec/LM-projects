@@ -1,5 +1,5 @@
 import type { AzubiProfil } from '../data/mock'
-import { heuteISO } from './wochen'
+import { datumAlsISO, heuteISO } from './wochen'
 
 export const pruefungsTitel = ['Abschlussprüfung Teil 1', 'Abschlussprüfung Teil 2'] as const
 
@@ -18,12 +18,13 @@ function tageZwischen(vonISO: string, bisISO: string): number {
 // Der Countdown wird bei jedem Rendern aus dem im Profil eingetragenen Datum berechnet –
 // null, solange kein (gültiger) Termin eingetragen ist oder der Termin schon vorbei ist.
 export function naechstePruefungFuer(profil: AzubiProfil): NaechstePruefung | null {
-  if (!profil.pruefungDatum || !/^\d{4}-\d{2}-\d{2}$/.test(profil.pruefungDatum)) return null
-  const tageVerbleibend = tageZwischen(heuteISO(), profil.pruefungDatum)
+  const datum = profil.pruefungDatum ? datumAlsISO(profil.pruefungDatum) : null
+  if (!datum) return null
+  const tageVerbleibend = tageZwischen(heuteISO(), datum)
   if (Number.isNaN(tageVerbleibend) || tageVerbleibend < 0) return null
   return {
     titel: profil.pruefungTitel || pruefungsTitel[0],
-    datumLabel: new Date(`${profil.pruefungDatum}T00:00:00`).toLocaleDateString('de-DE', {
+    datumLabel: new Date(`${datum}T00:00:00`).toLocaleDateString('de-DE', {
       day: 'numeric',
       month: 'long',
       year: 'numeric',

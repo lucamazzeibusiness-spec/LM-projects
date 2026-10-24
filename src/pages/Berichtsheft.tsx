@@ -11,6 +11,7 @@ import type { AusbildungsblockTyp, BerichtsheftEintrag, BerichtsheftKategorie } 
 import { bulletEingabeVerarbeiten, haeufigeStichpunkte, hatEchtenInhalt, stichpunktAnhaengen } from '../lib/stichpunkte'
 import {
   arbeitstageDerWoche,
+  datumAlsISO,
   ausbildungsjahrFuerWoche,
   heuteISO,
   heutigesDatumLabel,
@@ -87,7 +88,10 @@ export default function Berichtsheft() {
   const vorschlaege = bearbeitung ? haeufigeStichpunkte(fruehereTexte, bearbeitung.taetigkeiten) : []
   const heuteSchluessel = wochenSchluessel(heute)
   const istAktuelleWoche = ausgewaehlteWoche === heuteSchluessel
-  const beginnSchluessel = profil?.ausbildungsbeginn ? wochenSchluessel(profil.ausbildungsbeginn) : null
+  // Ungültige Eingaben (z. B. Tippfehler) gelten als nicht gesetzt – sonst würde die Nr. "NaN"
+  // und die Wochennavigation ließe sich nicht mehr zurückblättern.
+  const beginnISO = profil?.ausbildungsbeginn ? datumAlsISO(profil.ausbildungsbeginn) : null
+  const beginnSchluessel = beginnISO ? wochenSchluessel(beginnISO) : null
   const kannZurueck = !beginnSchluessel || ausgewaehlteWoche > beginnSchluessel
 
   const montagFreitag = useMemo(() => arbeitstageDerWoche(ausgewaehlteWoche), [ausgewaehlteWoche])
@@ -119,19 +123,19 @@ export default function Berichtsheft() {
   const nachweisMeta = useMemo(() => {
     if (!profil) return null
     const { von, bis } = wochenStartEnde(ausgewaehlteWoche)
-    const nrZahl = profil.ausbildungsbeginn
-      ? wochenNummerSeit(profil.ausbildungsbeginn, ausgewaehlteWoche)
+    const nrZahl = beginnISO
+      ? wochenNummerSeit(beginnISO, ausgewaehlteWoche)
       : alleWochenMitEintraegen.indexOf(ausgewaehlteWoche) + 1
     const nr = String(Math.max(1, nrZahl)).padStart(3, '0')
     const jahr = Number(ausgewaehlteWoche.slice(0, 4))
     const ausbildungsjahr = ausbildungsjahrFuerWoche(
       profil.lehrjahr,
       profil.lehrjahreGesamt,
-      profil.ausbildungsbeginn,
+      beginnISO ?? '',
       ausgewaehlteWoche,
     )
     return { nr, von, bis, jahr, ausbildungsjahr }
-  }, [profil, ausgewaehlteWoche, alleWochenMitEintraegen])
+  }, [profil, beginnISO, ausgewaehlteWoche, alleWochenMitEintraegen])
 
   const touchStartX = useRef<number | null>(null)
 
