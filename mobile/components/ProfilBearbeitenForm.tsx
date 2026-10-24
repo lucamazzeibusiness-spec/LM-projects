@@ -9,6 +9,7 @@ import {
   type AzubiProfil,
 } from '../data/mock'
 import { pruefungsTitel } from '../lib/pruefung'
+import { datumAlsISO, isoAlsDeutsch } from '../lib/wochen'
 
 const ausbildungsberufe: AusbildungsberufName[] = curricula.map((c) => c.beruf)
 
@@ -33,7 +34,15 @@ export default function ProfilBearbeitenForm({
   onSpeichern: (profil: AzubiProfil) => void
   onFertig: () => void
 }) {
-  const [entwurf, setEntwurf] = useState<AzubiProfil>(profil ?? azubiProfilBeispiel)
+  // Daten werden als TT.MM.JJJJ bearbeitet und beim Speichern wieder als ISO abgelegt.
+  const [entwurf, setEntwurf] = useState<AzubiProfil>(() => {
+    const p = profil ?? azubiProfilBeispiel
+    return {
+      ...p,
+      ausbildungsbeginn: isoAlsDeutsch(p.ausbildungsbeginn),
+      pruefungDatum: p.pruefungDatum ? isoAlsDeutsch(p.pruefungDatum) : p.pruefungDatum,
+    }
+  })
   const [gespeichert, setGespeichert] = useState(false)
 
   const aktualisieren = <K extends keyof AzubiProfil>(feld: K, wert: AzubiProfil[K]) => {
@@ -48,7 +57,11 @@ export default function ProfilBearbeitenForm({
     })
   }
 
+  const beginnOk = entwurf.ausbildungsbeginn.trim() === '' || datumAlsISO(entwurf.ausbildungsbeginn) !== null
+  const pruefungOk = !entwurf.pruefungDatum?.trim() || datumAlsISO(entwurf.pruefungDatum) !== null
   const formularOk =
+    beginnOk &&
+    pruefungOk &&
     entwurf.name.trim() &&
     entwurf.unternehmensbereich.trim() &&
     entwurf.ausbildungsberuf &&
@@ -58,7 +71,11 @@ export default function ProfilBearbeitenForm({
 
   const speichern = () => {
     if (!formularOk) return
-    onSpeichern(entwurf)
+    onSpeichern({
+      ...entwurf,
+      ausbildungsbeginn: datumAlsISO(entwurf.ausbildungsbeginn) ?? '',
+      pruefungDatum: entwurf.pruefungDatum?.trim() ? (datumAlsISO(entwurf.pruefungDatum) ?? undefined) : undefined,
+    })
     setGespeichert(true)
     setTimeout(onFertig, 600)
   }
@@ -145,9 +162,12 @@ export default function ProfilBearbeitenForm({
             <TextInput
               value={entwurf.ausbildungsbeginn}
               onChangeText={(t) => aktualisieren('ausbildungsbeginn', t)}
-              placeholder="JJJJ-MM-TT, z. B. 2026-09-01"
+              placeholder="TT.MM.JJJJ, z. B. 01.09.2026"
               className={inputClass}
             />
+            {entwurf.ausbildungsbeginn.trim() !== '' && !beginnOk && (
+              <Text className="mt-1 text-xs text-db-red">Bitte als Datum eingeben, z. B. 01.09.2026</Text>
+            )}
           </Feld>
         </View>
 
@@ -180,9 +200,10 @@ export default function ProfilBearbeitenForm({
             <TextInput
               value={entwurf.pruefungDatum ?? ''}
               onChangeText={(t) => aktualisieren('pruefungDatum', t)}
-              placeholder="JJJJ-MM-TT, z. B. 2027-03-10"
+              placeholder="TT.MM.JJJJ, z. B. 10.03.2027"
               className={inputClass}
             />
+            {!pruefungOk && <Text className="mt-1 text-xs text-db-red">Bitte als Datum eingeben, z. B. 10.03.2027</Text>}
           </Feld>
         </View>
 

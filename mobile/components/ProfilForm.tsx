@@ -8,6 +8,7 @@ import {
   type AusbildungsberufName,
   type AzubiProfil,
 } from '../data/mock'
+import { datumAlsISO } from '../lib/wochen'
 
 const ausbildungsberufe: AusbildungsberufName[] = curricula.map((c) => c.beruf)
 
@@ -46,7 +47,8 @@ export default function ProfilForm({
   }
 
   const schritt1Ok = entwurf.name.trim() && entwurf.unternehmensbereich.trim() && entwurf.ausbildungsberuf
-  const schritt2Ok = entwurf.lehrjahr >= 1
+  const beginnOk = entwurf.ausbildungsbeginn.trim() === '' || datumAlsISO(entwurf.ausbildungsbeginn) !== null
+  const schritt2Ok = entwurf.lehrjahr >= 1 && beginnOk
   const schritt3Ok = entwurf.abteilung.trim() && entwurf.werk.trim()
 
   const weiter = () => setSchritt((s) => Math.min(3, s + 1))
@@ -144,9 +146,12 @@ export default function ProfilForm({
                 <TextInput
                   value={entwurf.ausbildungsbeginn}
                   onChangeText={(t) => aktualisieren('ausbildungsbeginn', t)}
-                  placeholder="JJJJ-MM-TT, z. B. 2026-09-01"
+                  placeholder="TT.MM.JJJJ, z. B. 01.09.2026"
                   className={inputClass}
                 />
+                {entwurf.ausbildungsbeginn.trim() !== '' && !datumAlsISO(entwurf.ausbildungsbeginn) && (
+                  <Text className="mt-1 text-xs text-db-red">Bitte als Datum eingeben, z. B. 01.09.2026</Text>
+                )}
               </Feld>
             </>
           )}
@@ -221,7 +226,7 @@ export default function ProfilForm({
           </Pressable>
         ) : (
           <Pressable
-            onPress={() => onFertig(entwurf)}
+            onPress={() => onFertig({ ...entwurf, ausbildungsbeginn: datumAlsISO(entwurf.ausbildungsbeginn) ?? '' })}
             disabled={!schritt3Ok}
             className={`flex-1 items-center rounded-full bg-db-red px-4 py-3 ${!schritt3Ok ? 'opacity-40' : ''}`}
           >

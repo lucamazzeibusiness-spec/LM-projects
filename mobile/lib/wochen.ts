@@ -128,3 +128,22 @@ export function ausbildungsjahrFuerWoche(
   const ergebnis = schluessel < heute ? aktuellesLehrjahr - jahrestage : aktuellesLehrjahr + jahrestage
   return Math.min(Math.max(1, ergebnis), Math.max(1, lehrjahreGesamt))
 }
+
+// Liest ein eingetipptes Datum als ISO (JJJJ-MM-TT). Akzeptiert TT.MM.JJJJ (auch 1.9.2026) und
+// JJJJ-MM-TT; liefert null bei leerer, falsch formatierter oder unmöglicher Eingabe (z. B. 31.02.).
+export function datumAlsISO(eingabe: string): string | null {
+  const text = eingabe.trim()
+  const iso = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(text)
+  const deutsch = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.exec(text)
+  if (!iso && !deutsch) return null
+  const [jahr, monat, tag] = iso ? [+iso[1], +iso[2], +iso[3]] : [+deutsch![3], +deutsch![2], +deutsch![1]]
+  const d = new Date(jahr, monat - 1, tag)
+  if (d.getFullYear() !== jahr || d.getMonth() !== monat - 1 || d.getDate() !== tag) return null
+  return isoDatum(d)
+}
+
+// Für Eingabefelder: ISO-Datum als TT.MM.JJJJ anzeigen (anderes bleibt unverändert).
+export function isoAlsDeutsch(wert: string): string {
+  const iso = /^(\d{4})-(\d{2})-(\d{2})$/.exec(wert)
+  return iso ? `${iso[3]}.${iso[2]}.${iso[1]}` : wert
+}
