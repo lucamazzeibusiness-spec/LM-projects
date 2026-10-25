@@ -1,6 +1,7 @@
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
   updateProfile,
@@ -46,6 +47,7 @@ interface AuthContextValue {
   registrieren: (name: string, email: string, passwort: string) => Promise<void>
   anmelden: (email: string, passwort: string) => Promise<void>
   abmelden: () => Promise<void>
+  passwortZuruecksetzen: (email: string) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -75,12 +77,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await signInWithEmailAndPassword(auth, email, passwort)
   }
 
+  // Firebase verschickt eine E-Mail mit Link zum Neusetzen des Passworts (Vorlage auf Deutsch).
+  const passwortZuruecksetzen = async (email: string) => {
+    auth.languageCode = 'de'
+    await sendPasswordResetEmail(auth, email.trim())
+  }
+
   const abmelden = async () => {
     await signOut(auth)
   }
 
   return (
-    <AuthContext.Provider value={{ user, bereit, registrieren, anmelden, abmelden }}>
+    <AuthContext.Provider value={{ user, bereit, registrieren, anmelden, abmelden, passwortZuruecksetzen }}>
       {children}
     </AuthContext.Provider>
   )
