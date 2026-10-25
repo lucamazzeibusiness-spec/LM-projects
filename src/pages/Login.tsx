@@ -24,17 +24,43 @@ function fehlerText(code: string): string {
 }
 
 export default function Login() {
-  const { registrieren, anmelden } = useAuth()
+  const { registrieren, anmelden, passwortZuruecksetzen } = useAuth()
   const [modus, setModus] = useState<'anmelden' | 'registrieren'>('anmelden')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [passwort, setPasswort] = useState('')
   const [ladt, setLadt] = useState(false)
   const [fehler, setFehler] = useState<string | null>(null)
+  const [hinweis, setHinweis] = useState<string | null>(null)
+
+  const passwortVergessen = async () => {
+    setFehler(null)
+    setHinweis(null)
+    if (!email.trim()) {
+      setFehler('Gib oben zuerst deine E-Mail-Adresse ein.')
+      return
+    }
+    setLadt(true)
+    try {
+      await passwortZuruecksetzen(email)
+      setHinweis('Falls es ein Konto mit dieser E-Mail gibt, haben wir dir einen Link zum Zurücksetzen geschickt. Schau auch im Spam-Ordner nach.')
+    } catch (err) {
+      const code = err && typeof err === 'object' && 'code' in err ? String(err.code) : ''
+      // Ob es das Konto gibt, verraten wir nicht – nur echte Eingabe- oder Verbindungsfehler zeigen.
+      if (code === 'auth/user-not-found') {
+        setHinweis('Falls es ein Konto mit dieser E-Mail gibt, haben wir dir einen Link zum Zurücksetzen geschickt. Schau auch im Spam-Ordner nach.')
+      } else {
+        setFehler(fehlerText(code))
+      }
+    } finally {
+      setLadt(false)
+    }
+  }
 
   const absenden = async (e: React.FormEvent) => {
     e.preventDefault()
     setFehler(null)
+    setHinweis(null)
     setLadt(true)
     try {
       if (modus === 'registrieren') {
@@ -104,7 +130,19 @@ export default function Login() {
             />
           </div>
 
+          {modus === 'anmelden' && (
+            <button
+              type="button"
+              onClick={passwortVergessen}
+              disabled={ladt}
+              className="text-xs font-medium text-db-navy-light hover:text-db-navy hover:underline"
+            >
+              Passwort vergessen?
+            </button>
+          )}
+
           {fehler && <p className="rounded-lg bg-db-red/5 px-3 py-2 text-xs text-db-red-dark">{fehler}</p>}
+          {hinweis && <p className="rounded-lg bg-db-green/5 px-3 py-2 text-xs text-db-green">{hinweis}</p>}
 
           <button
             type="submit"
@@ -118,6 +156,7 @@ export default function Login() {
         <button
           onClick={() => {
             setFehler(null)
+            setHinweis(null)
             setModus((m) => (m === 'anmelden' ? 'registrieren' : 'anmelden'))
           }}
           className="mt-4 w-full text-center text-xs font-medium text-db-navy-light hover:text-db-navy"
