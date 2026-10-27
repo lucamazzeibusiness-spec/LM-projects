@@ -1,5 +1,5 @@
 import { router } from 'expo-router'
-import { ArrowRight, Bell, BellOff, CalendarCheck, ClipboardCheck, GraduationCap } from 'lucide-react-native'
+import { ArrowRight, Bell, BellOff, CalendarCheck, ClipboardCheck, GraduationCap, Thermometer } from 'lucide-react-native'
 import { useEffect, useState } from 'react'
 import { Pressable, ScrollView, Text, View } from 'react-native'
 import { GewerkBadge, PrioBadge, StatusBadge } from '../../components/Badges'
@@ -9,6 +9,7 @@ import { useAusbildungsplan } from '../../context/AusbildungsplanContext'
 import { useBerichtsheft } from '../../context/BerichtsheftContext'
 import { useLernaufgaben } from '../../context/LernaufgabenContext'
 import { erinnerungAktivieren, erinnerungDeaktivieren, erinnerungIstAktiv, heuteErinnern } from '../../lib/erinnerung'
+import { KRANKHEITSTAGE_GRENZE, KRANKHEITSTAGE_WARNUNG, krankheitstage } from '../../lib/fehlzeiten'
 import { hatEchtenInhalt } from '../../lib/stichpunkte'
 import { aktuelleWochentage, heuteISO, heutigerWochentagIndex, wochenSchluessel } from '../../lib/wochen'
 import { naechstePruefungFuer } from '../../lib/pruefung'
@@ -140,6 +141,8 @@ export default function Dashboard() {
 
       <KarteDesTages />
 
+      <KrankheitstageKarte anzahl={krankheitstage(eintraege)} />
+
       <View className="flex-row gap-3">
         {stats.map(({ label, value, Icon, tone, ziel }) => (
           <Pressable
@@ -211,5 +214,37 @@ export default function Dashboard() {
         </View>
       </View>
     </ScrollView>
+  )
+}
+
+function KrankheitstageKarte({ anzahl }: { anzahl: number }) {
+  const rest = KRANKHEITSTAGE_GRENZE - anzahl
+  const stufe = anzahl >= KRANKHEITSTAGE_GRENZE ? 'rot' : anzahl >= KRANKHEITSTAGE_WARNUNG ? 'gelb' : 'normal'
+  const farbe = { rot: 'text-db-red', gelb: 'text-db-amber', normal: 'text-db-navy dark:text-[#EEF1F4]' }[stufe]
+  const iconFarbe = { rot: '#EC0016', gelb: '#D98600', normal: '#14181F' }[stufe]
+  const balken = { rot: 'bg-db-red', gelb: 'bg-db-amber', normal: 'bg-db-green' }[stufe]
+  return (
+    <Pressable
+      onPress={() => router.push('/berichtsheft')}
+      className="rounded-xl border border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24] p-4"
+    >
+      <View className="flex-row items-center justify-between gap-2">
+        <View className="flex-row items-center gap-1.5">
+          <Thermometer size={16} color={iconFarbe} />
+          <Text className="text-sm font-semibold text-db-navy dark:text-[#EEF1F4]">Krankheitstage</Text>
+        </View>
+        <Text className={`text-sm font-semibold ${farbe}`}>
+          {anzahl} von {KRANKHEITSTAGE_GRENZE}
+        </Text>
+      </View>
+      <View className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-db-gray-100 dark:bg-[#1A2029]">
+        <View className={`h-full rounded-full ${balken}`} style={{ width: `${Math.min(100, (anzahl / KRANKHEITSTAGE_GRENZE) * 100)}%` }} />
+      </View>
+      <Text className={`mt-1.5 text-xs ${stufe === 'normal' ? 'text-db-navy-light dark:text-[#9AA4B0]' : farbe}`}>
+        {stufe === 'rot'
+          ? 'Grenze erreicht – sprich am besten mit deinem Ausbilder.'
+          : `Noch ${rest} ${rest === 1 ? 'Tag' : 'Tage'} bis zur Grenze · gezählt aus deinen Berichtsheft-Einträgen`}
+      </Text>
+    </Pressable>
   )
 }
