@@ -1,4 +1,4 @@
-import { CalendarCheck, ChevronLeft, ChevronRight, Download, Eye, Loader2, Pencil, Plus, X } from 'lucide-react'
+import { BadgeCheck, CalendarCheck, ChevronLeft, ChevronRight, Download, Eye, Loader2, Pencil, Plus, X } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
 import { BerichtStatusBadge } from '../components/Badges'
 import GrammatikPruefung from '../components/GrammatikPruefung'
@@ -8,6 +8,7 @@ import { useAusbildungsplan, type Wochenvorlage } from '../context/Ausbildungspl
 import { useBerichtsheft } from '../context/BerichtsheftContext'
 import { berichtsheftStreak, usePunkte, vergebeneIds } from '../context/PunkteContext'
 import type { AusbildungsblockTyp, BerichtsheftEintrag, BerichtsheftKategorie } from '../data/mock'
+import { unterschriebeneWochen, wochenStatus } from '../lib/unterschriften'
 import { KRANKHEITSTAGE_GRENZE, KRANKHEITSTAGE_WARNUNG, krankheitstage } from '../lib/fehlzeiten'
 import { bulletEingabeVerarbeiten, haeufigeStichpunkte, hatEchtenInhalt, stichpunktAnhaengen } from '../lib/stichpunkte'
 import {
@@ -77,6 +78,7 @@ export default function Berichtsheft() {
   // Laut Ausbildungsplan freier Tag (standardmäßig Sa/So): Eintragen geht, wird aber nicht angemahnt.
   const heuteFrei = !vorlage[wochentagIndexVon(heute)]
   const krankTage = krankheitstage(eintraege)
+  const unterschriften = unterschriebeneWochen(eintraege)
 
   // Eigene, oft verwendete Stichpunkte aus früheren Tagen (neueste zuerst) als Schnellauswahl.
   const fruehereTexte = useMemo(
@@ -108,6 +110,7 @@ export default function Berichtsheft() {
   )
   const anzeigeTage = [...montagFreitag, ...zusatzTage]
 
+  const statusDerWoche = wochenStatus(wocheEintraege)
   const wocheStunden = wocheEintraege.reduce((sum, e) => sum + e.stunden, 0)
   const erfassteTage = montagFreitag.filter((d) => hatEchtenInhalt(eintraegeNachDatum.get(d)?.taetigkeiten ?? '')).length
   const wocheVollstaendig = erfassteTage === montagFreitag.length
@@ -154,6 +157,14 @@ export default function Berichtsheft() {
       vorher.taetigkeiten !== bearbeitung.taetigkeiten ||
       vorher.stunden !== bearbeitung.stunden ||
       vorher.kategorie !== bearbeitung.kategorie
+    if (
+      geaendert &&
+      vorher?.status === 'Freigegeben' &&
+      !window.confirm(
+        'Dein Ausbilder hat diese Woche schon unterschrieben. Wenn du den Tag änderst, musst du die Woche neu unterschreiben lassen. Trotzdem ändern?',
+      )
+    )
+      return
     const gespeichert = geaendert ? { ...bearbeitung, status: 'Entwurf' as const } : bearbeitung
     setEintraege((prev) => [gespeichert, ...prev.filter((e) => e.id !== bearbeitung.id)])
 
@@ -166,6 +177,16 @@ export default function Berichtsheft() {
 
     setBearbeitung(null)
   }
+
+  // Der Ausbilder unterschreibt auf Papier oder per E-Mail – der Azubi hält das hier fest.
+  const unterschriftSetzen = (unterschrieben: boolean) =>
+    setEintraege((prev) =>
+      prev.map((e) =>
+        wochenSchluessel(e.datumISO) === ausgewaehlteWoche && hatEchtenInhalt(e.taetigkeiten)
+          ? { ...e, status: unterschrieben ? ('Freigegeben' as const) : ('Eingereicht' as const) }
+          : e,
+      ),
+    )
 
   const vorherigeWoche = () =>
     setAusgewaehlteWoche((w) => {
@@ -197,7 +218,11 @@ export default function Berichtsheft() {
       const betreff = await exportBerichtsheftPdf(profil, wocheEintraege, { ...nachweisMeta, unterschriftDataUrl })
       // Nach dem Unterschreiben und Exportieren gilt die Woche als eingereicht.
       setEintraege((prev) =>
-        prev.map((e) => (wochenSchluessel(e.datumISO) === ausgewaehlteWoche ? { ...e, status: 'Eingereicht' as const } : e)),
+        prev.map((e) =>
+          wochenSchluessel(e.datumISO) === ausgewaehlteWoche && e.status !== 'Freigegeben'
+            ? { ...e, status: 'Eingereicht' as const }
+            : e,
+        ),
       )
       if (profil.ausbilderEmail.trim()) {
         window.location.href = `mailto:${encodeURIComponent(profil.ausbilderEmail.trim())}?subject=${encodeURIComponent(betreff)}`
@@ -253,6 +278,11 @@ export default function Berichtsheft() {
         >
           Krankheitstage insgesamt: {krankTage} von {KRANKHEITSTAGE_GRENZE}
         </p>
+        {unterschriften.gesamt > 0 && (
+          <p className="text-xs font-medium text-db-navy-light">
+            Vom Ausbilder unterschrieben: {unterschriften.unterschrieben} von {unterschriften.gesamt} Wochen
+          </p>
+        )}
       </div>
 
       {!heutigerEintrag && heuteFrei ? (
@@ -449,6 +479,31 @@ export default function Berichtsheft() {
             Ausbildungsnachweis
           </button>
         </div>
+
+        {statusDerWoche === 'Eingereicht' && (
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-db-amber/30 bg-db-amber/5 px-4 py-3">
+            <p className="text-xs text-db-navy">Eingereicht – wartet auf die Unterschrift deines Ausbilders.</p>
+            <button
+              onClick={() => unterschriftSetzen(true)}
+              className="flex shrink-0 items-center gap-1.5 rounded-full bg-db-green px-3 py-1.5 text-xs font-semibold text-white"
+            >
+              <BadgeCheck size={14} /> Ist unterschrieben
+            </button>
+          </div>
+        )}
+        {statusDerWoche === 'Unterschrieben' && (
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-db-green/30 bg-db-green/5 px-4 py-3">
+            <p className="flex items-center gap-1.5 text-xs font-semibold text-db-green">
+              <BadgeCheck size={15} /> Vom Ausbilder unterschrieben
+            </p>
+            <button
+              onClick={() => unterschriftSetzen(false)}
+              className="shrink-0 text-xs font-medium text-db-navy-light hover:text-db-navy"
+            >
+              Rückgängig
+            </button>
+          </div>
+        )}
 
         <div className="space-y-3">
           {anzeigeTage.map((datumISO) => {

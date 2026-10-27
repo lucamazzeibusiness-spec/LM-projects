@@ -48,10 +48,17 @@ const berichtStyles: Record<BerichtsheftStatus, string> = {
   Freigegeben: 'bg-db-green/10 text-db-green',
 }
 
+// "Freigegeben" heißt für den Azubi: Der Ausbilder hat den Nachweis unterschrieben.
+const berichtLabels: Record<BerichtsheftStatus, string> = {
+  Entwurf: 'Entwurf',
+  Eingereicht: 'Eingereicht',
+  Freigegeben: 'Unterschrieben',
+}
+
 export function BerichtStatusBadge({ status }: { status: BerichtsheftStatus }) {
   return (
     <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${berichtStyles[status]}`}>
-      {status}
+      {berichtLabels[status]}
     </span>
   )
 }
