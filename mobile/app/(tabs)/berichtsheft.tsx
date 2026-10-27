@@ -1,6 +1,6 @@
-import { CalendarCheck, CheckSquare, ChevronLeft, ChevronRight, Download, Eye, Loader2, Pencil, Plus, Square, X } from 'lucide-react-native'
+import { BadgeCheck, CalendarCheck, CheckSquare, ChevronLeft, ChevronRight, Download, Eye, Loader2, Pencil, Plus, Square, X } from 'lucide-react-native'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Dimensions, Modal, PanResponder, Pressable, ScrollView, Text, TextInput, View } from 'react-native'
+import { Alert, Dimensions, Modal, PanResponder, Pressable, ScrollView, Text, TextInput, View } from 'react-native'
 import { WebView } from 'react-native-webview'
 import { BerichtStatusBadge } from '../../components/Badges'
 import GrammatikPruefung from '../../components/GrammatikPruefung'
@@ -10,6 +10,7 @@ import { useAusbildungsplan, type Wochenvorlage } from '../../context/Ausbildung
 import { berichtsheftStreak, usePunkte, vergebeneIds } from '../../context/PunkteContext'
 import { useBerichtsheft } from '../../context/BerichtsheftContext'
 import { ausbildungsnachweisVorschauHtml, exportBerichtsheftPdf } from '../../lib/exportBerichtsheft'
+import { unterschriebeneWochen, wochenStatus } from '../../lib/unterschriften'
 import { KRANKHEITSTAGE_GRENZE, KRANKHEITSTAGE_WARNUNG, krankheitstage } from '../../lib/fehlzeiten'
 import { bulletEingabeVerarbeiten, haeufigeStichpunkte, hatEchtenInhalt, stichpunktAnhaengen } from '../../lib/stichpunkte'
 import {
@@ -81,6 +82,7 @@ export default function Berichtsheft() {
   // Laut Ausbildungsplan freier Tag (standardmäßig Sa/So): Eintragen geht, wird aber nicht angemahnt.
   const heuteFrei = !vorlage[wochentagIndexVon(heute)]
   const krankTage = krankheitstage(eintraege)
+  const unterschriften = unterschriebeneWochen(eintraege)
 
   // Eigene, oft verwendete Stichpunkte aus früheren Tagen (neueste zuerst) als Schnellauswahl.
   const fruehereTexte = useMemo(
@@ -112,6 +114,7 @@ export default function Berichtsheft() {
   )
   const anzeigeTage = [...montagFreitag, ...zusatzTage]
 
+  const statusDerWoche = wochenStatus(wocheEintraege)
   const wocheStunden = wocheEintraege.reduce((sum, e) => sum + e.stunden, 0)
   const erfassteTage = montagFreitag.filter((d) => hatEchtenInhalt(eintraegeNachDatum.get(d)?.taetigkeiten ?? '')).length
   const wocheVollstaendig = erfassteTage === montagFreitag.length
@@ -143,6 +146,16 @@ export default function Berichtsheft() {
     return { nr, von, bis, jahr, ausbildungsjahr }
   }, [profil, beginnISO, ausgewaehlteWoche, alleWochenMitEintraegen])
 
+  // Der Ausbilder unterschreibt auf Papier oder per E-Mail – der Azubi hält das hier fest.
+  const unterschriftSetzen = (unterschrieben: boolean) =>
+    setEintraege((prev) =>
+      prev.map((e) =>
+        wochenSchluessel(e.datumISO) === ausgewaehlteWoche && hatEchtenInhalt(e.taetigkeiten)
+          ? { ...e, status: unterschrieben ? ('Freigegeben' as const) : ('Eingereicht' as const) }
+          : e,
+      ),
+    )
+
   const vorherigeWoche = () =>
     setAusgewaehlteWoche((w) => {
       const ziel = wocheVerschieben(w, -1)
@@ -173,7 +186,7 @@ export default function Berichtsheft() {
 
   const heuteBearbeiten = () => setBearbeitung(heutigerEintrag ?? neuerTageseintragFuer(heute, vorlage))
 
-  const speichern = () => {
+  const speichern = (unterschriftVerwerfen = false) => {
     if (!bearbeitung || !hatEchtenInhalt(bearbeitung.taetigkeiten)) return
     // Wird ein schon eingereichter Tag inhaltlich geändert, muss die Woche neu eingereicht werden.
     const vorher = eintraege.find((e) => e.id === bearbeitung.id)
@@ -182,6 +195,17 @@ export default function Berichtsheft() {
       vorher.taetigkeiten !== bearbeitung.taetigkeiten ||
       vorher.stunden !== bearbeitung.stunden ||
       vorher.kategorie !== bearbeitung.kategorie
+    if (geaendert && vorher?.status === 'Freigegeben' && !unterschriftVerwerfen) {
+      Alert.alert(
+        'Schon unterschrieben',
+        'Dein Ausbilder hat diese Woche schon unterschrieben. Wenn du den Tag änderst, musst du die Woche neu unterschreiben lassen.',
+        [
+          { text: 'Abbrechen', style: 'cancel' },
+          { text: 'Trotzdem ändern', style: 'destructive', onPress: () => speichern(true) },
+        ],
+      )
+      return
+    }
     const gespeichert = geaendert ? { ...bearbeitung, status: 'Entwurf' as const } : bearbeitung
     setEintraege((prev) => [gespeichert, ...prev.filter((e) => e.id !== bearbeitung.id)])
 
@@ -202,7 +226,11 @@ export default function Berichtsheft() {
       await exportBerichtsheftPdf(profil, wocheEintraege, { ...nachweisMeta, unterschriftDataUrl })
       // Nach dem Unterschreiben und Exportieren gilt die Woche als eingereicht.
       setEintraege((prev) =>
-        prev.map((e) => (wochenSchluessel(e.datumISO) === ausgewaehlteWoche ? { ...e, status: 'Eingereicht' as const } : e)),
+        prev.map((e) =>
+          wochenSchluessel(e.datumISO) === ausgewaehlteWoche && e.status !== 'Freigegeben'
+            ? { ...e, status: 'Eingereicht' as const }
+            : e,
+        ),
       )
     } finally {
       setExportiert(false)
@@ -255,6 +283,11 @@ export default function Berichtsheft() {
           >
             Krankheitstage insgesamt: {krankTage} von {KRANKHEITSTAGE_GRENZE}
           </Text>
+          {unterschriften.gesamt > 0 && (
+            <Text className="text-xs font-medium text-db-navy-light dark:text-[#9AA4B0]">
+              Vom Ausbilder unterschrieben: {unterschriften.unterschrieben} von {unterschriften.gesamt} Wochen
+            </Text>
+          )}
         </View>
 
         <Pressable
@@ -344,6 +377,32 @@ export default function Berichtsheft() {
               <Text className="text-xs font-semibold text-db-navy dark:text-[#EEF1F4]">Ausbildungsnachweis</Text>
             </Pressable>
           </View>
+
+          {statusDerWoche === 'Eingereicht' && (
+            <View className="flex-row items-center justify-between gap-3 rounded-xl border border-db-amber/30 bg-db-amber/5 px-4 py-3">
+              <Text className="flex-1 text-xs text-db-navy dark:text-[#EEF1F4]">
+                Eingereicht – wartet auf die Unterschrift deines Ausbilders.
+              </Text>
+              <Pressable
+                onPress={() => unterschriftSetzen(true)}
+                className="flex-row items-center gap-1.5 rounded-full bg-db-green px-3 py-1.5"
+              >
+                <BadgeCheck size={14} color="#fff" />
+                <Text className="text-xs font-semibold text-white">Ist unterschrieben</Text>
+              </Pressable>
+            </View>
+          )}
+          {statusDerWoche === 'Unterschrieben' && (
+            <View className="flex-row items-center justify-between gap-3 rounded-xl border border-db-green/30 bg-db-green/5 px-4 py-3">
+              <View className="flex-row items-center gap-1.5">
+                <BadgeCheck size={15} color="#1E8A3C" />
+                <Text className="text-xs font-semibold text-db-green">Vom Ausbilder unterschrieben</Text>
+              </View>
+              <Pressable onPress={() => unterschriftSetzen(false)}>
+                <Text className="text-xs font-medium text-db-navy-light dark:text-[#9AA4B0]">Rückgängig</Text>
+              </Pressable>
+            </View>
+          )}
 
           <View className="gap-3">
             {anzeigeTage.map((datumISO) => {
@@ -498,7 +557,7 @@ export default function Berichtsheft() {
                 />
               </View>
 
-              <Pressable onPress={speichern} className="items-center rounded-full bg-db-navy px-4 py-2.5 dark:bg-[#3A4453]">
+              <Pressable onPress={() => speichern()} className="items-center rounded-full bg-db-navy px-4 py-2.5 dark:bg-[#3A4453]">
                 <Text className="text-sm font-semibold text-white">Speichern</Text>
               </Pressable>
             </Pressable>
