@@ -8,6 +8,7 @@ import { useAusbildungsplan, type Wochenvorlage } from '../context/Ausbildungspl
 import { useBerichtsheft } from '../context/BerichtsheftContext'
 import { berichtsheftStreak, usePunkte, vergebeneIds } from '../context/PunkteContext'
 import type { AusbildungsblockTyp, BerichtsheftEintrag, BerichtsheftKategorie } from '../data/mock'
+import { KRANKHEITSTAGE_GRENZE, KRANKHEITSTAGE_WARNUNG, krankheitstage } from '../lib/fehlzeiten'
 import { bulletEingabeVerarbeiten, haeufigeStichpunkte, hatEchtenInhalt, stichpunktAnhaengen } from '../lib/stichpunkte'
 import {
   arbeitstageDerWoche,
@@ -75,6 +76,7 @@ export default function Berichtsheft() {
   const heutigerEintrag = eintraege.find((e) => e.datumISO === heute)
   // Laut Ausbildungsplan freier Tag (standardmäßig Sa/So): Eintragen geht, wird aber nicht angemahnt.
   const heuteFrei = !vorlage[wochentagIndexVon(heute)]
+  const krankTage = krankheitstage(eintraege)
 
   // Eigene, oft verwendete Stichpunkte aus früheren Tagen (neueste zuerst) als Schnellauswahl.
   const fruehereTexte = useMemo(
@@ -243,6 +245,13 @@ export default function Berichtsheft() {
         <p className="text-sm text-db-navy-light">
           Trag jeden Tag kurz ein, was du gemacht hast – am Ende der Woche fasst die App das automatisch zu deinem
           Wochenbericht zusammen.
+        </p>
+        <p
+          className={`mt-1 text-xs font-medium ${
+            krankTage >= KRANKHEITSTAGE_GRENZE ? 'text-db-red' : krankTage >= KRANKHEITSTAGE_WARNUNG ? 'text-db-amber' : 'text-db-navy-light'
+          }`}
+        >
+          Krankheitstage insgesamt: {krankTage} von {KRANKHEITSTAGE_GRENZE}
         </p>
       </div>
 

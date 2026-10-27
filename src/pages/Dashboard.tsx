@@ -1,4 +1,4 @@
-import { ArrowRight, Bell, BellOff, CalendarCheck, ClipboardCheck, GraduationCap } from 'lucide-react'
+import { ArrowRight, Bell, BellOff, CalendarCheck, ClipboardCheck, GraduationCap, Thermometer } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { GewerkBadge, PrioBadge, StatusBadge } from '../components/Badges'
@@ -7,6 +7,7 @@ import { useAzubiProfil } from '../context/AzubiProfilContext'
 import { useAusbildungsplan } from '../context/AusbildungsplanContext'
 import { useBerichtsheft } from '../context/BerichtsheftContext'
 import { useLernaufgaben } from '../context/LernaufgabenContext'
+import { KRANKHEITSTAGE_GRENZE, KRANKHEITSTAGE_WARNUNG, krankheitstage } from '../lib/fehlzeiten'
 import { hatEchtenInhalt } from '../lib/stichpunkte'
 import {
   erinnerungAktivieren,
@@ -136,6 +137,8 @@ export default function Dashboard() {
 
       <KarteDesTages />
 
+      <KrankheitstageKarte anzahl={krankheitstage(eintraege)} />
+
       <div className="grid grid-cols-2 gap-3">
         {stats.map(({ label, value, icon: Icon, tone, to }) => (
           <Link key={label} to={to} className="rounded-xl border border-db-gray-200 bg-db-surface p-4 hover:border-db-navy/30">
@@ -203,5 +206,32 @@ export default function Dashboard() {
         </ul>
       </div>
     </div>
+  )
+}
+
+function KrankheitstageKarte({ anzahl }: { anzahl: number }) {
+  const rest = KRANKHEITSTAGE_GRENZE - anzahl
+  const stufe = anzahl >= KRANKHEITSTAGE_GRENZE ? 'rot' : anzahl >= KRANKHEITSTAGE_WARNUNG ? 'gelb' : 'normal'
+  const farbe = { rot: 'text-db-red', gelb: 'text-db-amber', normal: 'text-db-navy' }[stufe]
+  const balken = { rot: 'bg-db-red', gelb: 'bg-db-amber', normal: 'bg-db-green' }[stufe]
+  return (
+    <Link to="/berichtsheft" className="block rounded-xl border border-db-gray-200 bg-db-surface p-4 hover:border-db-navy/30">
+      <div className="flex items-center justify-between gap-2">
+        <span className="flex items-center gap-1.5 text-sm font-semibold text-db-navy">
+          <Thermometer size={16} className={farbe} /> Krankheitstage
+        </span>
+        <span className={`text-sm font-semibold ${farbe}`}>
+          {anzahl} von {KRANKHEITSTAGE_GRENZE}
+        </span>
+      </div>
+      <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-db-gray-100">
+        <div className={`h-full rounded-full ${balken}`} style={{ width: `${Math.min(100, (anzahl / KRANKHEITSTAGE_GRENZE) * 100)}%` }} />
+      </div>
+      <p className={`mt-1.5 text-xs ${stufe === 'normal' ? 'text-db-navy-light' : farbe}`}>
+        {stufe === 'rot'
+          ? 'Grenze erreicht – sprich am besten mit deinem Ausbilder.'
+          : `Noch ${rest} ${rest === 1 ? 'Tag' : 'Tage'} bis zur Grenze · gezählt aus deinen Berichtsheft-Einträgen`}
+      </p>
+    </Link>
   )
 }
