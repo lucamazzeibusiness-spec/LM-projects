@@ -1,4 +1,4 @@
-import { BadgeCheck, CalendarCheck, CheckSquare, ChevronLeft, ChevronRight, Download, Eye, Loader2, Pencil, Plus, Square, X } from 'lucide-react-native'
+import { BadgeCheck, CalendarCheck, CheckSquare, ChevronDown, ChevronLeft, ChevronRight, Download, Eye, Loader2, Pencil, Plus, Square, X } from 'lucide-react-native'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, Dimensions, Modal, PanResponder, Pressable, ScrollView, Text, TextInput, View } from 'react-native'
 import { WebView } from 'react-native-webview'
@@ -10,7 +10,7 @@ import { useAusbildungsplan, type Wochenvorlage } from '../../context/Ausbildung
 import { berichtsheftStreak, usePunkte, vergebeneIds } from '../../context/PunkteContext'
 import { useBerichtsheft } from '../../context/BerichtsheftContext'
 import { ausbildungsnachweisVorschauHtml, exportBerichtsheftPdf } from '../../lib/exportBerichtsheft'
-import { unterschriebeneWochen, wochenStatus } from '../../lib/unterschriften'
+import { offeneNachweisWochen, type OffeneWoche, unterschriebeneWochen, wochenStatus } from '../../lib/unterschriften'
 import { KRANKHEITSTAGE_GRENZE, KRANKHEITSTAGE_WARNUNG, krankheitstage } from '../../lib/fehlzeiten'
 import { bulletEingabeVerarbeiten, haeufigeStichpunkte, hatEchtenInhalt, stichpunktAnhaengen } from '../../lib/stichpunkte'
 import {
@@ -63,6 +63,12 @@ function neuerTageseintragFuer(datumISO: string, vorlage: Wochenvorlage): Berich
   }
 }
 
+const offenLabel: Record<OffeneWoche['status'], { text: string; farbe: string }> = {
+  leer: { text: 'Fehlt', farbe: 'text-db-red' },
+  Entwurf: { text: 'Nicht eingereicht', farbe: 'text-db-amber' },
+  Eingereicht: { text: 'Wartet auf Unterschrift', farbe: 'text-db-amber' },
+}
+
 export default function Berichtsheft() {
   const { profil } = useAzubiProfil()
   const { eintraege, setEintraege } = useBerichtsheft()
@@ -76,6 +82,7 @@ export default function Berichtsheft() {
   const [signaturOffen, setSignaturOffen] = useState(false)
   const [unterschrift, setUnterschrift] = useState<string | null>(null)
   const [ausgewaehlteWoche, setAusgewaehlteWoche] = useState(() => wochenSchluessel(heuteISO()))
+  const [checkOffen, setCheckOffen] = useState(false)
 
   const heute = heuteISO()
   const heutigerEintrag = eintraege.find((e) => e.datumISO === heute)
@@ -83,6 +90,7 @@ export default function Berichtsheft() {
   const heuteFrei = !vorlage[wochentagIndexVon(heute)]
   const krankTage = krankheitstage(eintraege)
   const unterschriften = unterschriebeneWochen(eintraege)
+  const jahrJetzt = heuteISO().slice(0, 4)
 
   // Eigene, oft verwendete Stichpunkte aus früheren Tagen (neueste zuerst) als Schnellauswahl.
   const fruehereTexte = useMemo(
@@ -99,6 +107,8 @@ export default function Berichtsheft() {
   // Ungültige Eingaben (z. B. Tippfehler) gelten als nicht gesetzt – sonst würde die Nr. "NaN"
   // und die Wochennavigation ließe sich nicht mehr zurückblättern.
   const beginnISO = profil?.ausbildungsbeginn ? datumAlsISO(profil.ausbildungsbeginn) : null
+  const offeneWochen = useMemo(() => offeneNachweisWochen(eintraege, beginnISO, heute), [eintraege, beginnISO, heute])
+  const nachweisWochenGesamt = unterschriften.unterschrieben + offeneWochen.length
   const beginnSchluessel = beginnISO ? wochenSchluessel(beginnISO) : null
   const kannZurueck = !beginnSchluessel || ausgewaehlteWoche > beginnSchluessel
 
@@ -283,10 +293,52 @@ export default function Berichtsheft() {
           >
             Krankheitstage insgesamt: {krankTage} von {KRANKHEITSTAGE_GRENZE}
           </Text>
-          {unterschriften.gesamt > 0 && (
-            <Text className="text-xs font-medium text-db-navy-light dark:text-[#9AA4B0]">
-              Vom Ausbilder unterschrieben: {unterschriften.unterschrieben} von {unterschriften.gesamt} Wochen
-            </Text>
+          {nachweisWochenGesamt > 0 && (
+            <View>
+              <Pressable
+                onPress={() => setCheckOffen((o) => !o)}
+                disabled={offeneWochen.length === 0}
+                className="flex-row items-center gap-1"
+              >
+                <Text className="text-xs font-medium text-db-navy-light dark:text-[#9AA4B0]">
+                  Vom Ausbilder unterschrieben: {unterschriften.unterschrieben} von {nachweisWochenGesamt} Wochen
+                  {offeneWochen.length > 0 ? (
+                    <Text className="text-db-amber"> · {offeneWochen.length} offen</Text>
+                  ) : (
+                    <Text className="text-db-green"> · alles vollständig</Text>
+                  )}
+                </Text>
+                {offeneWochen.length > 0 && (
+                  <View style={{ transform: [{ rotate: checkOffen ? '180deg' : '0deg' }] }}>
+                    <ChevronDown size={13} color="#5C6670" />
+                  </View>
+                )}
+              </Pressable>
+              {checkOffen && offeneWochen.length > 0 && (
+                <View className="mt-2 gap-0.5 rounded-xl border border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24] p-2">
+                  <Text className="px-2 pb-1 text-xs text-db-navy-light dark:text-[#9AA4B0]">
+                    Für die Prüfungsanmeldung muss jede Woche eingetragen und unterschrieben sein. Tipp auf eine Woche,
+                    um sie zu öffnen.
+                  </Text>
+                  {offeneWochen.map((o) => (
+                    <Pressable
+                      key={o.woche}
+                      onPress={() => {
+                        setAusgewaehlteWoche(o.woche)
+                        setCheckOffen(false)
+                      }}
+                      className="flex-row items-center justify-between gap-2 rounded-lg px-2 py-1.5"
+                    >
+                      <Text className="text-xs text-db-navy dark:text-[#EEF1F4]">
+                        Woche {wochenLabel(o.woche)}
+                        {o.woche.slice(0, 4) !== jahrJetzt && ` ${o.woche.slice(0, 4)}`}
+                      </Text>
+                      <Text className={`text-xs font-medium ${offenLabel[o.status].farbe}`}>{offenLabel[o.status].text}</Text>
+                    </Pressable>
+                  ))}
+                </View>
+              )}
+            </View>
           )}
         </View>
 
