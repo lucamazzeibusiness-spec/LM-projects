@@ -1,4 +1,4 @@
-import { BadgeCheck, CalendarCheck, ChevronLeft, ChevronRight, Download, Eye, Loader2, Pencil, Plus, X } from 'lucide-react'
+import { BadgeCheck, CalendarCheck, ChevronDown, ChevronLeft, ChevronRight, Download, Eye, Loader2, Pencil, Plus, X } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
 import { BerichtStatusBadge } from '../components/Badges'
 import GrammatikPruefung from '../components/GrammatikPruefung'
@@ -8,7 +8,7 @@ import { useAusbildungsplan, type Wochenvorlage } from '../context/Ausbildungspl
 import { useBerichtsheft } from '../context/BerichtsheftContext'
 import { berichtsheftStreak, usePunkte, vergebeneIds } from '../context/PunkteContext'
 import type { AusbildungsblockTyp, BerichtsheftEintrag, BerichtsheftKategorie } from '../data/mock'
-import { unterschriebeneWochen, wochenStatus } from '../lib/unterschriften'
+import { offeneNachweisWochen, type OffeneWoche, unterschriebeneWochen, wochenStatus } from '../lib/unterschriften'
 import { KRANKHEITSTAGE_GRENZE, KRANKHEITSTAGE_WARNUNG, krankheitstage } from '../lib/fehlzeiten'
 import { bulletEingabeVerarbeiten, haeufigeStichpunkte, hatEchtenInhalt, stichpunktAnhaengen } from '../lib/stichpunkte'
 import {
@@ -60,6 +60,12 @@ function neuerTageseintragFuer(datumISO: string, vorlage: Wochenvorlage): Berich
   }
 }
 
+const offenLabel: Record<OffeneWoche['status'], { text: string; farbe: string }> = {
+  leer: { text: 'Fehlt', farbe: 'text-db-red' },
+  Entwurf: { text: 'Nicht eingereicht', farbe: 'text-db-amber' },
+  Eingereicht: { text: 'Wartet auf Unterschrift', farbe: 'text-db-amber' },
+}
+
 export default function Berichtsheft() {
   const { profil } = useAzubiProfil()
   const { eintraege, setEintraege } = useBerichtsheft()
@@ -72,6 +78,7 @@ export default function Berichtsheft() {
   const [signaturOffen, setSignaturOffen] = useState(false)
   const [unterschrift, setUnterschrift] = useState<string | null>(null)
   const [ausgewaehlteWoche, setAusgewaehlteWoche] = useState(() => wochenSchluessel(heuteISO()))
+  const [checkOffen, setCheckOffen] = useState(false)
 
   const heute = heuteISO()
   const heutigerEintrag = eintraege.find((e) => e.datumISO === heute)
@@ -79,6 +86,7 @@ export default function Berichtsheft() {
   const heuteFrei = !vorlage[wochentagIndexVon(heute)]
   const krankTage = krankheitstage(eintraege)
   const unterschriften = unterschriebeneWochen(eintraege)
+  const jahrJetzt = heuteISO().slice(0, 4)
 
   // Eigene, oft verwendete Stichpunkte aus früheren Tagen (neueste zuerst) als Schnellauswahl.
   const fruehereTexte = useMemo(
@@ -95,6 +103,8 @@ export default function Berichtsheft() {
   // Ungültige Eingaben (z. B. Tippfehler) gelten als nicht gesetzt – sonst würde die Nr. "NaN"
   // und die Wochennavigation ließe sich nicht mehr zurückblättern.
   const beginnISO = profil?.ausbildungsbeginn ? datumAlsISO(profil.ausbildungsbeginn) : null
+  const offeneWochen = useMemo(() => offeneNachweisWochen(eintraege, beginnISO, heute), [eintraege, beginnISO, heute])
+  const nachweisWochenGesamt = unterschriften.unterschrieben + offeneWochen.length
   const beginnSchluessel = beginnISO ? wochenSchluessel(beginnISO) : null
   const kannZurueck = !beginnSchluessel || ausgewaehlteWoche > beginnSchluessel
 
@@ -278,10 +288,50 @@ export default function Berichtsheft() {
         >
           Krankheitstage insgesamt: {krankTage} von {KRANKHEITSTAGE_GRENZE}
         </p>
-        {unterschriften.gesamt > 0 && (
-          <p className="text-xs font-medium text-db-navy-light">
-            Vom Ausbilder unterschrieben: {unterschriften.unterschrieben} von {unterschriften.gesamt} Wochen
-          </p>
+        {nachweisWochenGesamt > 0 && (
+          <div>
+            <button
+              onClick={() => setCheckOffen((o) => !o)}
+              disabled={offeneWochen.length === 0}
+              className="flex items-center gap-1 text-left text-xs font-medium text-db-navy-light hover:text-db-navy disabled:hover:text-db-navy-light"
+            >
+              <span>
+                Vom Ausbilder unterschrieben: {unterschriften.unterschrieben} von {nachweisWochenGesamt} Wochen
+                {offeneWochen.length > 0 ? (
+                  <span className="text-db-amber"> · {offeneWochen.length} offen</span>
+                ) : (
+                  <span className="text-db-green"> · alles vollständig</span>
+                )}
+              </span>
+              {offeneWochen.length > 0 && (
+                <ChevronDown size={13} className={`shrink-0 transition-transform ${checkOffen ? 'rotate-180' : ''}`} />
+              )}
+            </button>
+            {checkOffen && offeneWochen.length > 0 && (
+              <div className="mt-2 space-y-0.5 rounded-xl border border-db-gray-200 bg-db-surface p-2">
+                <p className="px-2 pb-1 text-xs text-db-navy-light">
+                  Für die Prüfungsanmeldung muss jede Woche eingetragen und unterschrieben sein. Tipp auf eine Woche, um
+                  sie zu öffnen.
+                </p>
+                {offeneWochen.map((o) => (
+                  <button
+                    key={o.woche}
+                    onClick={() => {
+                      setAusgewaehlteWoche(o.woche)
+                      setCheckOffen(false)
+                    }}
+                    className="flex w-full items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-left text-xs hover:bg-db-gray-50"
+                  >
+                    <span className="text-db-navy">
+                      Woche {wochenLabel(o.woche)}
+                      {o.woche.slice(0, 4) !== jahrJetzt && ` ${o.woche.slice(0, 4)}`}
+                    </span>
+                    <span className={`font-medium ${offenLabel[o.status].farbe}`}>{offenLabel[o.status].text}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         )}
       </div>
 
