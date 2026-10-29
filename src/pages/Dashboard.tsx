@@ -8,7 +8,7 @@ import { useAusbildungsplan } from '../context/AusbildungsplanContext'
 import { useBerichtsheft } from '../context/BerichtsheftContext'
 import { useLernaufgaben } from '../context/LernaufgabenContext'
 import { KRANKHEITSTAGE_GRENZE, KRANKHEITSTAGE_WARNUNG, krankheitstage } from '../lib/fehlzeiten'
-import { hatEchtenInhalt } from '../lib/stichpunkte'
+import { offeneNachweisWochen } from '../lib/unterschriften'
 import {
   erinnerungAktivieren,
   erinnerungDeaktivieren,
@@ -16,7 +16,7 @@ import {
   erinnerungWirdUnterstuetzt,
   heuteErinnern,
 } from '../lib/erinnerung'
-import { aktuelleWochentage, heuteISO, heutigerWochentagIndex, wochenSchluessel } from '../lib/wochen'
+import { aktuelleWochentage, datumAlsISO, heuteISO, heutigerWochentagIndex } from '../lib/wochen'
 import { naechstePruefungFuer } from '../lib/pruefung'
 import { type AusbildungsblockTyp } from '../data/mock'
 
@@ -45,15 +45,10 @@ export default function Dashboard() {
   if (!profil) return null
 
   const offen = lernaufgaben.filter((a) => a.status !== 'Erledigt')
-  // Vergangene Wochen mit Einträgen, deren Ausbildungsnachweis noch nicht unterschrieben und
-  // exportiert wurde – die laufende Woche zählt nicht, die ist ja noch in Arbeit.
-  const dieseWoche = wochenSchluessel(heuteISO())
-  const offeneWochen = new Set(
-    eintraege
-      .filter((e) => e.status === 'Entwurf' && hatEchtenInhalt(e.taetigkeiten))
-      .map((e) => wochenSchluessel(e.datumISO))
-      .filter((w) => w < dieseWoche),
-  ).size
+  // Vergangene Wochen, die ganz fehlen oder noch nicht als Ausbildungsnachweis eingereicht wurden –
+  // gleiche Zählung wie der Vollständigkeits-Check im Berichtsheft, die laufende Woche zählt nicht.
+  const beginnISO = profil.ausbildungsbeginn ? datumAlsISO(profil.ausbildungsbeginn) : null
+  const offeneWochen = offeneNachweisWochen(eintraege, beginnISO, heuteISO()).filter((o) => o.status !== 'Eingereicht').length
 
   const heuteIndex = heutigerWochentagIndex()
   const heutigerBlock = vorlage[heuteIndex]
