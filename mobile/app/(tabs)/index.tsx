@@ -8,10 +8,11 @@ import { useAzubiProfil } from '../../context/AzubiProfilContext'
 import { useAusbildungsplan } from '../../context/AusbildungsplanContext'
 import { useBerichtsheft } from '../../context/BerichtsheftContext'
 import { useLernaufgaben } from '../../context/LernaufgabenContext'
-import { erinnerungAktivieren, erinnerungDeaktivieren, erinnerungIstAktiv, heuteErinnern } from '../../lib/erinnerung'
+import { erinnerungAktivieren, erinnerungDeaktivieren, erinnerungenPlanen, erinnerungIstAktiv } from '../../lib/erinnerung'
 import { KRANKHEITSTAGE_GRENZE, KRANKHEITSTAGE_WARNUNG, krankheitstage } from '../../lib/fehlzeiten'
+import { hatEchtenInhalt } from '../../lib/stichpunkte'
 import { offeneNachweisWochen } from '../../lib/unterschriften'
-import { aktuelleWochentage, datumAlsISO, heuteISO, heutigerWochentagIndex } from '../../lib/wochen'
+import { aktuelleWochentage, datumAlsISO, heuteISO, heutigerWochentagIndex, tagVerschieben, wochentagIndexVon } from '../../lib/wochen'
 import { naechstePruefungFuer } from '../../lib/pruefung'
 import { type AusbildungsblockTyp } from '../../data/mock'
 
@@ -20,6 +21,8 @@ const typStyle: Record<AusbildungsblockTyp, string> = {
   Berufsschule: 'bg-purple-50 dark:bg-purple-500/15 text-purple-700 dark:text-purple-300',
   'DB Training': 'bg-orange-50 dark:bg-orange-500/15 text-orange-700 dark:text-orange-300',
 }
+
+const ERINNERUNG_VORAUS_TAGE = 7
 
 export default function Dashboard() {
   const { profil } = useAzubiProfil()
@@ -37,9 +40,16 @@ export default function Dashboard() {
     erinnerungIstAktiv().then(setErinnerungAn)
   }, [])
 
+  // Ausbildungstage der nächsten Woche (ab heute), für die noch kein Eintrag da ist – als Text,
+  // damit die Erinnerungen nur neu geplant werden, wenn sich daran etwas ändert.
+  const tageOhneEintrag = Array.from({ length: ERINNERUNG_VORAUS_TAGE }, (_, i) => tagVerschieben(heuteISO(), i))
+    .filter((d) => vorlage[wochentagIndexVon(d)])
+    .filter((d) => !eintraege.some((e) => e.datumISO === d && hatEchtenInhalt(e.taetigkeiten)))
+    .join(',')
+
   useEffect(() => {
-    if (!heutigerEintrag && !heuteFrei) heuteErinnern('Dein Berichtsheft-Eintrag für heute fehlt noch.')
-  }, [heutigerEintrag, heuteFrei])
+    erinnerungenPlanen(tageOhneEintrag ? tageOhneEintrag.split(',') : [])
+  }, [tageOhneEintrag, erinnerungAn])
 
   if (!profil) return null
 
@@ -68,7 +78,6 @@ export default function Dashboard() {
     } else {
       const ok = await erinnerungAktivieren()
       setErinnerungAn(ok)
-      if (ok && !heutigerEintrag && !heuteFrei) heuteErinnern('Dein Berichtsheft-Eintrag für heute fehlt noch.')
     }
   }
 
@@ -159,7 +168,7 @@ export default function Dashboard() {
         <View className="flex-row items-center gap-2">
           {erinnerungAn ? <Bell size={16} color="#1E8A3C" /> : <BellOff size={16} color="#5C6670" />}
           <Text className="text-sm text-db-navy dark:text-[#EEF1F4]">
-            {erinnerungAn ? 'Tägliche Erinnerung aktiv' : 'Tägliche Erinnerung aktivieren'}
+            {erinnerungAn ? 'Erinnerung um 16:30 aktiv' : 'Erinnerung um 16:30 aktivieren'}
           </Text>
         </View>
         <Text className="text-xs font-medium text-db-red">{erinnerungAn ? 'Deaktivieren' : 'Aktivieren'}</Text>
