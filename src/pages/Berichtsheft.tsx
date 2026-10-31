@@ -11,6 +11,7 @@ import type { AusbildungsblockTyp, BerichtsheftEintrag, BerichtsheftKategorie } 
 import { offeneNachweisWochen, type OffeneWoche, unterschriebeneWochen, wochenStatus } from '../lib/unterschriften'
 import { KRANKHEITSTAGE_GRENZE, KRANKHEITSTAGE_WARNUNG, krankheitstage } from '../lib/fehlzeiten'
 import { bulletEingabeVerarbeiten, haeufigeStichpunkte, hatEchtenInhalt, stichpunktAnhaengen } from '../lib/stichpunkte'
+import { feiertagAm } from '../lib/feiertage'
 import {
   arbeitstageDerWoche,
   datumAlsISO,
@@ -54,7 +55,8 @@ function neuerTageseintragFuer(datumISO: string, vorlage: Wochenvorlage): Berich
     datumISO,
     datum: datumLabelFuer(datumISO),
     kategorie: block ? kategorieFuerBlock[block.typ] : 'Betrieblich',
-    taetigkeiten: '',
+    // An bundesweiten Feiertagen ist der Eintrag schon vorausgefüllt – nur noch speichern.
+    taetigkeiten: feiertagAm(datumISO) ? '- Feiertag' : '',
     stunden: istFreitag ? 6 : 8,
     status: 'Entwurf',
   }
@@ -82,8 +84,10 @@ export default function Berichtsheft() {
 
   const heute = heuteISO()
   const heutigerEintrag = eintraege.find((e) => e.datumISO === heute)
-  // Laut Ausbildungsplan freier Tag (standardmäßig Sa/So): Eintragen geht, wird aber nicht angemahnt.
-  const heuteFrei = !vorlage[wochentagIndexVon(heute)]
+  // Laut Ausbildungsplan freier Tag (standardmäßig Sa/So) oder bundesweiter Feiertag: Eintragen
+  // geht, wird aber nicht angemahnt.
+  const heuteFeiertag = feiertagAm(heute)
+  const heuteFrei = !vorlage[wochentagIndexVon(heute)] || heuteFeiertag !== null
   const krankTage = krankheitstage(eintraege)
   const unterschriften = unterschriebeneWochen(eintraege)
   const jahrJetzt = heuteISO().slice(0, 4)
@@ -341,7 +345,7 @@ export default function Berichtsheft() {
           className="flex w-full items-center justify-between rounded-xl border border-db-gray-200 bg-db-surface px-4 py-3.5 text-left"
         >
           <span className="flex items-center gap-2 text-sm font-semibold text-db-navy-light">
-            <CalendarCheck size={18} /> Heute frei ({heutigesDatumLabel()}) – kein Eintrag nötig
+            <CalendarCheck size={18} /> {heuteFeiertag ?? 'Heute frei'} ({heutigesDatumLabel()}) – kein Eintrag nötig
           </span>
           <span className="flex items-center gap-1 text-xs font-medium text-db-navy-light">
             <Plus size={13} /> Trotzdem
@@ -565,7 +569,10 @@ export default function Berichtsheft() {
                   onClick={() => setBearbeitung(neuerTageseintragFuer(datumISO, vorlage))}
                   className="flex w-full items-center justify-between rounded-xl border border-dashed border-db-gray-200 bg-db-surface p-4 text-left hover:border-db-red/40"
                 >
-                  <span className="text-sm font-medium text-db-navy-light">{datumLabelFuer(datumISO)}</span>
+                  <span className="text-sm font-medium text-db-navy-light">
+                    {datumLabelFuer(datumISO)}
+                    {feiertagAm(datumISO) && ` · ${feiertagAm(datumISO)}`}
+                  </span>
                   <span className="flex items-center gap-1 text-xs font-medium text-db-red">
                     <Plus size={13} /> Eintragen
                   </span>

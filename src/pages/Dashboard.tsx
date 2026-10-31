@@ -16,6 +16,7 @@ import {
   erinnerungWirdUnterstuetzt,
   heuteErinnern,
 } from '../lib/erinnerung'
+import { feiertagAm } from '../lib/feiertage'
 import { aktuelleWochentage, datumAlsISO, heuteISO, heutigerWochentagIndex } from '../lib/wochen'
 import { naechstePruefungFuer } from '../lib/pruefung'
 import { type AusbildungsblockTyp } from '../data/mock'
@@ -34,9 +35,10 @@ export default function Dashboard() {
   const [erinnerungAn, setErinnerungAn] = useState(erinnerungIstAktiv)
 
   const heutigerEintrag = eintraege.find((e) => e.datumISO === heuteISO())
-  // Tage ohne Block im Ausbildungsplan (standardmäßig Sa/So) gelten als frei – dort wird
+  // Tage ohne Block im Ausbildungsplan (standardmäßig Sa/So) und bundesweite Feiertage gelten als frei – dort wird
   // weder erinnert noch ein fehlender Eintrag angemahnt.
-  const heuteFrei = !vorlage[heutigerWochentagIndex()]
+  const heuteFeiertag = feiertagAm(heuteISO())
+  const heuteFrei = !vorlage[heutigerWochentagIndex()] || heuteFeiertag !== null
 
   useEffect(() => {
     if (!heutigerEintrag && !heuteFrei) heuteErinnern('Dein Berichtsheft-Eintrag für heute fehlt noch.')
@@ -122,7 +124,7 @@ export default function Dashboard() {
               {heutigerEintrag
                 ? 'Berichtsheft heute eingetragen'
                 : heuteFrei
-                  ? 'Heute frei – kein Eintrag nötig'
+                  ? `${heuteFeiertag ?? 'Heute frei'} – kein Eintrag nötig`
                   : 'Berichtsheft-Eintrag fehlt noch'}
             </span>
             <ArrowRight size={14} />
