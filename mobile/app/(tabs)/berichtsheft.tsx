@@ -13,6 +13,7 @@ import { ausbildungsnachweisVorschauHtml, exportBerichtsheftPdf } from '../../li
 import { offeneNachweisWochen, type OffeneWoche, unterschriebeneWochen, wochenStatus } from '../../lib/unterschriften'
 import { KRANKHEITSTAGE_GRENZE, KRANKHEITSTAGE_WARNUNG, krankheitstage } from '../../lib/fehlzeiten'
 import { bulletEingabeVerarbeiten, haeufigeStichpunkte, hatEchtenInhalt, stichpunktAnhaengen } from '../../lib/stichpunkte'
+import { feiertagAm } from '../../lib/feiertage'
 import {
   arbeitstageDerWoche,
   datumAlsISO,
@@ -57,7 +58,8 @@ function neuerTageseintragFuer(datumISO: string, vorlage: Wochenvorlage): Berich
     datumISO,
     datum: datumLabelFuer(datumISO),
     kategorie: block ? kategorieFuerBlock[block.typ] : 'Betrieblich',
-    taetigkeiten: '',
+    // An bundesweiten Feiertagen ist der Eintrag schon vorausgefüllt – nur noch speichern.
+    taetigkeiten: feiertagAm(datumISO) ? '- Feiertag' : '',
     stunden: istFreitag ? 6 : 8,
     status: 'Entwurf',
   }
@@ -86,8 +88,10 @@ export default function Berichtsheft() {
 
   const heute = heuteISO()
   const heutigerEintrag = eintraege.find((e) => e.datumISO === heute)
-  // Laut Ausbildungsplan freier Tag (standardmäßig Sa/So): Eintragen geht, wird aber nicht angemahnt.
-  const heuteFrei = !vorlage[wochentagIndexVon(heute)]
+  // Laut Ausbildungsplan freier Tag (standardmäßig Sa/So) oder bundesweiter Feiertag: Eintragen
+  // geht, wird aber nicht angemahnt.
+  const heuteFeiertag = feiertagAm(heute)
+  const heuteFrei = !vorlage[wochentagIndexVon(heute)] || heuteFeiertag !== null
   const krankTage = krankheitstage(eintraege)
   const unterschriften = unterschriebeneWochen(eintraege)
   const jahrJetzt = heuteISO().slice(0, 4)
@@ -362,7 +366,7 @@ export default function Berichtsheft() {
               {heutigerEintrag
                 ? `Heute schon erfasst (${heutigesDatumLabel()})`
                 : heuteFrei
-                  ? `Heute frei (${heutigesDatumLabel()}) – kein Eintrag nötig`
+                  ? `${heuteFeiertag ?? 'Heute frei'} (${heutigesDatumLabel()}) – kein Eintrag nötig`
                   : `Heutigen Eintrag ausfüllen (${heutigesDatumLabel()})`}
             </Text>
           </View>
@@ -466,7 +470,10 @@ export default function Berichtsheft() {
                     onPress={() => setBearbeitung(neuerTageseintragFuer(datumISO, vorlage))}
                     className="flex-row items-center justify-between rounded-xl border border-dashed border-db-gray-200 dark:border-[#2A323D] bg-white dark:bg-[#171C24] p-4"
                   >
-                    <Text className="text-sm font-medium text-db-navy-light dark:text-[#9AA4B0]">{datumLabelFuer(datumISO)}</Text>
+                    <Text className="text-sm font-medium text-db-navy-light dark:text-[#9AA4B0]">
+                      {datumLabelFuer(datumISO)}
+                      {feiertagAm(datumISO) && ` · ${feiertagAm(datumISO)}`}
+                    </Text>
                     <View className="flex-row items-center gap-1">
                       <Plus size={13} color="#EC0016" />
                       <Text className="text-xs font-medium text-db-red">Eintragen</Text>

@@ -12,6 +12,7 @@ import { erinnerungAktivieren, erinnerungDeaktivieren, erinnerungenPlanen, erinn
 import { KRANKHEITSTAGE_GRENZE, KRANKHEITSTAGE_WARNUNG, krankheitstage } from '../../lib/fehlzeiten'
 import { hatEchtenInhalt } from '../../lib/stichpunkte'
 import { offeneNachweisWochen } from '../../lib/unterschriften'
+import { feiertagAm } from '../../lib/feiertage'
 import { aktuelleWochentage, datumAlsISO, heuteISO, heutigerWochentagIndex, tagVerschieben, wochentagIndexVon } from '../../lib/wochen'
 import { naechstePruefungFuer } from '../../lib/pruefung'
 import { type AusbildungsblockTyp } from '../../data/mock'
@@ -32,9 +33,10 @@ export default function Dashboard() {
   const [erinnerungAn, setErinnerungAn] = useState(false)
 
   const heutigerEintrag = eintraege.find((e) => e.datumISO === heuteISO())
-  // Tage ohne Block im Ausbildungsplan (standardmäßig Sa/So) gelten als frei – dort wird
+  // Tage ohne Block im Ausbildungsplan (standardmäßig Sa/So) und bundesweite Feiertage gelten als frei – dort wird
   // weder erinnert noch ein fehlender Eintrag angemahnt.
-  const heuteFrei = !vorlage[heutigerWochentagIndex()]
+  const heuteFeiertag = feiertagAm(heuteISO())
+  const heuteFrei = !vorlage[heutigerWochentagIndex()] || heuteFeiertag !== null
 
   useEffect(() => {
     erinnerungIstAktiv().then(setErinnerungAn)
@@ -43,7 +45,7 @@ export default function Dashboard() {
   // Ausbildungstage der nächsten Woche (ab heute), für die noch kein Eintrag da ist – als Text,
   // damit die Erinnerungen nur neu geplant werden, wenn sich daran etwas ändert.
   const tageOhneEintrag = Array.from({ length: ERINNERUNG_VORAUS_TAGE }, (_, i) => tagVerschieben(heuteISO(), i))
-    .filter((d) => vorlage[wochentagIndexVon(d)])
+    .filter((d) => vorlage[wochentagIndexVon(d)] && !feiertagAm(d))
     .filter((d) => !eintraege.some((e) => e.datumISO === d && hatEchtenInhalt(e.taetigkeiten)))
     .join(',')
 
@@ -134,7 +136,7 @@ export default function Dashboard() {
                 {heutigerEintrag
                   ? 'Berichtsheft heute eingetragen'
                   : heuteFrei
-                    ? 'Heute frei – kein Eintrag nötig'
+                    ? `${heuteFeiertag ?? 'Heute frei'} – kein Eintrag nötig`
                     : 'Berichtsheft-Eintrag fehlt noch'}
               </Text>
             </View>
