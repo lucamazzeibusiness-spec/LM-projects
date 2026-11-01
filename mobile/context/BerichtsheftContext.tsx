@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, type Dispatch, type ReactNode, type SetStateAction } from 'react'
-import { berichtsheft as initialEintraege, type BerichtsheftEintrag } from '../data/mock'
+import { berichtsheftBereinigen, type BerichtsheftEintrag } from '../data/mock'
 import { cloudSchreiben } from '../lib/cloudSync'
 import { ladeGespeichert, speichere } from '../lib/storage'
 
@@ -13,12 +13,12 @@ interface BerichtsheftContextValue {
 const BerichtsheftContext = createContext<BerichtsheftContextValue | null>(null)
 
 export function BerichtsheftProvider({ children }: { children: ReactNode }) {
-  const [eintraege, setEintraege] = useState<BerichtsheftEintrag[]>(initialEintraege)
+  const [eintraege, setEintraege] = useState<BerichtsheftEintrag[]>([])
   const [geladen, setGeladen] = useState(false)
 
   useEffect(() => {
-    ladeGespeichert<BerichtsheftEintrag[]>(STORAGE_KEY, initialEintraege).then((e) => {
-      setEintraege(e)
+    ladeGespeichert<BerichtsheftEintrag[]>(STORAGE_KEY, []).then((e) => {
+      setEintraege(berichtsheftBereinigen(e))
       setGeladen(true)
     })
   }, [])
