@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, type Dispatch, type ReactNode, type SetStateAction } from 'react'
-import { berichtsheft as initialEintraege, type BerichtsheftEintrag } from '../data/mock'
+import { berichtsheftBereinigen, type BerichtsheftEintrag } from '../data/mock'
 import { cloudSchreiben } from '../lib/cloudSync'
 
 const STORAGE_KEY = 'berichtsheft:eintraege'
@@ -7,9 +7,9 @@ const STORAGE_KEY = 'berichtsheft:eintraege'
 function geladeneEintraege(): BerichtsheftEintrag[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? JSON.parse(raw) : initialEintraege
+    return raw ? berichtsheftBereinigen(JSON.parse(raw)) : []
   } catch {
-    return initialEintraege
+    return []
   }
 }
 

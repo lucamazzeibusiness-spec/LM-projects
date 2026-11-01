@@ -220,7 +220,11 @@ export interface BerichtsheftEintrag {
   ausbilderKommentar?: string
 }
 
-export const berichtsheft: BerichtsheftEintrag[] = [
+// Frühere Versionen haben neuen Nutzern diese erfundenen Beispiel-Einträge (samt Ausbilder-Kommentar)
+// ins Berichtsheft gelegt – sie landeten so im echten Ausbildungsnachweis und im Vollständigkeits-Check.
+// Neue Nutzer starten jetzt leer; unveränderte Beispiel-Einträge werden beim Laden entfernt
+// (siehe berichtsheftBereinigen).
+const berichtsheftAltesBeispiel: BerichtsheftEintrag[] = [
   {
     id: 'B-1',
     datumISO: '2026-09-08',
@@ -261,6 +265,14 @@ export const berichtsheft: BerichtsheftEintrag[] = [
     status: 'Entwurf',
   },
 ]
+
+// Ein Beispiel-Eintrag gilt als unverändert, wenn Datum und Inhalt noch stimmen – der Status zählt
+// nicht, weil schon ein Wochen-Export ihn ändert. Bearbeitete Einträge gehören dem Azubi und bleiben.
+export function berichtsheftBereinigen(eintraege: BerichtsheftEintrag[]): BerichtsheftEintrag[] {
+  const kennung = (e: BerichtsheftEintrag) => JSON.stringify([e.id, e.datumISO, e.kategorie, e.taetigkeiten, e.stunden])
+  const beispiel = new Set(berichtsheftAltesBeispiel.map(kennung))
+  return eintraege.filter((e) => !beispiel.has(kennung(e)))
+}
 
 export type AusbildungsberufName = 'Elektroniker für Betriebstechnik' | 'Industriemechaniker' | 'Mechatroniker'
 export type LernfeldStatus = 'Abgeschlossen' | 'Aktuell' | 'Geplant'
