@@ -1,0 +1,64 @@
+//@version=5
+// Screen Picks Trend — long-only trend-following strategy (single chart version)
+// Rules mirror the live Robinhood MCP strategy:
+//   BUY  : close > SMA(50) AND SMA(50) > SMA(200) AND RSI(14) < 70
+//   SELL : close < 0.97 × SMA(50)  (trend break)   — closes the long only
+//   STOP : 15% below entry price
+//   No shorts, no pyramiding, 5-bar cooldown after an exit.
+// Signals are evaluated on the bar close and filled on the NEXT bar's open (no look-ahead).
+strategy("Screen Picks Trend", overlay = true,
+     default_qty_type = strategy.percent_of_equity, default_qty_value = 33,
+     initial_capital = 100000, pyramiding = 0,
+     commission_type = strategy.commission.percent, commission_value = 0.05,
+     process_orders_on_close = false, max_labels_count = 500)
+
+// ── Inputs ──────────────────────────────────────────────
+fastLen   = input.int(50,  "Fast SMA")
+slowLen   = input.int(200, "Slow SMA")
+rsiLen    = input.int(14,  "RSI length")
+rsiMax    = input.float(70, "Max RSI to buy")
+exitPct   = input.float(3,  "Exit: % below fast SMA") / 100
+stopPct   = input.float(15, "Stop-loss %") / 100
+cooldown  = input.int(5,   "Bars to wait after an exit")
+startDate = input.time(timestamp("2023-07-20"), "Backtest start")
+
+// ── Indicators ──────────────────────────────────────────
+smaFast = ta.sma(close, fastLen)
+smaSlow = ta.sma(close, slowLen)
+rsiVal  = ta.rsi(close, rsiLen)
+
+// ── Cooldown tracking ───────────────────────────────────
+var int lastExitBar = na
+if strategy.position_size[1] > 0 and strategy.position_size == 0
+    lastExitBar := bar_index
+cooledDown = na(lastExitBar) or bar_index - lastExitBar > cooldown
+
+// ── Conditions ──────────────────────────────────────────
+inWindow  = time >= startDate
+buySignal = close > smaFast and smaFast > smaSlow and rsiVal < rsiMax
+sellSignal = close < smaFast * (1 - exitPct)
+
+// ── Orders (long only: "sell" = close the position) ─────
+if inWindow and strategy.position_size == 0 and buySignal and cooledDown
+    strategy.entry("Long", strategy.long)
+
+if strategy.position_size > 0
+    strategy.exit("Stop 15%", from_entry = "Long", stop = strategy.position_avg_price * (1 - stopPct))
+    if sellSignal
+        strategy.close("Long", comment = "Trend exit")
+
+// ── Visuals ─────────────────────────────────────────────
+plot(smaFast, "SMA 50",  color = color.new(color.orange, 0), linewidth = 2)
+plot(smaSlow, "SMA 200", color = color.new(color.blue, 0),   linewidth = 2)
+// Actual fills: position opened / closed on this bar
+entered = strategy.position_size > 0 and nz(strategy.position_size[1]) == 0
+exited  = strategy.position_size == 0 and nz(strategy.position_size[1]) > 0
+if entered
+    label.new(bar_index, low, "BUY\n" + str.tostring(strategy.position_avg_price, "#.##"),
+         style = label.style_label_up, color = color.new(color.green, 0),
+         textcolor = color.white, size = size.normal)
+if exited
+    label.new(bar_index, high, "SELL\n" + str.tostring(close, "#.##"),
+         style = label.style_label_down, color = color.new(color.red, 0),
+         textcolor = color.white, size = size.normal)
+bgcolor(strategy.position_size > 0 ? color.new(color.green, 92) : na, title = "In position")
