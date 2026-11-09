@@ -48,3 +48,30 @@ Caveats:
 - 28 stocks is still a small universe.
 - Survivorship bias: all 28 still exist today.
 - 11 years is one long bull market with three corrections.
+
+## 4. Bigger pool: 89 stocks (≈ 2015 S&P 100), Jan 2016 → Nov 2026
+
+| Strategy | Total | CAGR | Max DD | Years > SPY | Worst year vs SPY |
+|---|---|---|---|---|---|
+| SPY buy & hold | +283% | 13.3% | −34.1% | – | – |
+| Momentum 12-1 top 3 | +460% | 17.3% | −37.7% | 5/11 | −18% (2023) |
+| Momentum 12-1 top 5 | +393% | 15.9% | −32.3% | 5/11 | −18% (2016) |
+| Momentum 12-1 top 10 | +260% | 12.6% | −30.8% | 2/11 | −18% (2016) |
+| Top 5, only above 200d | +282% | 13.2% | −33.4% | 5/11 | −25% (2016) |
+| Top 5, hold SPY when SPY < 200d | +264% | 12.7% | −34.8% | 4/11 | −14% (2026) |
+| Momentum 6-1 top 5 | +241% | 12.0% | −37.3% | 5/11 | −27% (2026) |
+| Momentum 9-1 top 5 | +314% | 14.1% | −33.1% | 5/11 | −19% (2023) |
+| Momentum 3-1 top 5 | +112% | 7.2% | −53.0% | 4/11 | −32% (2020) |
+
+**Rebalance day:** top 5 CAGR was 15.9% / 16.1% / 19.4% / 17.9% when rebalancing 0 / 5 / 10 / 15 days before month-end.
+
+**Random 45-stock halves (40 draws):**
+- Top 3: median 14.0% CAGR (range 4.3%–25.3%). Beats SPY in 23/40.
+- Top 5: median 11.1% CAGR (range 8.4%–15.9%). Beats SPY in 9/40.
+
+**Conclusion:** 12-1 momentum with a concentrated top 3 has the best odds of beating SPY, but it is fragile:
+- It lagged SPY in more than half of the years.
+- Results swing a lot with the settings (lookback, number of stocks, rebalance day).
+- Most of the gain came in 2020–22.
+
+None of the tested rules beats SPY reliably.
