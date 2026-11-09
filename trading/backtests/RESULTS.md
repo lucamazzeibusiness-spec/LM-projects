@@ -75,3 +75,20 @@ Caveats:
 - Most of the gain came in 2020–22.
 
 None of the tested rules beats SPY reliably.
+
+## 5. Sector cap on momentum (89 stocks, 2016–2026)
+
+| Variant | CAGR | Max DD | Years > SPY |
+|---|---|---|---|
+| SPY | 13.3% | −34.1% | – |
+| Top 3, no cap | 17.3% | −37.7% | 5/11 |
+| Top 3, max 1 per sector | 14.4% | −35.1% | 7/11 |
+| Top 3, max 2 per sector | 17.3% | −37.7% | 5/11 |
+| Top 5, no cap | 15.9% | −32.3% | 5/11 |
+| Top 5, max 1 per sector | 15.3% | −28.2% | 7/11 |
+
+**Random 45-stock halves, top 3:**
+- No cap: median 14.0%, beats SPY in 23/40.
+- Max 1 per sector: median 12.9%, beats SPY in 18/40.
+
+**Decision (user, 2026-11-09):** pure top 3, no cap.

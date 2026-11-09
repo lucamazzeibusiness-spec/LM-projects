@@ -1,6 +1,6 @@
 # Trade Log – MCP account (••••4866)
 
-Strategy: **Screen Picks Trend** (long only, 3 slots).
+Strategy: **Screen Picks Trend** until 2026-11-09, then **Momentum Top 3** from 2026-11-10 (see STRATEGY.md).
 Buy when close > SMA50 > SMA200 and RSI14 < 70. Sell when close < 0.97 × SMA50, or on a 15% stop.
 News buys are half size, only on strong confirmed news.
 Times are German time (CET). Prices in USD. Each new row is added by the scheduled trading runs.
