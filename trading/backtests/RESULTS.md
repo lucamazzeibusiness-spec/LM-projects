@@ -92,3 +92,35 @@ None of the tested rules beats SPY reliably.
 - Max 1 per sector: median 12.9%, beats SPY in 18/40.
 
 **Decision (user, 2026-11-09):** pure top 3, no cap.
+
+## 6. Making momentum react to the present (top 3, 89 stocks, 2016–2026)
+
+| Variant | CAGR | Max DD | Years > SPY | Random pools: median / beats SPY / beats base |
+|---|---|---|---|---|
+| Base 12-1 (skip last month) | 17.3% | −37.7% | 5/11 | 14.0% / 23 / – |
+| Include latest month (12-0) | **23.0%** | −33.3% | 7/11 | **16.9% / 28 / 33** |
+| Only buy above 50d | 9.6% | −41.5% | 4/11 | 8.1% / 4 / 3 |
+| Only buy above 200d | 15.6% | −33.7% | 5/11 | 11.9% / 16 / 2 |
+| Skip if last month < −10% | 13.0% | −35.3% | 5/11 | 11.3% / 11 / 3 |
+| 15% stop-loss | 12.7% | −33.7% | 4/11 | 9.8% / 9 / 0 |
+| Sell below 50d mid-month | 4.7% | −34.6% | 4/11 | 2.5% / 0 / 0 |
+| Rebalance twice a month | 14.9% | −36.9% | 5/11 | 14.5% / 24 / 28 |
+| Rank by gain / volatility | 13.1% | −27.6% | 5/11 | 9.8% / 7 / 3 |
+
+**How many recent days to skip:**
+
+| Skip | CAGR | Max DD | Years > SPY | 2016–19 | 2020–22 | 2023–26 | Beats 12-1 (pools) |
+|---|---|---|---|---|---|---|---|
+| 0 days | 23.0% | −33.3% | 7/11 | +19% | +230% | +145% | 33/40 |
+| 5 days | 20.3% | −34.6% | 6/11 | +10% | +223% | +112% | 29/40 |
+| 10 days | 21.2% | −33.3% | 6/11 | +41% | +154% | +128% | 37/40 |
+| 15 days | 18.8% | −39.3% | 6/11 | +36% | +174% | +78% | 36/40 |
+
+**Conclusion:**
+- Stops, trend exits and filters all hurt.
+- Including more recent data helped consistently, across every skip setting and in the random pools.
+
+**Caveats:**
+- This contradicts the classic research, where skipping the last month helps.
+- Most of the edge came in 2020–22.
+- In 2016–19 the 0-day version lagged SPY badly: +19% vs +68%.
