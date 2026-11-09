@@ -3,7 +3,8 @@
 Usage: python3 rank.py <historicals JSON files...>
 Input: Robinhood get_equity_historicals outputs (daily bars, ~14 months, must include SPY).
 Signal: as of the last trading day of the PREVIOUS month (month-end close),
-        momentum = close 21 trading days before that / close 252 trading days before that - 1.
+        momentum = month-end close / close 252 trading days before - 1 (12-0: latest month INCLUDED,
+        changed 2026-11-09 after backtest section 6).
 Prints the ranking, the top 3, and the dates used.
 """
 import json, sys, datetime, os
@@ -21,7 +22,8 @@ first_of_month = datetime.date.today().replace(day=1).isoformat()
 asof = max(d for d in days if d < first_of_month)
 j = days.index(asof)
 if j < 252: sys.exit(f"ERROR: need >=253 SPY bars before {asof}, have {j+1}")
-d21, d252 = days[j - 21], days[j - 252]
+SKIP = 0   # trading days skipped at the end; 0 = include the latest month
+d21, d252 = days[j - SKIP], days[j - 252]
 rows, missing = [], []
 for s in UNIVERSE:
     c = closes.get(s, {})
