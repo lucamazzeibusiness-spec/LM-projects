@@ -29,7 +29,7 @@ The daily run only reports a status. The 14:45 news briefing is for information 
 ## Rebalance history
 | Date | Signal as of | Top 3 | Notes |
 |---|---|---|---|
-| 2026-11-10 | 2026-10-30 | AMD, TXN, COP (preview, 12-0) | First rebalance. Sells MSFT and DXCM |
+| 2026-11-10 | 2026-10-30 | AMD, TXN, COP | First rebalance done 16:20 CET. Sold MSFT and DXCM. Bought $187.97 each. Cash $0.02 |
 
 ## Expectations (backtest 2016–2026, 89 stocks, 12-0)
 - About 23% per year vs the S&P 500's 13%. Expect less live.
