@@ -22,6 +22,15 @@ Runs on the first trading day of each month, at the 16:12 German time run (10:12
 No trades: no stop-loss, no trend exits, no news buys. This matches the backtest.
 The daily run only reports a status. The 14:45 news briefing is for information only.
 
+## Monitoring (user decisions, 2026-11-11)
+- **Drawdown alert at −35%:** the daily run compares the account value with the peak in `momentum/monitor.json`.
+  - Drawdown = value ÷ (peak + deposits since the peak) − 1.
+  - A new high updates the peak.
+  - At −35% or worse: a push alert, **no trades**. The user decides.
+  - Alert again only at a further −5% (−40%, −45%, …), or after recovering above −30% and falling below −35% again.
+- **12-month review on 2027-11-10:** account vs SPY since the start ($564.14 / SPY $750.51 on 2026-11-10, 16:20 CET), adjusted for deposits.
+- **Deposits:** record every deposit in `monitor.json` (`net_deposits_since_start`) so performance and drawdown stay correct.
+
 ## Logging
 - Every fill goes into `trade_log.md`.
 - Every rebalance goes into the rebalance table below.

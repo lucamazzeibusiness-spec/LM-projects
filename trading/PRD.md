@@ -131,4 +131,5 @@ Backtest 2016–2026, 89 large US stocks with full history, 12-0 window, 0.05% s
 1. **Horizon:** judge only after 12+ months of continuous live running.
 2. **Friction:** expect live returns somewhat below the backtest (spreads, slippage, rounding, and survivor bias in the backtest).
 3. **No changes during weak phases:** don't change the strategy just because it's lagging.
-4. **−35% watch level:** it's a KPI, **not an automatic stop**. If the account falls below it, the copilot alerts the user and the user decides. Still open: what exactly should happen then? (Template question in `CONTEXT_FOR_NOTEBOOKLM.md`, section 7A.)
+4. **−35% alert (user decision, 2026-11-11):** a drawdown of −35% or worse below the peak account value triggers a **push alert only**. No automatic stop; the user decides. Tracked in `momentum/monitor.json`.
+5. **12-month review on 2027-11-10 (user decision):** the first full evaluation, account vs S&P 500 since the start.
