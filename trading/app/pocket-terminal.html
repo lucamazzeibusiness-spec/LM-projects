@@ -1,106 +1,109 @@
 <title>Pocket Terminal</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
 <style>
-/* Layout: a station departure hall. One split-flap board per track, enamel track plates as navigation,
-   signal lamps for risk, a PA-style announcement strip for the chat. Deliberately single-theme: a board is dark. */
+/* A station departure hall: split-flap boards for the big figures, enamel track plates in a thumb bar at the bottom,
+   signal lamps for risk, an information desk for the chat. Single dark theme on purpose: a board is dark. */
 :root{
-  --hall:#0e0f10;          /* the wall the board hangs on */
-  --board:#17181a;         /* board housing */
-  --flap:#232427;          /* flap face */
-  --flap-lo:#1b1c1f;       /* lower flap half */
-  --seam:#050506;          /* the split */
-  --char:#efece2;          /* flap lettering */
-  --plate:#1f4d3a;         /* enamel track plate (station green) */
-  --plate-ink:#efece2;
-  --lamp:#f2b632;          /* signal amber */
-  --go:#7ccf8e; --stop:#ff7a6b; --mute:#7d7f84;
+  --hall:#0e0f10; --board:#17181a; --flap:#25262a; --flap-lo:#1d1e21; --seam:#050506;
+  --char:#efece2; --ink2:#c4c6ca; --mute:#9a9ca2; --rule:#2a2c30;
+  --plate:#1f4d3a; --plate-edge:#2c6a51; --plate-ink:#efece2;
+  --lamp:#f2b632; --go:#86d897; --stop:#ff8576;
   --flapfont:"Barlow Condensed","Arial Narrow",Impact,sans-serif;
   --text:"Barlow","Helvetica Neue",Arial,sans-serif;
+  --navh:66px;
   color-scheme:dark;
 }
 [hidden]{display:none!important}
-html,body{height:100%}
-body{background:var(--hall);color:var(--char);font:15px/1.45 var(--text);font-variant-numeric:tabular-nums;
-  background-image:radial-gradient(120% 60% at 50% -10%,#1a1c1f 0%,var(--hall) 60%)}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--hall)}
-.hall{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px 40px;display:grid;gap:18px}
+*{-webkit-tap-highlight-color:transparent}
+body{background:var(--hall);color:var(--char);font:16px/1.5 var(--text);font-variant-numeric:tabular-nums;margin:0;
+  background-image:radial-gradient(120% 50% at 50% -10%,#1a1c1f 0%,var(--hall) 60%);
+  padding-bottom:calc(var(--navh) + 24px + env(safe-area-inset-bottom,0px))}
+.hall{max-width:640px;margin:0 auto;padding:calc(14px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px));display:grid;gap:16px}
+.view{display:grid;gap:16px;min-width:0}
 
 /* ---------- split-flap cells ---------- */
-.fl{display:inline-flex;gap:2px;vertical-align:middle}
-.fl i{--w:.78em;position:relative;display:inline-grid;place-items:center;width:var(--w);height:1.42em;font:600 1em/1 var(--flapfont);
+.fl{display:inline-flex;gap:2px;vertical-align:middle;max-width:100%;flex-wrap:nowrap}
+.fl i{position:relative;display:inline-grid;place-items:center;width:.74em;height:1.36em;font:600 1em/1 var(--flapfont);
   font-style:normal;text-transform:uppercase;color:var(--char);border-radius:2px;
-  background:linear-gradient(180deg,var(--flap) 0 50%,var(--flap-lo) 50% 100%);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 1px 0 rgba(0,0,0,.6)}
-.fl i::after{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:var(--seam);opacity:.45}
-.fl.xl i::after,.fl.lg i::after{height:2px;top:calc(50% - 1px);opacity:.85}
+  background:linear-gradient(180deg,var(--flap) 0 50%,var(--flap-lo) 50% 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 1px 0 rgba(0,0,0,.6)}
+.fl.lg i::after,.fl.xl i::after{content:"";position:absolute;left:0;right:0;top:calc(50% - 1px);height:2px;background:var(--seam);opacity:.8}
+.fl.md i::after{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:var(--seam);opacity:.3}
 .fl.go i{color:var(--go)} .fl.stop i{color:var(--stop)} .fl.amb i{color:var(--lamp)} .fl.mute i{color:var(--mute)}
-.fl.xl{font-size:clamp(30px,10vw,52px)} .fl.lg{font-size:21px} .fl.md{font-size:16px} .fl.sm{font-size:12.5px}
-.fl i.turn{animation:turn .07s linear}
-@keyframes turn{0%{transform:scaleY(1)}50%{transform:scaleY(.15)}100%{transform:scaleY(1)}}
+.fl.xl{font-size:clamp(36px,11.5vw,58px)} .fl.lg{font-size:22px} .fl.md{font-size:20px}
+.fl i.turn{animation:turn .06s linear}
+@keyframes turn{50%{transform:scaleY(.2)}}
 @media (prefers-reduced-motion:reduce){.fl i.turn{animation:none}}
 
-/* ---------- hall header ---------- */
-.marquee{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;border-bottom:3px solid var(--plate);padding-bottom:12px}
-.station{font:700 13px/1.1 var(--flapfont);letter-spacing:.32em;text-transform:uppercase;color:var(--mute)}
-.station b{display:block;color:var(--char);font-size:22px;letter-spacing:.12em;margin-top:4px}
-.clockbox{text-align:right;display:grid;gap:4px;justify-items:end}
-.et{font:600 12px/1 var(--flapfont);letter-spacing:.2em;color:var(--mute)}
+/* ---------- header ---------- */
+.marquee{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;border-bottom:3px solid var(--plate);padding-bottom:12px}
+.station{font:700 12.5px/1.1 var(--flapfont);letter-spacing:.24em;text-transform:uppercase;color:var(--mute)}
+.station b{display:block;color:var(--char);font-size:24px;letter-spacing:.1em;margin-top:4px}
+.clockbox{display:grid;gap:5px;justify-items:end}
+.et{font:600 12.5px/1 var(--flapfont);letter-spacing:.14em;color:var(--mute)}
 
-/* ---------- track plates (nav) ---------- */
-nav.tracks{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-nav.tracks a{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:8px;text-decoration:none;color:var(--plate-ink);
-  background:var(--plate);border-radius:4px;padding:7px 9px;border:2px solid #2c6a51;box-shadow:inset 0 0 0 1px rgba(0,0,0,.35)}
-nav.tracks a b{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--plate-ink);color:var(--plate);font:700 15px/1 var(--flapfont)}
-nav.tracks a span{font:600 14px/1 var(--flapfont);letter-spacing:.12em;text-transform:uppercase}
+/* ---------- track plates: bottom thumb bar ---------- */
+nav.tracks{position:fixed;left:0;right:0;bottom:0;z-index:20;display:grid;grid-template-columns:repeat(6,1fr);gap:5px;
+  padding:8px max(10px,env(safe-area-inset-right,0px),calc((100vw - 640px)/2)) calc(8px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px),calc((100vw - 640px)/2));
+  background:rgba(12,13,14,.97);border-top:3px solid var(--plate)}
+nav.tracks a{display:grid;justify-items:center;align-content:center;gap:4px;min-height:52px;text-decoration:none;color:var(--plate-ink);
+  background:var(--plate);border-radius:6px;border:2px solid var(--plate-edge)}
+nav.tracks a b{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--plate-ink);color:var(--plate);font:700 14px/1 var(--flapfont)}
+nav.tracks a span{font:600 12px/1 var(--flapfont);letter-spacing:.06em;text-transform:uppercase}
 nav.tracks a[aria-current="page"]{background:var(--lamp);border-color:var(--lamp);color:#1b1405}
 nav.tracks a[aria-current="page"] b{background:#1b1405;color:var(--lamp)}
 a:focus-visible,button:focus-visible,textarea:focus-visible{outline:2px solid var(--lamp);outline-offset:3px}
 
 /* ---------- boards ---------- */
-.board{background:var(--board);border-radius:6px;padding:14px 12px 12px;display:grid;gap:12px;min-width:0;
+.board{background:var(--board);border-radius:8px;padding:16px 14px;display:grid;gap:14px;min-width:0;
   box-shadow:0 0 0 1px #000,inset 0 0 0 1px #26282b,0 14px 30px -18px #000}
-.boardhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
-.cap{font:600 11px/1.2 var(--flapfont);letter-spacing:.24em;text-transform:uppercase;color:var(--mute)}
+.boardhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.cap{font:600 13px/1.25 var(--flapfont);letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
 .cap.amb{color:var(--lamp)}
-.grid{display:grid;gap:7px 8px;overflow-x:auto;padding-bottom:2px;align-items:center;justify-content:start}
-.grid:has(> .cols-4){grid-template-columns:repeat(4,max-content)}
-.grid:has(> .cols-3){grid-template-columns:repeat(3,max-content)}
-.r{display:contents;white-space:nowrap}
-.grid > .sub{grid-column:1/-1;margin:-3px 0 4px}
-.sub{font:400 12.5px/1.4 var(--text);color:var(--mute);white-space:normal}
-.sub a{color:var(--lamp)}
-.pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
-.pair > div{display:grid;gap:5px}
-.notice{border-top:1px dashed #33363a;padding-top:10px;display:grid;gap:6px}
-.notice ol{margin:0;padding-left:18px;display:grid;gap:3px;font-size:13.5px;color:#cfccc2}
-.fault{font:500 13px/1.4 var(--text);color:#1b1405;background:var(--lamp);border-radius:3px;padding:8px 10px}
+.sub{font:400 14.5px/1.5 var(--text);color:var(--ink2)}
+.sub a,.note a{color:var(--lamp)}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:14px 12px}
+.pair > div{display:grid;gap:6px;min-width:0}
+.notice{border-top:1px dashed #33363a;padding-top:12px;display:grid;gap:8px}
+.notice ol{margin:0;padding-left:20px;display:grid;gap:5px;font-size:15px;color:var(--ink2)}
+.fault{font:500 14.5px/1.45 var(--text);color:#1b1405;background:var(--lamp);border-radius:4px;padding:10px 12px}
+
+/* departure rows: one item per row, big tiles, plain-text details */
+.deps{display:grid}
+.dep{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:8px 12px;padding:13px 0;border-top:1px solid var(--rule);min-width:0}
+.dep:first-child{border-top:0;padding-top:2px}
+.dep:last-child{padding-bottom:0}
+.dep .val{justify-self:end}
+.tags{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:4px 16px;font:500 15px/1.35 var(--text);color:var(--ink2)}
+.tag b{font:600 12.5px/1 var(--flapfont);letter-spacing:.1em;text-transform:uppercase;color:var(--mute);margin-right:6px}
+.tag.go{color:var(--go)} .tag.stop{color:var(--stop)} .tag.amb{color:var(--lamp)}
+.note{grid-column:1/-1;font:400 14.5px/1.5 var(--text);color:var(--ink2)}
 
 /* signal lamps: drawdown */
-.lamps{display:grid;grid-template-columns:repeat(35,1fr);gap:2px;min-width:0}
-.lamps s{display:block;height:9px;border-radius:2px;background:#26282b;text-decoration:none}
-.lamps s.on{background:var(--lamp);box-shadow:0 0 6px rgba(242,182,50,.55)}
-.lamps s.red{background:var(--stop);box-shadow:0 0 6px rgba(255,122,107,.6)}
+.lamps{display:grid;grid-template-columns:repeat(35,1fr);gap:2px}
+.lamps s{display:block;height:12px;border-radius:2px;background:#2a2c30;text-decoration:none}
+.lamps s.on{background:var(--lamp);box-shadow:0 0 6px rgba(242,182,50,.5)}
+.lamps s.red{background:var(--stop);box-shadow:0 0 6px rgba(255,133,118,.55)}
 
-button.lever{font:700 13px/1 var(--flapfont);letter-spacing:.18em;text-transform:uppercase;color:var(--char);background:#2a2c30;
-  border:0;border-bottom:3px solid #0a0a0b;border-radius:4px;padding:9px 12px;cursor:pointer}
+button.lever{font:700 14px/1 var(--flapfont);letter-spacing:.14em;text-transform:uppercase;color:var(--char);background:#2a2c30;
+  border:0;border-bottom:3px solid #0a0a0b;border-radius:6px;min-height:44px;padding:0 16px;cursor:pointer}
 button.lever:active{transform:translateY(2px);border-bottom-width:1px}
 button.lever.amb{background:var(--lamp);color:#1b1405;border-bottom-color:#7a5a12}
 button.lever:disabled{opacity:.45;cursor:default}
 
-/* ---------- announcements (chat) ---------- */
-.pa{display:grid;gap:12px}
-.ann{border-left:4px solid var(--plate);padding:8px 0 8px 12px;white-space:pre-wrap;word-wrap:break-word;min-width:0;font:400 15px/1.5 var(--text)}
-.ann.me{border-left-color:var(--lamp);color:#d9d6cc}
-.ann .who{display:block;font:600 11px/1 var(--flapfont);letter-spacing:.24em;text-transform:uppercase;color:var(--mute);margin-bottom:6px}
+/* ---------- information desk (chat) ---------- */
+.pa{display:grid;gap:14px}
+.ann{border-left:4px solid var(--plate);padding:6px 0 6px 12px;white-space:pre-wrap;word-wrap:break-word;min-width:0;font:400 16px/1.55 var(--text)}
+.ann.me{border-left-color:var(--lamp);color:var(--ink2)}
+.ann .who{display:block;font:600 12.5px/1 var(--flapfont);letter-spacing:.14em;text-transform:uppercase;color:var(--mute);margin-bottom:6px}
 .ann.live .who::after{content:" ●";color:var(--lamp);animation:blink 1s steps(2) infinite}
 @keyframes blink{50%{opacity:0}}
 @media (prefers-reduced-motion:reduce){.ann.live .who::after{animation:none}}
-.counter{display:grid;grid-template-columns:1fr auto;gap:8px;position:sticky;bottom:0;background:var(--hall);padding-block:10px calc(10px + env(safe-area-inset-bottom,0px))}
-textarea{font:15px/1.4 var(--text);background:#0a0b0c;color:var(--char);border:2px solid #2a2c30;border-radius:4px;padding:10px;resize:vertical;min-height:46px;max-height:180px;width:100%;box-sizing:border-box}
-.quick{display:flex;flex-wrap:wrap;gap:6px}
-.quick button{font:600 12px/1 var(--flapfont);letter-spacing:.12em;text-transform:uppercase;color:var(--char);background:transparent;border:1px solid #3a3d42;border-radius:20px;padding:7px 11px;cursor:pointer}
+.counter{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end;position:sticky;bottom:calc(var(--navh) + env(safe-area-inset-bottom,0px));background:var(--hall);padding-block:10px;margin:0}
+textarea{font:16px/1.4 var(--text);background:#0a0b0c;color:var(--char);border:2px solid #2e3034;border-radius:6px;padding:11px 12px;resize:none;min-height:48px;max-height:160px;width:100%;box-sizing:border-box}
+.quick{display:flex;flex-wrap:wrap;gap:8px}
+.quick button{font:600 13.5px/1 var(--flapfont);letter-spacing:.08em;text-transform:uppercase;color:var(--char);background:transparent;border:1px solid #3e4146;border-radius:22px;min-height:40px;padding:0 14px;cursor:pointer}
 </style>
 
 <div class="hall">
@@ -109,28 +112,20 @@ textarea{font:15px/1.4 var(--text);background:#0a0b0c;color:var(--char);border:2
     <div class="clockbox"><span class="fl lg" id="clock"></span><span class="et" id="et">— ET · NEW YORK</span></div>
   </header>
 
-  <nav class="tracks" id="tabs" aria-label="Tracks">
-    <a href="#mcp"><b>1</b><span>MCP</span></a>
-    <a href="#personal"><b>2</b><span>Private</span></a>
-    <a href="#trades"><b>3</b><span>Trades</span></a>
-    <a href="#backtests"><b>4</b><span>Tests</span></a>
-    <a href="#news"><b>5</b><span>News</span></a>
-    <a href="#chat"><b>6</b><span>Ask</span></a>
-  </nav>
-
   <!-- TRACK 1 · MCP -->
-  <section id="v-mcp" aria-label="MCP account" class="hall" style="padding:0">
+  <section id="v-mcp" aria-label="MCP account" class="view">
     <div class="board">
-      <div class="boardhead"><span class="cap amb">Track 1 · Momentum Top 3 · <span id="mcp-acct">MCP ••••</span></span><span class="cap" id="mcp-upd">connecting</span></div>
+      <div class="boardhead"><span class="cap amb">Track 1 · Momentum Top 3</span><span class="cap" id="mcp-upd">connecting</span></div>
       <span class="fl xl" id="mcp-value"></span>
+      <span class="cap" id="mcp-acct">MCP ••••</span>
       <div class="pair">
         <div><span class="cap">Since start</span><span class="fl md" id="mcp-since"></span></div>
-        <div><span class="cap">S&amp;P 500 since start</span><span class="fl md" id="spy-since"></span></div>
+        <div><span class="cap">S&amp;P 500</span><span class="fl md" id="spy-since"></span></div>
         <div><span class="cap">Vs S&amp;P</span><span class="fl md" id="mcp-vs"></span></div>
         <div><span class="cap">Cash</span><span class="fl md" id="mcp-cash"></span></div>
       </div>
-      <div style="display:grid;gap:6px">
-        <div class="boardhead"><span class="cap">From peak · alarm at −35%</span><span class="fl sm" id="mcp-dd"></span></div>
+      <div style="display:grid;gap:8px">
+        <div class="boardhead"><span class="cap">From peak · alarm −35%</span><span class="fl md" id="mcp-dd"></span></div>
         <div class="lamps" id="lamps" aria-hidden="true"></div>
         <span class="sub" id="dd-note"></span>
       </div>
@@ -138,17 +133,20 @@ textarea{font:15px/1.4 var(--text);background:#0a0b0c;color:var(--char);border:2
     </div>
     <div class="board">
       <div class="boardhead"><span class="cap amb">Holdings</span><button class="lever" id="refresh" type="button">Refresh</button></div>
-      <div class="grid" id="mcp-pos"><span class="sub">Waiting for Robinhood…</span></div>
-      <div class="notice"><span class="cap">Timetable</span><ol id="rules"><li>Loading…</li></ol>
-        <div class="boardhead"><span class="cap">Next rebalance</span><span class="fl sm amb" id="next-reb"></span></div></div>
+      <div class="deps" id="mcp-pos"><span class="sub">Waiting for Robinhood…</span></div>
+    </div>
+    <div class="board">
+      <div class="boardhead"><span class="cap amb">Next rebalance</span><span class="fl md amb" id="next-reb"></span></div>
+      <div class="notice"><span class="cap">Timetable</span><ol id="rules"><li>Loading…</li></ol></div>
     </div>
   </section>
 
   <!-- TRACK 2 · PRIVATE -->
-  <section id="v-personal" aria-label="Private account" class="hall" style="padding:0" hidden>
+  <section id="v-personal" aria-label="Private account" class="view" hidden>
     <div class="board">
-      <div class="boardhead"><span class="cap amb">Track 2 · Private · read only · <span id="p-acct">••••</span></span><span class="cap" id="p-upd"></span></div>
+      <div class="boardhead"><span class="cap amb">Track 2 · Private · read only</span><span class="cap" id="p-upd"></span></div>
       <span class="fl xl" id="p-value"></span>
+      <span class="cap" id="p-acct">••••</span>
       <div class="pair">
         <div><span class="cap">Stocks</span><span class="fl md" id="p-eq"></span></div>
         <div><span class="cap">Crypto</span><span class="fl md" id="p-cr"></span></div>
@@ -157,38 +155,39 @@ textarea{font:15px/1.4 var(--text);background:#0a0b0c;color:var(--char);border:2
       </div>
       <div id="p-err" hidden></div>
     </div>
-    <div class="board"><span class="cap amb">Positions</span><div class="grid" id="p-pos"><span class="sub">Loads when you open this track.</span></div></div>
-    <div class="board"><span class="cap amb">Waiting orders</span><div class="grid" id="p-ord"><span class="sub">—</span></div></div>
+    <div class="board"><span class="cap amb">Positions</span><div class="deps" id="p-pos"><span class="sub">Loads when you open this track.</span></div></div>
+    <div class="board"><span class="cap amb">Waiting orders</span><div class="deps" id="p-ord"><span class="sub">—</span></div></div>
   </section>
 
   <!-- TRACK 3 · TRADES -->
-  <section id="v-trades" aria-label="MCP trades" class="hall" style="padding:0" hidden>
+  <section id="v-trades" aria-label="MCP trades" class="view" hidden>
     <div class="board">
-      <div class="boardhead"><span class="cap amb">Track 3 · Filled MCP orders · live</span><span class="cap" id="t-upd"></span></div>
-      <div class="grid" id="t-orders"><span class="sub">Loads when you open this track.</span></div>
+      <div class="boardhead"><span class="cap amb">Track 3 · Filled MCP orders</span><span class="cap" id="t-upd"></span></div>
+      <div class="deps" id="t-orders"><span class="sub">Loads when you open this track.</span></div>
       <div id="t-err" hidden></div>
     </div>
-    <div class="board"><span class="cap amb">Closed trades</span><div class="grid" id="t-closed"><span class="sub">Loading…</span></div><span class="sub" id="t-stats"></span></div>
-    <div class="board"><span class="cap amb">Rebalance log</span><div class="grid" id="t-reb"><span class="sub">Loading…</span></div></div>
+    <div class="board"><span class="cap amb">Closed trades</span><div class="deps" id="t-closed"><span class="sub">Loading…</span></div><span class="sub" id="t-stats"></span></div>
+    <div class="board"><span class="cap amb">Rebalance log</span><div class="deps" id="t-reb"><span class="sub">Loading…</span></div></div>
   </section>
 
   <!-- TRACK 4 · TESTS -->
-  <section id="v-backtests" aria-label="Backtests" class="hall" style="padding:0" hidden>
+  <section id="v-backtests" aria-label="Backtests" class="view" hidden>
     <div class="board">
-      <div class="boardhead"><span class="cap amb">Track 4 · Backtests 2016–2026 · 89 stocks</span><span class="cap" id="b-upd"></span></div>
-      <div class="grid" id="b-rows"><span class="sub">Loading…</span></div>
-      <div class="notice"><span class="cap">Lessons</span><ol id="b-notes"><li>Loading…</li></ol></div>
+      <div class="boardhead"><span class="cap amb">Track 4 · Backtests 2016–2026</span><span class="cap" id="b-upd"></span></div>
+      <span class="sub">89 stocks · yearly return (CAGR) on the tiles</span>
+      <div class="deps" id="b-rows"><span class="sub">Loading…</span></div>
     </div>
+    <div class="board"><div class="notice" style="border:0;padding:0"><span class="cap amb">Lessons</span><ol id="b-notes"><li>Loading…</li></ol></div></div>
   </section>
 
   <!-- TRACK 5 · NEWS -->
-  <section id="v-news" aria-label="News" class="hall" style="padding:0" hidden>
-    <div class="boardhead"><span class="cap amb">Track 5 · Pre-market notices · 14:45 CET</span><span class="cap" id="n-upd"></span></div>
-    <div id="n-list" style="display:grid;gap:14px"><div class="board"><span class="sub">Loading notices…</span></div></div>
+  <section id="v-news" aria-label="News" class="view" hidden>
+    <div class="boardhead"><span class="cap amb">Track 5 · Notices · 14:45 CET</span><span class="cap" id="n-upd"></span></div>
+    <div id="n-list" class="view"><div class="board"><span class="sub">Loading notices…</span></div></div>
   </section>
 
   <!-- TRACK 6 · ASK -->
-  <section id="v-chat" aria-label="Ask" class="hall" style="padding:0" hidden>
+  <section id="v-chat" aria-label="Ask" class="view" hidden>
     <div class="board">
       <span class="cap amb">Track 6 · Information desk</span>
       <span class="sub">Ask about your accounts or the strategy. The desk reads live quotes and positions from Robinhood (read only). It can't browse the web or place orders; news comes from the saved notices.</span>
@@ -200,13 +199,23 @@ textarea{font:15px/1.4 var(--text);background:#0a0b0c;color:var(--char);border:2
       </div>
     </div>
     <div class="pa" id="chatlog" aria-live="polite"></div>
-    <form class="counter" id="composer">
-      <textarea id="q" rows="2" placeholder="Your question…" aria-label="Message"></textarea>
-      <div style="display:grid;gap:6px"><button class="lever amb" id="send" type="submit">Ask</button><button class="lever" id="stop" type="button" hidden>Stop</button></div>
-    </form>
     <span class="sub" id="chat-note"></span>
+    <form class="counter" id="composer">
+      <textarea id="q" rows="1" placeholder="Your question…" aria-label="Message"></textarea>
+      <button class="lever amb" id="send" type="submit">Ask</button>
+      <button class="lever" id="stop" type="button" hidden>Stop</button>
+    </form>
   </section>
 </div>
+
+<nav class="tracks" id="tabs" aria-label="Tracks">
+  <a href="#mcp"><b>1</b><span>MCP</span></a>
+  <a href="#personal"><b>2</b><span>Private</span></a>
+  <a href="#trades"><b>3</b><span>Trades</span></a>
+  <a href="#backtests"><b>4</b><span>Tests</span></a>
+  <a href="#news"><b>5</b><span>News</span></a>
+  <a href="#chat"><b>6</b><span>Ask</span></a>
+</nav>
 
 <script>
 (() => {
@@ -216,15 +225,15 @@ textarea{font:15px/1.4 var(--text);background:#0a0b0c;color:var(--char);border:2
   const state = { acct: null, mcp: null, personal: null, strategy: null, tradelog: null, backtests: null, briefings: [] };
   let mcp = null, sample = null;
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const mk = (tag, cls) => { const e = document.createElement(tag); if (cls) e.className = cls; return e; };
 
-  // ---------- split-flap engine ----------
-  const DRUM = " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+-−%.,:/·";
-  function flap(el, text, len, align){
+  // ---------- split-flap engine (short spins: 2–4 flips per tile) ----------
+  const DRUM = " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+-%.,:/";
+  function flap(el, text){
     if (typeof el === "string") el = $(el);
     if (!el) return;
     text = String(text ?? "").toUpperCase();
-    if (len) text = align === "r" ? text.padStart(len).slice(-len) : text.padEnd(len).slice(0, len);
-    while (el.children.length < text.length) el.append(document.createElement("i"));
+    while (el.children.length < text.length) el.append(mk("i"));
     while (el.children.length > text.length) el.lastChild.remove();
     [...text].forEach((ch, k) => {
       const cell = el.children[k];
@@ -232,40 +241,44 @@ textarea{font:15px/1.4 var(--text);background:#0a0b0c;color:var(--char);border:2
       cell.dataset.c = ch;
       if (reduce) { cell.textContent = ch; return; }
       let start = DRUM.indexOf(cell.textContent || " "); if (start < 0) start = 0;
-      const steps = 3 + ((k * 7) % 6);
-      let n = 0;
+      const steps = 2 + (k % 3); let n = 0;
       const spin = () => {
-        n++;
-        cell.classList.remove("turn"); void cell.offsetWidth; cell.classList.add("turn");
-        cell.textContent = n >= steps ? ch : DRUM[(start + n * 5) % DRUM.length];
-        if (n < steps) setTimeout(spin, 55 + k * 4);
+        n++; cell.classList.remove("turn"); void cell.offsetWidth; cell.classList.add("turn");
+        cell.textContent = n >= steps ? ch : DRUM[(start + n * 7) % DRUM.length];
+        if (n < steps) setTimeout(spin, 45);
       };
-      setTimeout(spin, k * 28);
+      setTimeout(spin, k * 16);
     });
   }
   const tone = (el, n) => { el = typeof el === "string" ? $(el) : el; if (!el) return; el.classList.remove("go","stop","mute","amb"); el.classList.add(n > 0 ? "go" : n < 0 ? "stop" : "mute"); };
-  function row(cells, cols){ // cells: [{t, len, align, tone}]
-    const r = document.createElement("div"); r.className = "r " + cols;
-    for (const c of cells) { const s = document.createElement("span"); s.className = "fl " + (c.size || "sm") + (c.tone ? " " + c.tone : ""); r.append(s); flap(s, c.t, c.len, c.align); }
-    return r;
+  // one departure row: big tiles for the name and the key number, plain text for the details
+  function dep(box, o){
+    const d = mk("div", "dep");
+    const a = mk("span", "fl md" + (o.symTone ? " " + o.symTone : "")); d.append(a); flap(a, o.sym);
+    const v = mk("span", "fl md val" + (o.valTone ? " " + o.valTone : "")); d.append(v); flap(v, o.val);
+    if (o.tags && o.tags.length) {
+      const t = mk("div", "tags");
+      for (const [label, text, tn_] of o.tags) { const s = mk("span", "tag" + (tn_ ? " " + tn_ : "")); const b = mk("b"); b.textContent = label; s.append(b, document.createTextNode(text)); t.append(s); }
+      d.append(t);
+    }
+    if (o.note) { const n = mk("div", "note"); n.append(o.note); d.append(n); }
+    box.append(d);
   }
-  function head(labels, cols){ const r = document.createElement("div"); r.className = "r h " + cols; labels.forEach(([l, w]) => { const s = document.createElement("span"); s.className = "cap"; s.style.minWidth = w; s.textContent = l; r.append(s); }); return r; }
-  function sub(text){ const s = document.createElement("span"); s.className = "sub"; s.textContent = text; return s; }
+  const sub = (text) => { const s = mk("span", "sub"); s.textContent = text; return s; };
 
   // ---------- formatting ----------
   const usd = (n, d=2) => (n == null || isNaN(n)) ? "—" : (n < 0 ? "-$" : "$") + Math.abs(n).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
   const pct = (n, d=1) => (n == null || isNaN(n)) ? "—" : (n > 0 ? "+" : n < 0 ? "-" : "") + Math.abs(n*100).toFixed(d) + "%";
   const tn = (n) => n > 0 ? "go" : n < 0 ? "stop" : "mute";
   const mask = (a) => a ? "••••" + String(a).slice(-4) : "••••";
-  const cetShort = (iso) => { try { const d = new Date(iso); return d.toLocaleDateString("de-DE",{timeZone:"Europe/Berlin",day:"2-digit",month:"2-digit"}).replace(/\.$/, "") + " " + d.toLocaleTimeString("de-DE",{timeZone:"Europe/Berlin",hour:"2-digit",minute:"2-digit"}); } catch { return "—"; } };
+  const cetShort = (iso) => { try { const d = new Date(iso); return d.toLocaleDateString("de-DE",{timeZone:"Europe/Berlin",day:"2-digit",month:"2-digit"}).replace(/\.$/, "") + " " + d.toLocaleTimeString("de-DE",{timeZone:"Europe/Berlin",hour:"2-digit",minute:"2-digit"}) + " CET"; } catch { return "—"; } };
   const num = (x) => x == null ? null : Number(x);
   const nowCET = () => new Date().toLocaleTimeString("de-DE",{timeZone:"Europe/Berlin",hour:"2-digit",minute:"2-digit"});
 
   function tick(){ try { flap("clock", nowCET()); $("et").textContent = new Date().toLocaleTimeString("en-US",{timeZone:"America/New_York",hour:"2-digit",minute:"2-digit"}) + " ET · NEW YORK"; } catch {} }
   tick(); setInterval(tick, 20000);
 
-  // lamps
-  const lampsEl = $("lamps"); for (let i = 0; i < 35; i++) lampsEl.append(document.createElement("s"));
+  const lampsEl = $("lamps"); for (let i = 0; i < 35; i++) lampsEl.append(mk("s"));
   function lamps(dd){ const lit = Math.min(35, Math.round(Math.abs(Math.min(dd, 0)) * 100)); [...lampsEl.children].forEach((s, i) => { s.className = i < lit ? (lit >= 25 ? "red" : "on") : ""; }); }
 
   // ---------- routing ----------
@@ -276,6 +289,7 @@ textarea{font:15px/1.4 var(--text);background:#0a0b0c;color:var(--char);border:2
     document.querySelectorAll("#tabs a").forEach(a => a.setAttribute("aria-current", a.getAttribute("href") === "#"+v ? "page" : "false"));
     if (mcp && !loaded.has(v)) { if (v === "personal") { loaded.add(v); loadPersonal(); } if (v === "trades") { loaded.add(v); loadOrders(); } }
     try { localStorage.setItem("pt-tab", v); } catch {}
+    window.scrollTo(0, 0);
   }
   window.addEventListener("hashchange", route);
   if (!location.hash) { try { const t = localStorage.getItem("pt-tab"); if (t && VIEWS.includes(t)) history.replaceState(null, "", "#"+t); } catch {} }
@@ -286,12 +300,12 @@ textarea{font:15px/1.4 var(--text);background:#0a0b0c;color:var(--char);border:2
       case "needs_reauth": return "Robinhood needs to be reconnected: claude.ai → Settings → Connectors.";
       case "server_not_connected": case "server_not_found": return "Robinhood isn't connected for this page. Add it in claude.ai → Settings → Connectors.";
       case "selection_required": return "Pick which Robinhood connector this page should use (claude.ai will ask).";
-      case "not_in_manifest": case "approval_required": return "This page isn't allowed to read Robinhood yet. Allow it in the page's permissions menu, then pull Refresh.";
+      case "not_in_manifest": case "approval_required": return "This page isn't allowed to read Robinhood yet. Allow it in the page's permissions menu, then tap Refresh.";
       case "blocked_by_policy": return "Your organization blocks this Robinhood tool for this page.";
-      case "server_unavailable": case "rate_limited": return "Robinhood didn't answer in time. Pull Refresh in a moment.";
+      case "server_unavailable": case "rate_limited": return "Robinhood didn't answer in time. Tap Refresh in a moment.";
       case "tool_error": return "Robinhood reported an error: " + (e.message || "unknown");
       case "not_granted": case "capability_disabled": case "capability_removed": return "Live data isn't available in this view. Open the page on claude.ai.";
-      default: return "Couldn't reach Robinhood (" + ((e && e.code) || "error") + "). Pull Refresh to try again.";
+      default: return "Couldn't reach Robinhood (" + ((e && e.code) || "error") + "). Tap Refresh to try again.";
     }
   }
   const showErr = (id, e) => { const el = $(id); el.hidden = false; el.className = "fault"; el.textContent = errCopy(e); };
@@ -314,6 +328,9 @@ textarea{font:15px/1.4 var(--text);background:#0a0b0c;color:var(--char);border:2
     state.acct = { mcp: list.find(a => a.agentic_allowed) || null, main: list.find(a => a.is_default) || null };
     return state.acct;
   }
+  function posRow(box, sym, val, pl, day){
+    dep(box, { sym, val, tags: [["P/L", pct(pl), tn(pl)], ["Today", pct(day), tn(day)]] });
+  }
 
   // ---------- TRACK 1 ----------
   async function loadMcp(fresh){
@@ -322,7 +339,7 @@ textarea{font:15px/1.4 var(--text);background:#0a0b0c;color:var(--char);border:2
     try {
       const { mcp: a } = await accounts();
       if (!a) throw { code: "tool_error", message: "no account with agent trading enabled" };
-      $("mcp-acct").textContent = "MCP " + mask(a.account_number);
+      $("mcp-acct").textContent = "MCP account " + mask(a.account_number);
       const [pf, pos] = await Promise.all([ rh("get_portfolio", { account_number: a.account_number }, fresh), rh("get_equity_positions", { account_number: a.account_number }, fresh) ]);
       const held = (pos.positions || []).filter(p => Number(p.quantity) > 0);
       const q = await quotes([...held.map(p => p.symbol), "SPY"], fresh);
@@ -336,27 +353,26 @@ textarea{font:15px/1.4 var(--text);background:#0a0b0c;color:var(--char);border:2
     if (m) {
       const total = num(m.pf.total_value);
       flap("mcp-value", usd(total)); flap("mcp-cash", usd(num(m.pf.cash)));
-      $("mcp-upd").textContent = "updated " + new Date(m.at).toLocaleTimeString("de-DE",{timeZone:"Europe/Berlin",hour:"2-digit",minute:"2-digit"}) + " CET";
-      const g = $("mcp-pos"); g.replaceChildren(head([["Stock","3.6em"],["Value","6.4em"],["P/L","4.8em"],["Today","4.8em"]], "cols-4"));
+      $("mcp-upd").textContent = new Date(m.at).toLocaleTimeString("de-DE",{timeZone:"Europe/Berlin",hour:"2-digit",minute:"2-digit"}) + " CET";
+      const g = $("mcp-pos"); g.replaceChildren();
       for (const p of m.held) {
         const qq = m.q[p.symbol] || {}; const qty = Number(p.quantity), cost = Number(p.average_buy_price)*qty, val = (qq.price||0)*qty;
-        const pl = cost ? val/cost - 1 : null, day = qq.prev ? qq.price/qq.prev - 1 : null;
-        g.append(row([{t:p.symbol,len:4},{t:usd(val),len:8,align:"r"},{t:pct(pl),len:6,align:"r",tone:tn(pl)},{t:pct(day),len:6,align:"r",tone:tn(day)}], "cols-4"));
+        posRow(g, p.symbol, usd(val), cost ? val/cost - 1 : null, qq.prev ? qq.price/qq.prev - 1 : null);
       }
       if (!m.held.length) g.append(sub("No open positions."));
       if (s && s.start_value) {
-        const dep = Number(s.net_deposits_since_start || 0);
-        const since = total / (s.start_value + dep) - 1; flap("mcp-since", pct(since)); tone("mcp-since", since);
+        const dep_ = Number(s.net_deposits_since_start || 0);
+        const since = total / (s.start_value + dep_) - 1; flap("mcp-since", pct(since)); tone("mcp-since", since);
         const spy = m.q.SPY && m.q.SPY.price; const spySince = spy && s.spy_start ? spy / s.spy_start - 1 : null;
         flap("spy-since", pct(spySince)); tone("spy-since", spySince);
         const diff = spySince == null ? null : since - spySince; flap("mcp-vs", pct(diff)); tone("mcp-vs", diff);
         const peak = Math.max(Number(s.peak_value || 0), total); const dd = peak ? total/peak - 1 : 0;
         flap("mcp-dd", pct(dd)); tone("mcp-dd", dd); lamps(dd);
-        $("dd-note").textContent = "Peak " + usd(peak) + " · each lamp = 1% below peak · alarm only, no trade";
+        $("dd-note").textContent = "Peak " + usd(peak) + " · 1 lamp = 1% below peak · alarm only, never a trade";
       }
     }
     if (s) {
-      $("rules").replaceChildren(...(s.rules || []).map(r => { const li = document.createElement("li"); li.textContent = r; return li; }));
+      $("rules").replaceChildren(...(s.rules || []).map(r => { const li = mk("li"); li.textContent = r; return li; }));
       flap("next-reb", (s.next_rebalance || "—").replace(" · 16:12 CET", "").replace(/^\w+ /, ""));
     }
   }
@@ -368,7 +384,7 @@ textarea{font:15px/1.4 var(--text);background:#0a0b0c;color:var(--char);border:2
     try {
       const { main } = await accounts();
       if (!main) throw { code: "tool_error", message: "no default account found" };
-      $("p-acct").textContent = mask(main.account_number);
+      $("p-acct").textContent = "Account " + mask(main.account_number);
       const [pf, pos, cpos, ords] = await Promise.all([
         rh("get_portfolio", { account_number: main.account_number }),
         rh("get_equity_positions", { account_number: main.account_number }),
@@ -384,18 +400,17 @@ textarea{font:15px/1.4 var(--text);background:#0a0b0c;color:var(--char);border:2
       const total = num(pf.total_value);
       flap("p-value", usd(total, 0)); flap("p-eq", usd(num(pf.equity_value), 0)); flap("p-cr", usd(num(pf.crypto_value), 0));
       flap("p-cash", usd(num(pf.cash), 0)); flap("p-bp", usd(num(pf.buying_power && pf.buying_power.buying_power), 0));
-      const g = $("p-pos"); g.replaceChildren(head([["Asset","3.6em"],["Value","6.4em"],["P/L","4.8em"],["Today","4.8em"]], "cols-4"));
-      for (const p of held) { const qq = q[p.symbol] || {}; const qty = Number(p.quantity), cost = Number(p.average_buy_price)*qty, val = (qq.price||0)*qty, pl = cost ? val/cost-1 : null, day = qq.prev ? qq.price/qq.prev-1 : null;
-        g.append(row([{t:p.symbol,len:4},{t:usd(val,0),len:8,align:"r"},{t:pct(pl),len:6,align:"r",tone:tn(pl)},{t:pct(day),len:6,align:"r",tone:tn(day)}], "cols-4")); }
-      for (const c of crypto) { const code = c.currency.code, qq = cq[code] || {}, qty = Number(c.quantity), cb = (c.cost_bases||[])[0], cost = cb ? Number(cb.direct_cost_basis) : null, val = (qq.price||0)*qty, pl = cost ? val/cost-1 : null, day = qq.prev ? qq.price/qq.prev-1 : null;
-        g.append(row([{t:code,len:4},{t:usd(val,0),len:8,align:"r"},{t:pct(pl),len:6,align:"r",tone:tn(pl)},{t:pct(day),len:6,align:"r",tone:tn(day)}], "cols-4")); }
+      const g = $("p-pos"); g.replaceChildren();
+      for (const p of held) { const qq = q[p.symbol] || {}; const qty = Number(p.quantity), cost = Number(p.average_buy_price)*qty, val = (qq.price||0)*qty;
+        posRow(g, p.symbol, usd(val, 0), cost ? val/cost-1 : null, qq.prev ? qq.price/qq.prev-1 : null); }
+      for (const c of crypto) { const code = c.currency.code, qq = cq[code] || {}, qty = Number(c.quantity), cb = (c.cost_bases||[])[0], cost = cb ? Number(cb.direct_cost_basis) : null, val = (qq.price||0)*qty;
+        posRow(g, code, usd(val, 0), cost ? val/cost-1 : null, qq.prev ? qq.price/qq.prev-1 : null); }
       if (!held.length && !crypto.length) g.append(sub("No positions."));
       const open = (ords.orders || []).filter(o => ["confirmed","queued","new","unconfirmed","partially_filled"].includes(o.state));
       const og = $("p-ord"); og.replaceChildren();
-      if (open.length) { og.append(head([["Order","7em"],["Qty","3em"],["Limit","6em"]], "cols-3"));
-        for (const o of open) og.append(row([{t:(o.side === "buy" ? "BUY " : "SELL ") + o.symbol,len:9,tone:"amb"},{t:String(Number(o.quantity)),len:4,align:"r"},{t:o.price ? usd(num(o.price)) : "MARKET",len:8,align:"r"}], "cols-3")); }
-      else og.append(sub("No waiting orders."));
-      $("p-upd").textContent = "updated " + nowCET() + " CET"; clearErr("p-err");
+      for (const o of open) dep(og, { sym: o.symbol, val: o.price ? usd(num(o.price)) : "MARKET", valTone: "amb", tags: [["Side", o.side === "buy" ? "Buy" : "Sell", o.side === "buy" ? "go" : "stop"], ["Qty", String(Number(o.quantity))]] });
+      if (!open.length) og.append(sub("No waiting orders."));
+      $("p-upd").textContent = nowCET() + " CET"; clearErr("p-err");
       state.personal = { total, held: held.map(p => ({ symbol: p.symbol, qty: Number(p.quantity), avg: Number(p.average_buy_price), price: (q[p.symbol]||{}).price })), crypto: crypto.map(c => ({ code: c.currency.code, qty: Number(c.quantity), price: (cq[c.currency.code]||{}).price })), cash: num(pf.cash) };
     } catch (e) { showErr("p-err", e); $("p-upd").textContent = "not updated"; loaded.delete("personal"); }
   }
@@ -405,44 +420,47 @@ textarea{font:15px/1.4 var(--text);background:#0a0b0c;color:var(--char);border:2
     try {
       const { mcp: a } = await accounts();
       const d = await rh("get_equity_orders", { account_number: a.account_number, state: "filled" });
-      const g = $("t-orders"); g.replaceChildren(head([["When CET","7.6em"],["Side","3em"],["Stock","3.6em"],["Fill","6em"]], "cols-4"));
+      const g = $("t-orders"); g.replaceChildren();
       const list = (d.orders || []).slice(0, 12);
-      for (const o of list) g.append(row([{t:cetShort(o.last_transaction_at || o.created_at),len:11,tone:"mute"},{t:o.side === "buy" ? "BUY" : "SELL",len:4,tone:o.side === "buy" ? "go" : "stop"},{t:o.symbol,len:4},{t:usd(num(o.average_price)),len:7,align:"r"}], "cols-4"));
+      for (const o of list) dep(g, { sym: o.symbol, val: usd(num(o.average_price)), tags: [["", o.side === "buy" ? "Bought" : "Sold", o.side === "buy" ? "go" : "stop"], ["", cetShort(o.last_transaction_at || o.created_at)]] });
       if (!list.length) g.append(sub("No filled orders yet."));
-      $("t-upd").textContent = "live from Robinhood"; clearErr("t-err");
+      $("t-upd").textContent = "live"; clearErr("t-err");
     } catch (e) { showErr("t-err", e); loaded.delete("trades"); }
   }
   function renderTradelog(){
     const t = state.tradelog; if (!t) return;
-    const g = $("t-closed"); g.replaceChildren(head([["Stock","3.6em"],["Exit","5em"],["P/L","4.8em"],["$","5.6em"]], "cols-4"));
-    for (const c of (t.closed || [])) { g.append(row([{t:c.symbol,len:4},{t:String(c.exit_date).slice(5),len:5,tone:"mute"},{t:pct(c.pl_pct),len:6,align:"r",tone:tn(c.pl_pct)},{t:usd(c.pl_usd),len:7,align:"r",tone:tn(c.pl_usd)}], "cols-4")); g.append(sub(c.reason)); }
+    const g = $("t-closed"); g.replaceChildren();
+    for (const c of (t.closed || [])) dep(g, { sym: c.symbol, val: usd(c.pl_usd), valTone: tn(c.pl_usd), tags: [["P/L", pct(c.pl_pct), tn(c.pl_pct)], ["Exit", String(c.exit_date)]], note: c.reason });
+    if (!(t.closed || []).length) g.append(sub("No closed trades yet."));
     $("t-stats").textContent = t.stats || "";
-    const rg = $("t-reb"); rg.replaceChildren(head([["Date","5.6em"],["Signal","5.6em"],["Top 3","9em"]], "cols-3"));
-    for (const r of (t.rebalances || [])) rg.append(row([{t:String(r.date).slice(5),len:5},{t:String(r.signal).slice(5),len:5,tone:"mute"},{t:(r.top3 || []).join(" "),len:13,tone:"amb"}], "cols-3"));
+    const rg = $("t-reb"); rg.replaceChildren();
+    for (const r of (t.rebalances || [])) dep(rg, { sym: String(r.date).slice(5), val: (r.top3 || []).join(" "), valTone: "amb", tags: [["Signal", String(r.signal)]] });
   }
 
   // ---------- TRACK 4 ----------
   const CODES = ["S&P 500","MOM3 LIVE","MOM3 SKIP1","MOM5","MOM3 SECT","MOM3 STOP","OLD TREND"];
   function renderBacktests(){
     const b = state.backtests; if (!b) return;
-    const g = $("b-rows"); g.replaceChildren(head([["Strategy","8em"],["CAGR","4em"],["Max DD","4.4em"],["Yrs>SPY","3.6em"]], "cols-4"));
-    (b.rows || []).forEach((r, i) => { g.append(row([{t:CODES[i] || r.name.slice(0,10),len:10,tone:r.live ? "amb" : ""},{t:r.cagr,len:5,align:"r"},{t:String(r.maxdd).replace("−","-"),len:6,align:"r",tone:"stop"},{t:r.years === "–" ? "—" : r.years,len:4,align:"r"}], "cols-4")); g.append(sub(r.name + (r.live ? " · running now" : ""))); });
-    $("b-notes").replaceChildren(...(b.notes || []).map(n => { const li = document.createElement("li"); li.textContent = n; return li; }));
+    const g = $("b-rows"); g.replaceChildren();
+    (b.rows || []).forEach((r, i) => dep(g, { sym: CODES[i] || r.name.slice(0,10), symTone: r.live ? "amb" : "", val: r.cagr,
+      tags: [["Max DD", String(r.maxdd), "stop"], ["Yrs > S&P", r.years === "–" ? "—" : r.years]], note: r.name + (r.live ? " · running now" : "") }));
+    $("b-notes").replaceChildren(...(b.notes || []).map(n => { const li = mk("li"); li.textContent = n; return li; }));
     $("b-upd").textContent = b.updated ? "as of " + b.updated : "";
   }
 
   // ---------- TRACK 5 ----------
   function renderNews(){
     const list = state.briefings, box = $("n-list"); box.replaceChildren();
-    if (!list.length) { const b = document.createElement("div"); b.className = "board"; b.append(sub("No notices yet. The 14:45 CET run posts one every trading day.")); box.append(b); return; }
+    if (!list.length) { const b = mk("div", "board"); b.append(sub("No notices yet. The 14:45 CET run posts one every trading day.")); box.append(b); return; }
     for (const n of list) {
-      const b = document.createElement("div"); b.className = "board";
-      const h = document.createElement("div"); h.className = "boardhead"; const c1 = document.createElement("span"); c1.className = "cap amb"; c1.textContent = n.date; const c2 = document.createElement("span"); c2.className = "cap"; c2.textContent = n.time || "14:45 CET"; h.append(c1, c2); b.append(h);
-      const g = document.createElement("div"); g.className = "grid"; g.append(head([["Stock","3.6em"],["Status","6.4em"],["Pre-mkt","4.8em"]], "cols-3"));
+      const b = mk("div", "board");
+      const h = mk("div", "boardhead"); const c1 = mk("span", "cap amb"); c1.textContent = n.date; const c2 = mk("span", "cap"); c2.textContent = n.time || "14:45 CET"; h.append(c1, c2); b.append(h);
+      const g = mk("div", "deps");
       for (const i of (n.items || [])) {
         const st = i.rating === "positive" ? ["GOOD NEWS","go"] : i.rating === "negative" ? ["WARNING","stop"] : ["ON TIME","mute"];
-        g.append(row([{t:i.ticker,len:4},{t:st[0],len:9,tone:st[1]},{t:i.pre == null ? "—" : pct(i.pre),len:6,align:"r",tone:tn(i.pre)}], "cols-3"));
-        const s = sub(i.headline); (i.sources || []).forEach(src => { s.append(" · "); const a = document.createElement("a"); a.href = src.url; a.target = "_blank"; a.rel = "noopener"; a.textContent = src.name; s.append(a); }); g.append(s);
+        const note = document.createDocumentFragment(); note.append(i.headline || "");
+        (i.sources || []).forEach(src => { note.append(" · "); const a = mk("a"); a.href = src.url; a.target = "_blank"; a.rel = "noopener"; a.textContent = src.name; note.append(a); });
+        dep(g, { sym: i.ticker, val: st[0], valTone: st[1], tags: i.pre == null ? [] : [["Pre-market", pct(i.pre), tn(i.pre)]], note });
       }
       b.append(g); if (n.note) b.append(sub(n.note)); box.append(b);
     }
@@ -451,13 +469,13 @@ textarea{font:15px/1.4 var(--text);background:#0a0b0c;color:var(--char);border:2
 
   // ---------- TRACK 6 ----------
   const turns = []; let ctl = null;
-  const RULES = () => `You are the information desk of the user's pocket trading terminal (a disciplined quant research analyst). The user is in Germany: give times in German time (CET) first.
+  const RULES = () => `You are the information desk of the user's pocket trading terminal (a disciplined quant research analyst). The user is in Germany: give times in German time (CET) first. They read on a phone: keep answers short, use short lines.
 Rules:
 - Use numbers with their source (Robinhood live, saved strategy, trade log, backtests, notices). Never invent figures. You cannot browse the web; for news use the saved notices only and say when something isn't covered.
 - MCP account = automated "Momentum Top 3" strategy (S&P 100, 12-month momentum incl. latest month, top 3 at 1/3 each, monthly rebalance on the first trading day, no stops, no trades between rebalances). Private account = the user's own, read only. Keep them separate: when discussing the MCP strategy never bring in the private account.
 - You cannot place, cancel or change orders. If asked, say so; MCP trades only happen at the scheduled monthly rebalance.
 - Claude is made by Anthropic: give no recommendation, signal or price target on Anthropic (ticker ANT), and flag the conflict if it comes up.
-- Be short and concrete. End any recommendation or judgment with a 3-line "Bias check": confirmation bias / drift from the rules / concentration & conflicts.
+- End any recommendation or judgment with a 3-line "Bias check": confirmation bias / drift from the rules / concentration & conflicts.
 Data loaded in the page right now (JSON):
 ${JSON.stringify(snapshot()).slice(0, 12000)}`;
   function snapshot(){
@@ -474,14 +492,15 @@ ${JSON.stringify(snapshot()).slice(0, 12000)}`;
     async execute(input){ const syms = (Array.isArray(input.symbols) ? input.symbols : [input.symbols]).map(s => String(s).toUpperCase()).slice(0,10); setNote("Checking the board: " + syms.join(", ")); const q = await quotes(syms, true); return Object.fromEntries(Object.entries(q).map(([k,v]) => [k, { price: v.price, prev_close: v.prev }])); }
   }];
   const setNote = (t) => { $("chat-note").textContent = t; };
-  function ann(role, text){ const d = document.createElement("div"); d.className = "ann " + (role === "user" ? "me" : "live"); const w = document.createElement("span"); w.className = "who"; w.textContent = role === "user" ? "You asked" : "Information desk"; const t = document.createElement("div"); t.textContent = text; d.append(w, t); $("chatlog").append(d); d.scrollIntoView({ block: "end", behavior: reduce ? "auto" : "smooth" }); return t; }
+  function ann(role, text){ const d = mk("div", "ann " + (role === "user" ? "me" : "live")); const w = mk("span", "who"); w.textContent = role === "user" ? "You asked" : "Information desk"; const t = mk("div"); t.textContent = text; d.append(w, t); $("chatlog").append(d); d.scrollIntoView({ block: "end", behavior: reduce ? "auto" : "smooth" }); return t; }
+  const grow = () => { const q = $("q"); q.style.height = "auto"; q.style.height = Math.min(q.scrollHeight + 4, 160) + "px"; };
   async function send(text){
     text = text.trim(); if (!text || !sample) return;
-    $("q").value = ""; try { localStorage.removeItem("pt-draft"); } catch {}
+    $("q").value = ""; grow(); try { localStorage.removeItem("pt-draft"); } catch {}
     ann("user", text); turns.push({ role: "user", content: text });
     while (turns.length > 16) turns.shift(); if (turns[0] && turns[0].role !== "user") turns.shift();
     const out = ann("assistant", "One moment…");
-    $("send").disabled = true; $("stop").hidden = false; setNote("");
+    $("send").hidden = true; $("stop").hidden = false; setNote("");
     ctl = new AbortController();
     const caps = await sample.limits().catch(() => null);
     const opts = { cache: false, signal: ctl.signal, onText: ({ text }) => { out.textContent = text; } };
@@ -500,17 +519,18 @@ ${JSON.stringify(snapshot()).slice(0, 12000)}`;
       else setNote("The answer was interrupted (" + (c || "error") + "). Ask again to retry.");
       if (!out.textContent) out.parentElement.remove();
       turns.pop();
-    } finally { out.parentElement && out.parentElement.classList.remove("live"); $("send").disabled = false; $("stop").hidden = true; }
+    } finally { out.parentElement && out.parentElement.classList.remove("live"); $("send").hidden = false; $("stop").hidden = true; }
   }
   $("composer").addEventListener("submit", (ev) => { ev.preventDefault(); send($("q").value); });
-  $("q").addEventListener("keydown", (ev) => { if (ev.key === "Enter" && !ev.shiftKey) { ev.preventDefault(); send($("q").value); } });
-  $("q").addEventListener("input", () => { try { localStorage.setItem("pt-draft", $("q").value); } catch {} });
-  try { $("q").value = localStorage.getItem("pt-draft") || ""; } catch {}
+  $("q").addEventListener("keydown", (ev) => { if (ev.key === "Enter" && !ev.shiftKey && !matchMedia("(pointer:coarse)").matches) { ev.preventDefault(); send($("q").value); } });
+  $("q").addEventListener("input", () => { grow(); try { localStorage.setItem("pt-draft", $("q").value); } catch {} });
+  try { $("q").value = localStorage.getItem("pt-draft") || ""; grow(); } catch {}
   $("stop").addEventListener("click", () => ctl && ctl.abort());
   $("chips").addEventListener("click", (ev) => { const b = ev.target.closest("button[data-q]"); if (b) send(b.dataset.q); });
 
   // ---------- boot ----------
-  ["mcp-value","mcp-since","spy-since","mcp-vs","mcp-cash","mcp-dd","next-reb","p-value","p-eq","p-cr","p-cash","p-bp"].forEach(id => flap(id, id.endsWith("value") ? "$ ---.--" : "---", 0));
+  ["mcp-since","spy-since","mcp-vs","mcp-cash","mcp-dd","next-reb","p-eq","p-cr","p-cash","p-bp"].forEach(id => flap(id, "---"));
+  ["mcp-value","p-value"].forEach(id => flap(id, "$---.--"));
   route();
   (async () => {
     const C = window.claude;
