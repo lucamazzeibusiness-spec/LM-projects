@@ -11,3 +11,6 @@ Private claude.ai app page: https://claude.ai/artifact/9ikXP6uDGNmMPA6mVrhvqo (o
 
 **Data:** live numbers come from the Robinhood connector (read-only tools only). Strategy, trade log, backtests and briefings live in the artifact's database, written by Claude's scheduled tasks (14:45 briefing, 16:12 run).
 **Source:** `pocket-terminal.html`. Republish it from a Claude session with the same artifact URL.
+
+## Design (2026-11-11)
+Split-flap departure board (Solari style): every figure is built from flap cells that spin into place, accounts are numbered enamel "track" plates, drawdown is a row of 35 signal lamps (1 lamp = 1% below peak, red from −25%), the chat is an "information desk" with announcement-style replies. Fonts: Barlow Condensed / Barlow. Reduced-motion turns off the flap spin.
