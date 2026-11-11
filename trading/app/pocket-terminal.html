@@ -13,6 +13,7 @@
   --flapfont:"Barlow Condensed","Arial Narrow",Impact,sans-serif;
   --text:"Barlow","Helvetica Neue",Arial,sans-serif;
   --navh:66px;
+  --s1:#c98500; --s2:#3987e5;   /* chart series: strategy (amber), S&P 500 (blue); validated on the board surface */
   color-scheme:dark;
 }
 [hidden]{display:none!important}
@@ -92,6 +93,34 @@ button.lever:active{transform:translateY(2px);border-bottom-width:1px}
 button.lever.amb{background:var(--lamp);color:#1b1405;border-bottom-color:#7a5a12}
 button.lever:disabled{opacity:.45;cursor:default}
 
+/* ---------- charts ---------- */
+.chart{position:relative;touch-action:pan-y;user-select:none;-webkit-user-select:none;min-height:40px}
+.chart svg{display:block;width:100%;overflow:visible}
+.chart .tick{font:500 12px var(--text);fill:var(--mute)}
+.chart .gl{stroke:#2a2c30;stroke-width:1}
+.chart .zero{stroke:#4a4d53;stroke-width:1}
+.chart .ref{stroke:var(--mute);stroke-width:1;stroke-dasharray:4 4}
+.chart .reflbl{font:500 12px var(--text);fill:var(--ink2)}
+.chart .endlbl{font:600 13px var(--flapfont);letter-spacing:.06em;fill:var(--char)}
+.chart .hair{stroke:var(--char);stroke-opacity:.45;stroke-width:1}
+.chart .hit{fill:transparent;outline:none}
+.chart .hit:focus-visible{stroke:var(--lamp);stroke-width:2}
+.tip{position:absolute;top:2px;pointer-events:none;background:#0a0b0c;border:1px solid #3a3d42;border-radius:6px;padding:7px 10px;font:500 14px/1.4 var(--text);color:var(--char);white-space:nowrap;box-shadow:0 6px 18px -6px #000;z-index:2}
+.tip b{display:block;font:600 12px var(--flapfont);letter-spacing:.1em;color:var(--mute);text-transform:uppercase;margin-bottom:2px}
+.tip i,.legend i{display:inline-block;width:14px;height:3px;border-radius:2px;margin-right:7px;vertical-align:middle}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font:500 15px/1.3 var(--text);color:var(--ink2)}
+.ranges{display:flex;gap:6px;flex-wrap:wrap}
+.ranges button{font:600 13px/1 var(--flapfont);letter-spacing:.1em;color:var(--char);background:transparent;border:1px solid #3e4146;border-radius:18px;min-height:36px;min-width:48px;padding:0 12px;cursor:pointer}
+.ranges button[aria-pressed="true"]{background:var(--lamp);border-color:var(--lamp);color:#1b1405}
+details.nums summary{font:600 13px/1 var(--flapfont);letter-spacing:.1em;text-transform:uppercase;color:var(--mute);cursor:pointer;min-height:36px;display:flex;align-items:center}
+details.nums table{width:100%;border-collapse:collapse;font:400 14.5px/1.3 var(--text);color:var(--ink2);margin-top:4px}
+details.nums th{font:600 12px var(--flapfont);letter-spacing:.1em;text-transform:uppercase;color:var(--mute);text-align:right;padding:5px 0;font-weight:600}
+details.nums td{text-align:right;padding:6px 0;border-top:1px solid var(--rule)}
+details.nums th:first-child,details.nums td:first-child{text-align:left}
+.dep.tap{cursor:pointer}
+.dep.tap:focus-visible{outline:2px solid var(--lamp);outline-offset:4px;border-radius:4px}
+.dep .more{grid-column:1/-1;display:grid;gap:10px;padding-top:6px;cursor:default}
+
 /* ---------- information desk (chat) ---------- */
 .pa{display:grid;gap:14px}
 .ann{border-left:4px solid var(--plate);padding:6px 0 6px 12px;white-space:pre-wrap;word-wrap:break-word;min-width:0;font:400 16px/1.55 var(--text)}
@@ -132,8 +161,15 @@ textarea{font:16px/1.4 var(--text);background:#0a0b0c;color:var(--char);border:2
       <div id="mcp-err" hidden></div>
     </div>
     <div class="board">
+      <div class="boardhead"><span class="cap amb">Since start · vs S&amp;P 500</span><span class="cap">daily closes</span></div>
+      <div class="legend" id="h-legend"></div>
+      <div id="h-chart"><span class="sub">Loading history…</span></div>
+      <span class="sub">Touch and slide across the chart to read each day. “Now” is live.</span>
+    </div>
+    <div class="board">
       <div class="boardhead"><span class="cap amb">Holdings</span><button class="lever" id="refresh" type="button">Refresh</button></div>
       <div class="deps" id="mcp-pos"><span class="sub">Waiting for Robinhood…</span></div>
+      <span class="sub">Tap a stock for its price chart.</span>
     </div>
     <div class="board">
       <div class="boardhead"><span class="cap amb">Next rebalance</span><span class="fl md amb" id="next-reb"></span></div>
@@ -155,7 +191,7 @@ textarea{font:16px/1.4 var(--text);background:#0a0b0c;color:var(--char);border:2
       </div>
       <div id="p-err" hidden></div>
     </div>
-    <div class="board"><span class="cap amb">Positions</span><div class="deps" id="p-pos"><span class="sub">Loads when you open this track.</span></div></div>
+    <div class="board"><span class="cap amb">Positions</span><div class="deps" id="p-pos"><span class="sub">Loads when you open this track.</span></div><span class="sub">Tap a position for its price chart.</span></div>
     <div class="board"><span class="cap amb">Waiting orders</span><div class="deps" id="p-ord"><span class="sub">—</span></div></div>
   </section>
 
@@ -176,6 +212,13 @@ textarea{font:16px/1.4 var(--text);background:#0a0b0c;color:var(--char);border:2
       <div class="boardhead"><span class="cap amb">Track 4 · Backtests 2016–2026</span><span class="cap" id="b-upd"></span></div>
       <span class="sub">89 stocks · yearly return (CAGR) on the tiles</span>
       <div class="deps" id="b-rows"><span class="sub">Loading…</span></div>
+    </div>
+    <div class="board" id="g-board" hidden>
+      <div class="boardhead"><span class="cap amb">Growth of $1,000 · 2016–2026</span><span class="cap">month-end</span></div>
+      <div class="legend" id="g-legend"></div>
+      <div id="g-chart"></div>
+      <span class="sub">Backtest on 89 stocks, not live money. All tested stocks still exist today, so expect live results below this line.</span>
+      <div id="g-nums"></div>
     </div>
     <div class="board"><div class="notice" style="border:0;padding:0"><span class="cap amb">Lessons</span><ol id="b-notes"><li>Loading…</li></ol></div></div>
   </section>
@@ -222,7 +265,7 @@ textarea{font:16px/1.4 var(--text);background:#0a0b0c;color:var(--char);border:2
   const $ = (id) => document.getElementById(id);
   const RH = "Robinhood";
   const VIEWS = ["mcp","personal","trades","backtests","news","chat"];
-  const state = { acct: null, mcp: null, personal: null, strategy: null, tradelog: null, backtests: null, briefings: [] };
+  const state = { acct: null, mcp: null, personal: null, strategy: null, tradelog: null, backtests: null, history: null, briefings: [] };
   let mcp = null, sample = null;
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const mk = (tag, cls) => { const e = document.createElement(tag); if (cls) e.className = cls; return e; };
@@ -262,7 +305,117 @@ textarea{font:16px/1.4 var(--text);background:#0a0b0c;color:var(--char);border:2
       d.append(t);
     }
     if (o.note) { const n = mk("div", "note"); n.append(o.note); d.append(n); }
+    if (o.onTap) {
+      d.classList.add("tap"); d.tabIndex = 0; d.setAttribute("role", "button"); d.setAttribute("aria-expanded", "false");
+      const toggle = (ev) => {
+        if (ev.target.closest(".more")) return;
+        let more = d.querySelector(".more");
+        if (more) { more.remove(); d.setAttribute("aria-expanded", "false"); return; }
+        more = mk("div", "more"); d.append(more); d.setAttribute("aria-expanded", "true"); o.onTap(more);
+      };
+      d.addEventListener("click", toggle);
+      d.addEventListener("keydown", (ev) => { if ((ev.key === "Enter" || ev.key === " ") && ev.target === d) { ev.preventDefault(); toggle(ev); } });
+    }
     box.append(d);
+  }
+
+  // ---------- charts: hand-drawn SVG lines, crosshair + tooltip, 2px lines, one y-axis ----------
+  const esc = (t) => String(t).replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
+  function niceTicks(lo, hi, count){
+    const span = hi - lo, raw = span / count, mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    const step = [1, 2, 2.5, 5, 10].map(f => f * mag).find(st => span / st <= count) || 10 * mag;
+    const out = []; for (let v = Math.floor(lo / step) * step; v <= hi + step * 1e-9; v += step) out.push(+v.toFixed(10));
+    if (out[out.length - 1] < hi) out.push(out[out.length - 1] + step);
+    return out;
+  }
+  const charts = new Set();
+  const ro = new ResizeObserver(entries => entries.forEach(e => e.target._cfg && drawChart(e.target)));
+  function lineChart(box, cfg){ box.classList.add("chart"); box._cfg = cfg; if (!charts.has(box)) { charts.add(box); ro.observe(box); } drawChart(box); }
+  function drawChart(box){
+    const cfg = box._cfg, W = box.clientWidth; if (!W) return;
+    const H = cfg.h || 190, n = cfg.labels.length;
+    const m = { l: 50, r: cfg.end ? 44 : 12, t: 12, b: 26 };
+    const vals = cfg.series.flatMap(s => s.values).filter(v => v != null && isFinite(v));
+    if (cfg.ref != null) vals.push(cfg.ref.v);
+    if (cfg.zero) vals.push(0);
+    let lo = Math.min(...vals), hi = Math.max(...vals);
+    if (!(hi > lo)) { const pad = Math.abs(hi) * 0.02 || 0.01; lo -= pad; hi += pad; }
+    const ticks = niceTicks(lo, hi, 4); lo = ticks[0]; hi = ticks[ticks.length - 1];
+    const pw = W - m.l - m.r, ph = H - m.t - m.b;
+    const x = (i) => m.l + (n < 2 ? pw / 2 : i * pw / (n - 1)), y = (v) => m.t + (hi - v) / (hi - lo) * ph;
+    let g = "";
+    for (const tk of ticks) g += `<line class="${cfg.zero && tk === 0 ? "zero" : "gl"}" x1="${m.l}" x2="${W - m.r}" y1="${y(tk)}" y2="${y(tk)}"/><text class="tick" x="${m.l - 8}" y="${y(tk) + 4}" text-anchor="end">${esc(cfg.yfmt(tk))}</text>`;
+    const xi = n <= 2 ? [...Array(n).keys()] : [0, Math.round((n - 1) / 2), n - 1];
+    xi.forEach((i, k) => { const a = n === 1 ? "middle" : k === 0 ? "start" : k === xi.length - 1 ? "end" : "middle"; g += `<text class="tick" x="${x(i)}" y="${H - 6}" text-anchor="${a}">${esc((cfg.xlabel || (v => v))(cfg.labels[i]))}</text>`; });
+    if (cfg.ref) g += `<line class="ref" x1="${m.l}" x2="${W - m.r}" y1="${y(cfg.ref.v)}" y2="${y(cfg.ref.v)}"/><text class="reflbl" x="${m.l + 4}" y="${y(cfg.ref.v) - 6}">${esc(cfg.ref.label)}</text>`;
+    const ends = [];
+    for (const s of cfg.series) {
+      let d = "", pen = false;
+      s.values.forEach((v, i) => { if (v == null || !isFinite(v)) { pen = false; return; } d += (pen ? "L" : "M") + x(i).toFixed(1) + " " + y(v).toFixed(1); pen = true; });
+      g += `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+      if (n <= 14) s.values.forEach((v, i) => { if (v != null) g += `<circle cx="${x(i)}" cy="${y(v)}" r="4" fill="${s.color}" stroke="var(--board)" stroke-width="2"/>`; });
+      let li = s.values.length - 1; while (li >= 0 && s.values[li] == null) li--;
+      if (li >= 0) { if (n > 14) g += `<circle cx="${x(li)}" cy="${y(s.values[li])}" r="4" fill="${s.color}" stroke="var(--board)" stroke-width="2"/>`; ends.push({ y: y(s.values[li]), x: x(li), t: s.short || s.name }); }
+    }
+    if (cfg.end) { ends.sort((a, b) => a.y - b.y); for (let k = 1; k < ends.length; k++) if (ends[k].y - ends[k - 1].y < 15) ends[k].y = ends[k - 1].y + 15;
+      for (const e of ends) g += `<text class="endlbl" x="${e.x + 8}" y="${e.y + 4}">${esc(e.t)}</text>`; }
+    g += `<line class="hair" x1="0" x2="0" y1="${m.t}" y2="${H - m.b}" visibility="hidden"/><g class="dots"></g>`;
+    g += `<rect class="hit" x="${m.l - 10}" y="0" width="${pw + 20}" height="${H}" tabindex="0" role="img" aria-label="${esc(cfg.aria || "Chart")}. Use left and right arrows to read values."/>`;
+    box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" height="${H}">${g}</svg><div class="tip" hidden></div>`;
+    const svg = box.querySelector("svg"), hair = svg.querySelector(".hair"), dots = svg.querySelector(".dots"), tip = box.querySelector(".tip"), hit = svg.querySelector(".hit");
+    let cur = -1, hideT = null;
+    const show = (i) => {
+      i = Math.max(0, Math.min(n - 1, i)); cur = i; clearTimeout(hideT);
+      const X = x(i); hair.setAttribute("x1", X); hair.setAttribute("x2", X); hair.setAttribute("visibility", "visible");
+      dots.innerHTML = cfg.series.map(s => s.values[i] == null ? "" : `<circle cx="${X}" cy="${y(s.values[i])}" r="5" fill="${s.color}" stroke="var(--board)" stroke-width="2"/>`).join("");
+      tip.replaceChildren(); const b = mk("b"); b.textContent = (cfg.tiplabel || cfg.xlabel || (v => v))(cfg.labels[i]); tip.append(b);
+      for (const s of cfg.series) { const row = mk("div"); const sw = mk("i"); sw.style.background = s.color; row.append(sw, (cfg.series.length > 1 ? (s.short || s.name) + "  " : "") + (s.values[i] == null ? "—" : cfg.fmt(s.values[i], s, i))); tip.append(row); }
+      tip.hidden = false; const tw = tip.offsetWidth; tip.style.left = (X > W / 2 ? Math.max(0, X - tw - 12) : Math.min(W - tw, X + 12)) + "px";
+    };
+    const hide = () => { hair.setAttribute("visibility", "hidden"); dots.innerHTML = ""; tip.hidden = true; cur = -1; };
+    const at = (ev) => { const r = svg.getBoundingClientRect(); return Math.round(((ev.clientX - r.left) - m.l) / (n < 2 ? 1 : pw / (n - 1))); };
+    hit.addEventListener("pointermove", (ev) => show(at(ev)));
+    hit.addEventListener("pointerdown", (ev) => show(at(ev)));
+    hit.addEventListener("pointerleave", (ev) => { if (ev.pointerType === "mouse") hide(); });
+    hit.addEventListener("pointerup", (ev) => { if (ev.pointerType !== "mouse") hideT = setTimeout(hide, 2500); });
+    hit.addEventListener("keydown", (ev) => { if (ev.key === "ArrowRight" || ev.key === "ArrowLeft") { ev.preventDefault(); show((cur < 0 ? n - 1 : cur) + (ev.key === "ArrowRight" ? 1 : -1)); } if (ev.key === "Escape") hide(); });
+    hit.addEventListener("blur", hide);
+  }
+  function legend(box, items){ box.replaceChildren(...items.map(([name, color, val]) => { const s = mk("span"); const i = mk("i"); i.style.background = color; s.append(i, name + (val ? " " : "")); if (val) { const b = mk("b"); b.style.color = "var(--char)"; b.textContent = val; s.append(b); } return s; })); }
+  function numTable(box, head, rows){
+    const d = mk("details", "nums"); const sm = mk("summary"); sm.textContent = "Show the numbers"; d.append(sm);
+    const t = mk("table"); const tr = mk("tr"); head.forEach(h => { const th = mk("th"); th.textContent = h; tr.append(th); }); t.append(tr);
+    rows.forEach(r => { const row = mk("tr"); r.forEach(c => { const td = mk("td"); td.textContent = c; row.append(td); }); t.append(row); });
+    d.append(t); box.replaceChildren(d);
+  }
+  const dmy = (iso) => { const p = String(iso).slice(0, 10).split("-"); return p.length === 3 ? p[2] + "." + p[1] : String(iso); };
+  const todayET = () => new Date().toLocaleDateString("en-CA", { timeZone: "America/New_York" });
+  const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+  // price chart for one stock (opens under its row); ranges in one row above the chart
+  const RANGES = [["1M", 31], ["3M", 92], ["1Y", 366]];
+  function stockChart(more, sym, avg, live){
+    const bar = mk("div", "ranges"), chart = mk("div"), info = mk("span", "sub");
+    more.append(bar, chart, info);
+    const pick = async (label, days) => {
+      [...bar.children].forEach(b => b.setAttribute("aria-pressed", String(b.textContent === label)));
+      chart.replaceChildren(sub("Loading " + sym + "…")); info.textContent = "";
+      try {
+        const start = new Date(Date.now() - days * 864e5); start.setUTCHours(0, 0, 0, 0);
+        const d = await rh("get_equity_historicals", { symbols: [sym], start_time: start.toISOString().replace(".000", ""), interval: "day" });
+        const r = (d.results || []).find(z => z.symbol === sym) || (d.results || [])[0];
+        const bars = ((r && r.bars) || []).filter(b => !b.interpolated);
+        const labels = bars.map(b => b.begins_at.slice(0, 10)), closes = bars.map(b => Number(b.close_price));
+        if (live && labels.length && labels[labels.length - 1] < todayET()) { labels.push("Now"); closes.push(live); }
+        if (closes.length < 2) { chart.replaceChildren(sub("Not enough price history for " + sym + ".")); return; }
+        const chg = closes[closes.length - 1] / closes[0] - 1;
+        info.textContent = label + " change " + pct(chg) + " · dashed line = your average cost";
+        lineChart(chart, { h: 180, labels, series: [{ name: sym, color: "var(--s1)", values: closes }], fmt: (v) => usd(v), yfmt: (v) => "$" + (v >= 1000 ? Math.round(v).toLocaleString("en-US") : v.toFixed(v < 10 ? 2 : 0)),
+          ref: avg ? { v: avg, label: "Avg " + usd(avg) } : null, xlabel: (l) => l === "Now" ? "Now" : dmy(l), aria: sym + " closing prices, " + label });
+      } catch (e) { chart.replaceChildren(); const f = mk("div", "fault"); f.textContent = errCopy(e); chart.append(f); }
+    };
+    for (const [label, days] of RANGES) { const b = mk("button"); b.type = "button"; b.textContent = label; b.addEventListener("click", () => pick(label, days)); bar.append(b); }
+    pick("3M", 92);
   }
   const sub = (text) => { const s = mk("span", "sub"); s.textContent = text; return s; };
 
@@ -328,8 +481,9 @@ textarea{font:16px/1.4 var(--text);background:#0a0b0c;color:var(--char);border:2
     state.acct = { mcp: list.find(a => a.agentic_allowed) || null, main: list.find(a => a.is_default) || null };
     return state.acct;
   }
-  function posRow(box, sym, val, pl, day){
-    dep(box, { sym, val, tags: [["P/L", pct(pl), tn(pl)], ["Today", pct(day), tn(day)]] });
+  function posRow(box, sym, val, pl, day, chart){
+    dep(box, { sym, val, tags: [["P/L", pct(pl), tn(pl)], ["Today", pct(day), tn(day)], ["", "Chart ▾", "amb"]],
+      onTap: chart && mcp ? (more) => stockChart(more, sym, chart.avg, chart.live) : null });
   }
 
   // ---------- TRACK 1 ----------
@@ -357,7 +511,7 @@ textarea{font:16px/1.4 var(--text);background:#0a0b0c;color:var(--char);border:2
       const g = $("mcp-pos"); g.replaceChildren();
       for (const p of m.held) {
         const qq = m.q[p.symbol] || {}; const qty = Number(p.quantity), cost = Number(p.average_buy_price)*qty, val = (qq.price||0)*qty;
-        posRow(g, p.symbol, usd(val), cost ? val/cost - 1 : null, qq.prev ? qq.price/qq.prev - 1 : null);
+        posRow(g, p.symbol, usd(val), cost ? val/cost - 1 : null, qq.prev ? qq.price/qq.prev - 1 : null, { avg: Number(p.average_buy_price), live: qq.price });
       }
       if (!m.held.length) g.append(sub("No open positions."));
       if (s && s.start_value) {
@@ -371,10 +525,38 @@ textarea{font:16px/1.4 var(--text);background:#0a0b0c;color:var(--char);border:2
         $("dd-note").textContent = "Peak " + usd(peak) + " · 1 lamp = 1% below peak · alarm only, never a trade";
       }
     }
+    renderHistory();
     if (s) {
       $("rules").replaceChildren(...(s.rules || []).map(r => { const li = mk("li"); li.textContent = r; return li; }));
       flap("next-reb", (s.next_rebalance || "—").replace(" · 16:12 CET", "").replace(/^\w+ /, ""));
     }
+  }
+  function renderHistory(){
+    const h = state.history; if (!h || !h.start) return;
+    const pts = [{ ...h.start, label: "Start" }, ...(h.points || []).map(p => ({ ...p, label: p.d }))];
+    const m = state.mcp;
+    if (m && m.q.SPY && m.q.SPY.price && pts[pts.length - 1].d < todayET()) pts.push({ label: "Now", v: num(m.pf.total_value), spy: m.q.SPY.price, dep: Number((state.strategy || {}).net_deposits_since_start || 0) });
+    const base = h.start.v, sb = h.start.spy;
+    const mine = pts.map(p => p.v / (base + Number(p.dep || 0)) - 1), spy = pts.map(p => p.spy / sb - 1);
+    legend($("h-legend"), [["MCP", "var(--s1)", pct(mine[mine.length - 1])], ["S&P 500", "var(--s2)", pct(spy[spy.length - 1])]]);
+    const lab = (l) => l === "Start" ? "Start" : l === "Now" ? "Now" : dmy(l);
+    lineChart($("h-chart"), { h: 190, zero: true, end: true, labels: pts.map(p => p.label),
+      series: [{ name: "MCP", short: "MCP", color: "var(--s1)", values: mine }, { name: "S&P 500", short: "S&P", color: "var(--s2)", values: spy }],
+      fmt: (v, s, i) => pct(v) + (s.short === "MCP" ? "  " + usd(pts[i].v) : ""), yfmt: (v) => (v > 0 ? "+" : "") + (v * 100).toFixed(Math.abs(hiSpan(mine, spy)) < 0.05 ? 1 : 0) + "%",
+      xlabel: lab, tiplabel: (l) => l === "Start" ? "Start · 10.11 16:20 CET" : l === "Now" ? "Now · live" : dmy(l) + " close", aria: "MCP account versus S&P 500, percent since start" });
+  }
+  const hiSpan = (a, b) => Math.max(...a, ...b) - Math.min(...a, ...b, 0);
+  function renderGrowth(){
+    const c = state.backtests && state.backtests.curve; if (!c || !c.points || !c.points.length) return;
+    $("g-board").hidden = false;
+    const P = c.points, last = P[P.length - 1];
+    legend($("g-legend"), [["Momentum Top 3", "var(--s1)", usd(last[1], 0)], ["S&P 500", "var(--s2)", usd(last[2], 0)]]);
+    const ml = (ym) => MON[Number(ym.slice(5, 7)) - 1] + " " + ym.slice(0, 4);
+    lineChart($("g-chart"), { h: 210, end: true, labels: P.map(p => p[0]),
+      series: [{ name: "Momentum Top 3", short: "MOM", color: "var(--s1)", values: P.map(p => p[1]) }, { name: "S&P 500", short: "S&P", color: "var(--s2)", values: P.map(p => p[2]) }],
+      fmt: (v) => usd(v, 0), yfmt: (v) => "$" + (v >= 1000 ? (v / 1000) + "k" : v), xlabel: (ym) => ym.slice(0, 4), tiplabel: ml, aria: "Growth of 1,000 dollars, momentum strategy versus S&P 500, 2016 to 2026" });
+    const rows = P.filter((p, i) => p[0].endsWith("-12") || i === P.length - 1).map(p => [p[0].endsWith("-12") ? p[0].slice(0, 4) : ml(p[0]), usd(p[1], 0), usd(p[2], 0)]);
+    numTable($("g-nums"), ["Year end", "Momentum", "S&P 500"], rows);
   }
   $("refresh").addEventListener("click", () => loadMcp(true));
 
@@ -402,7 +584,7 @@ textarea{font:16px/1.4 var(--text);background:#0a0b0c;color:var(--char);border:2
       flap("p-cash", usd(num(pf.cash), 0)); flap("p-bp", usd(num(pf.buying_power && pf.buying_power.buying_power), 0));
       const g = $("p-pos"); g.replaceChildren();
       for (const p of held) { const qq = q[p.symbol] || {}; const qty = Number(p.quantity), cost = Number(p.average_buy_price)*qty, val = (qq.price||0)*qty;
-        posRow(g, p.symbol, usd(val, 0), cost ? val/cost-1 : null, qq.prev ? qq.price/qq.prev-1 : null); }
+        posRow(g, p.symbol, usd(val, 0), cost ? val/cost-1 : null, qq.prev ? qq.price/qq.prev-1 : null, { avg: Number(p.average_buy_price), live: qq.price }); }
       for (const c of crypto) { const code = c.currency.code, qq = cq[code] || {}, qty = Number(c.quantity), cb = (c.cost_bases||[])[0], cost = cb ? Number(cb.direct_cost_basis) : null, val = (qq.price||0)*qty;
         posRow(g, code, usd(val, 0), cost ? val/cost-1 : null, qq.prev ? qq.price/qq.prev-1 : null); }
       if (!held.length && !crypto.length) g.append(sub("No positions."));
@@ -446,6 +628,7 @@ textarea{font:16px/1.4 var(--text);background:#0a0b0c;color:var(--char);border:2
       tags: [["Max DD", String(r.maxdd), "stop"], ["Yrs > S&P", r.years === "–" ? "—" : r.years]], note: r.name + (r.live ? " · running now" : "") }));
     $("b-notes").replaceChildren(...(b.notes || []).map(n => { const li = mk("li"); li.textContent = n; return li; }));
     $("b-upd").textContent = b.updated ? "as of " + b.updated : "";
+    renderGrowth();
   }
 
   // ---------- TRACK 5 ----------
@@ -482,7 +665,7 @@ ${JSON.stringify(snapshot()).slice(0, 12000)}`;
     const m = state.mcp;
     return { now_cet: new Date().toLocaleString("de-DE",{timeZone:"Europe/Berlin"}),
       mcp_account: m ? { total_value: num(m.pf.total_value), cash: num(m.pf.cash), positions: m.held.map(p => ({ symbol: p.symbol, qty: Number(p.quantity), avg_cost: Number(p.average_buy_price), price: (m.q[p.symbol]||{}).price, prev_close: (m.q[p.symbol]||{}).prev })), spy: m.q.SPY } : "not loaded",
-      strategy: state.strategy || "not loaded", trade_log: state.tradelog || "not loaded", backtests: state.backtests || "not loaded",
+      strategy: state.strategy || "not loaded", mcp_daily_history: state.history || "not loaded", trade_log: state.tradelog || "not loaded", backtests: state.backtests ? { ...state.backtests, curve: state.backtests.curve ? { from: state.backtests.curve.from, to: state.backtests.curve.to, last: state.backtests.curve.points.slice(-1)[0] } : undefined } : "not loaded",
       latest_notice: state.briefings[0] || "none saved", private_account: state.personal || "not loaded (open track 2 to load it)" };
   }
   const chatTools = () => [{
@@ -545,6 +728,7 @@ ${JSON.stringify(snapshot()).slice(0, 12000)}`;
     const done = () => clearTimeout(timer);
     db.doc("terminal/strategy").onSnapshot(sn => { done(); state.strategy = sn.exists ? sn.data() : null; renderMcp(); }, done);
     db.doc("terminal/tradelog").onSnapshot(sn => { done(); state.tradelog = sn.exists ? sn.data() : null; renderTradelog(); }, done);
+    db.doc("terminal/history").onSnapshot(sn => { done(); state.history = sn.exists ? sn.data() : null; renderHistory(); if (!state.history) $("h-chart").replaceChildren(sub("No history saved yet.")); }, done);
     db.doc("terminal/backtests").onSnapshot(sn => { done(); state.backtests = sn.exists ? sn.data() : null; renderBacktests(); }, done);
     db.collection("briefings").orderBy("date", "desc").limit(10).onSnapshot(sn => { done(); state.briefings = sn.docs.map(x => x.data()); renderNews(); }, done);
   })();

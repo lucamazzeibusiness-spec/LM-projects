@@ -17,3 +17,9 @@ Split-flap departure board (Solari style): every figure is built from flap cells
 
 ### Phone pass (2026-11-11)
 Track plates moved to a fixed bottom thumb bar; tables replaced by one "departure row" per item (20px tiles for name and key figure, plain 15px text for details); labels 13px; 16px chat input (no iOS zoom); 44px touch targets; shorter flap spin (2–4 flips).
+
+### Charts (2026-11-11)
+- Track 1: MCP vs S&P 500, % since start, from db `terminal/history` (daily closes appended by the 16:12 CET run) plus a live "Now" point.
+- Holdings (MCP and private): tap a row → price chart with 1M/3M/1Y and a dashed average-cost line (`get_equity_historicals`, read-only; added to the page's tool list).
+- Track 4: growth of $1,000, 2016–2026, momentum (live rules) vs SPY, from db `terminal/backtests.curve` (source: trading/backtests/curve_momentum_vs_spy.json, export_curve.py), plus a year-end table.
+- Hand-drawn SVG, no chart library. Colors: strategy #c98500, S&P #3987e5 (validated for colorblind separation and contrast on the board surface). Touch-and-slide crosshair tooltip; arrow keys work too.
