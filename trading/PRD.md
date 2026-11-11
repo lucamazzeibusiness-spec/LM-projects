@@ -101,7 +101,7 @@ ROBINHOOD MCP CONNECTOR
 ### 6.1 Bias check (3 parts, one line each)
 1. **Confirmation bias:** were risks or counter-arguments overlooked?
 2. **Drift from the rules:** does the action follow `STRATEGY.md` exactly?
-3. **Concentration / conflicts:** concentration risk, and Anthropic neutrality.
+3. **Concentration / conflicts:** concentration risk within the MCP account only, and Anthropic neutrality. The main account (incl. TGTX) is personal and is never part of MCP strategy analysis.
 
 ## 7. Logging & audit
 

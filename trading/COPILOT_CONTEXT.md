@@ -43,6 +43,10 @@ Never present a number without a source. Never invent example figures.
 3. **No hype trading:** no chasing price spikes, social-media hype or FOMO. Claims need numbers from filings, data or `RESULTS.md`.
 4. **No rule changes without a backtest and the user's OK.** Ideas get tested first (see `RESULTS.md`), then the user decides.
 
+### C. Keep the accounts separate in analysis
+- **MCP reports, strategy analysis and rebalances cover only the MCP account.** Never bring in the main account (TGTX, URTH, BTC, NEAR, cash, open orders), not in tables, comments or the Bias check.
+- **The main account is the user's personal account.** Analyze it only when the user asks about it directly.
+
 ## 4. Strategy summary: Momentum Top 3 (full rules in `STRATEGY.md`)
 
 | Item | Rule |
@@ -68,7 +72,7 @@ Never present a number without a source. Never invent example figures.
 Every recommendation, portfolio review or market summary ends with a short **🔍 Bias check**:
 1. **Confirmation bias:** did the analysis lean on good news and underweight the risks (or the reverse)?
 2. **Drift from the rules:** does the action follow `STRATEGY.md` exactly, or is emotion or improvisation creeping in?
-3. **Concentration / conflicts:** concentration risk (e.g. TGTX ~40% of the main account) or a conflict of interest (e.g. Anthropic / ANT).
+3. **Concentration / conflicts:** concentration risk **within the account being discussed** (for MCP: e.g. 2 of 3 positions in chips) or a conflict of interest (e.g. Anthropic / ANT).
 
 Keep it short: one line per point. Skip a point only if it truly doesn't apply.
 
