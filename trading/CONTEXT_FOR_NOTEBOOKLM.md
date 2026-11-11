@@ -127,3 +127,58 @@ Answer as concretely as possible (numbers instead of "a lot / a little"):
 -
 
 **Tip:** once you've worked these out, I'll save your answers as `trading/USER_PREFERENCES.md` in the repo and build them into the automatic tasks, so they stay in effect permanently.
+
+---
+
+## 8. 🔬 PICO(T) research questions for NotebookLM
+
+**How it works:**
+- NotebookLM only answers from the uploaded sources. A PICO question tells it exactly what to look for.
+- **P** = Population (what it's about) · **I** = Intervention (what is tested or done) · **C** = Comparison (compared with what) · **O** = Outcome (measurable result) · **T** = Time frame.
+
+**Sources to upload first:**
+- This file
+- `trading/backtests/RESULTS.md` (all backtest numbers)
+- TGTX: Q3 2026 press release, earnings call coverage, latest 10-Q from SEC EDGAR
+- General: research articles on momentum strategies and position sizing
+
+### Q1 – Strategy (MCP account)
+- **P:** Large US stocks (S&P 100)
+- **I:** Momentum Top 3, monthly rebalance, latest month included
+- **C:** S&P 500 buy & hold
+- **O:** Yearly return, worst drop, number of years beating the S&P
+- **T:** 2016–2026
+
+> "Based on the sources, how robust is the outperformance of Momentum Top 3 vs the S&P 500, and in which periods or market conditions did it fail? Cite the source for each statement."
+
+### Q2 – Position size TGTX (main account)
+- **P:** Private investor with ~$16.8k, ~41% in a single biotech stock
+- **I:** Holding the full position through the Phase 3 result
+- **C:** Trimming to 25–30% of the account
+- **O:** Range of possible account gains/losses after a good vs a bad Phase 3 outcome
+- **T:** Until Q1 2027
+
+> "What do the sources say about the risks of concentrated biotech positions ahead of binary trial results, and how large are typical price moves after positive vs negative Phase 3 data? Cite the source for each statement."
+
+### Q3 – TGTX fundamentals
+- **P:** TG Therapeutics / Briumvi in the CD20 MS market
+- **I:** Under-the-skin (subcutaneous) Briumvi, Phase 3
+- **C:** IV Briumvi alone, and competitor Kesimpta (self-injected)
+- **O:** Sales potential, launch timing, key risks
+- **T:** 2027–2028
+
+> "Which statements in the sources support or contradict a launch of subcutaneous Briumvi in mid-2027 vs 2028, and what sales potential do they describe? Cite the source for each statement."
+
+### Q4 – IPO rules (e.g. ANT), neutral
+- **P:** Large tech IPOs
+- **I:** Buying on the first trading day with a limit order
+- **C:** Waiting 30–90 days after the listing
+- **O:** Average return and size of price swings after 3, 6 and 12 months
+
+> "What do the sources say about how large tech IPOs perform in their first months, and does waiting after the listing improve results? Cite the source for each statement."
+
+### Tips
+- **Always ask for sources** ("Cite the source for each statement"), so you can check where each point comes from.
+- **The C matters most:** without a comparison you can't tell whether something is actually better.
+- **Make the O measurable:** %, $, dates instead of "good/bad".
+- **Bring the answers back to Claude:** Claude checks them against real data (e.g. a new backtest) before anything changes in the rules.
