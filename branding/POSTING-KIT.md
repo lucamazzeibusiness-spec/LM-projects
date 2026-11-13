@@ -3,9 +3,8 @@
 ## 1. Channel setup (YouTube Studio → Customization)
 
 **Branding**
-- Profile picture: `branding/profile.png` (800×800; YouTube shows it as a circle)
-- Banner: `branding/banner.png` (2560×1440; the text sits in the safe area that shows on phones)
-- Note: the banner/profile picture live on YouTube are the newer cloud-session versions (tagline "NEWS • GAMEPLAY • CLIPS • TIPPS & TRICKS"); the PNGs in this folder are the first design.
+- Profile picture: `branding/out/pfp_a_wanted.png` (the one in use; YouTube shows it as a circle)
+- Banner: `branding/out/banner.png` (2560×1440; the text sits in the safe area that shows on phones)
 
 **Basic info**
 - Name: `GTA Deutschland`

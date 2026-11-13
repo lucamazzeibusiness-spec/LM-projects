@@ -46,6 +46,26 @@ No API key? Write your own script JSON (`title`, `description`, `tags`,
 `scenes: [{narration, visual}]`) and pass `--script-file`. `--music file.mp3`
 adds quiet background music; only use music you have the rights to.
 
+## Other tools
+
+| Script | What it does |
+| --- | --- |
+| `clip_vod.py` | Twitch VOD (or local recording) to candidate Shorts. Scores loudness, German reaction words and chat; GPU transcription with CPU fallback. `--credit NAME` shows "CLIP VON NAME"; `--times 1:23:10-1:23:40,...` renders hand-picked ranges. |
+| `footage_short.py` | Footage-led Shorts from a JSON plan: on-screen text, freeze-frame zoom, optional narrator voice with captions. |
+| `meme.py` | Two-part meme Short: image or video on top, a clip with its sound below. |
+
+## Branding (`branding/`)
+
+| Script | Output (in `branding/out/`) |
+| --- | --- |
+| `make_branding.py` | YouTube banner (2560x1440) and the first profile picture |
+| `make_pfp.py` | Profile picture concepts; `pfp_a_wanted.png` is the one in use |
+| `make_twitch.py` | Twitch profile banner, offline screen and five info panels |
+
+`branding/POSTING-KIT.md` has the channel description and upload texts. German texts
+for the Twitch panels are in `docs/twitch-panel-texte.md`; the channel's content rules
+are in `docs/RULES.md`.
+
 ## Config (`config.json`)
 
 | key | meaning |

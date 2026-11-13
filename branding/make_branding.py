@@ -1,6 +1,6 @@
 """Draw the GTA Deutschland channel banner and profile picture (original art, no Rockstar assets).
 
-    .venv\\Scripts\\python.exe branding\\make_branding.py
+    python branding/make_branding.py
 """
 import math
 import random
@@ -8,14 +8,20 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
-OUT = Path(__file__).parent
+OUT = Path(__file__).parent / "out"
+OUT.mkdir(exist_ok=True)
 FONTS = Path("C:/Windows/Fonts")
+FALLBACK = Path("/usr/share/fonts/opentype/inter")  # Linux preview: Inter instead of Impact/Arial
 FLAG = [(20, 20, 20), (221, 0, 0), (255, 206, 0)]
 SKY = [(0.0, (16, 6, 36)), (0.45, (92, 18, 104)), (0.75, (255, 46, 136)), (1.0, (255, 150, 60))]
 
 
 def font(name: str, size: int) -> ImageFont.FreeTypeFont:
-    return ImageFont.truetype(str(FONTS / name), size)
+    if (FONTS / name).exists():
+        return ImageFont.truetype(str(FONTS / name), size)
+    if "impact" in name:
+        return ImageFont.truetype(str(FALLBACK / "InterDisplay-Black.otf"), int(size * 0.8))
+    return ImageFont.truetype(str(FALLBACK / "Inter-Bold.otf"), size)
 
 
 def lerp(a, b, t):
@@ -115,36 +121,123 @@ def flag_bar(d: ImageDraw.ImageDraw, cx: int, y: int, width: int, height: int) -
         d.rectangle([cx - width // 2, y + i * height // 3, cx + width // 2, y + (i + 1) * height // 3], fill=c)
 
 
+def skyline_sides(d, w, horizon, scale, seed):
+    """Skyline that stays low in the middle so the sun stays visible."""
+    rnd = random.Random(seed)
+    x = 0
+    while x < w:
+        bw = int(rnd.randint(40, 100) * scale)
+        dist = abs((x + bw / 2) - w / 2) / (w / 2)          # 0 centre .. 1 edge
+        bh = int(rnd.randint(140, 380) * scale * (0.15 + 0.85 * dist ** 1.4))
+        d.rectangle([x, horizon - bh, x + bw, horizon], fill=(30, 8, 50))
+        d.line([(x, horizon - bh), (x + bw, horizon - bh)], fill=(255, 90, 170), width=2)  # neon roof edge
+        for wy in range(horizon - bh + 10, horizon - 8, int(22 * scale)):
+            for wx in range(x + 6, x + bw - 6, int(16 * scale)):
+                if rnd.random() < 0.22:
+                    d.rectangle([wx, wy, wx + 5 * scale, wy + 8 * scale], fill=(255, 200, 130))
+        x += bw + int(rnd.randint(0, 10) * scale)
+
+
+def grid(img, horizon):
+    """Neon perspective grid on the ground."""
+    w, h = img.size
+    layer = Image.new("RGBA", img.size, (0, 0, 0, 0))
+    d = ImageDraw.Draw(layer)
+    col = (255, 60, 170, 150)
+    for k in range(-12, 13):
+        d.line([(w / 2 + k * 18, horizon), (w / 2 + k * 170, h)], fill=col, width=2)
+    y, step = horizon + 6, 6
+    while y < h:
+        d.line([(0, y), (w, y)], fill=col, width=2)
+        step *= 1.35
+        y += step
+    glow = layer.filter(ImageFilter.GaussianBlur(4))
+    img.paste(Image.alpha_composite(img.convert("RGBA"), glow).convert("RGB"))
+    img.paste(Image.alpha_composite(img.convert("RGBA"), layer).convert("RGB"))
+
+
+def gradient_text(img, xy, text, f, top, bottom, outline=(255, 255, 255), glow=(255, 40, 160)):
+    w, h = img.size
+    mask = Image.new("L", img.size, 0)
+    ImageDraw.Draw(mask).text(xy, text, font=f, fill=255, anchor="mm")
+    x0, y0, x1, y1 = mask.getbbox()
+    # outer neon glow from a thick outline
+    glow_mask = Image.new("L", img.size, 0)
+    ImageDraw.Draw(glow_mask).text(xy, text, font=f, fill=255, anchor="mm", stroke_width=14)
+    img.paste(glow, (0, 0), glow_mask.filter(ImageFilter.GaussianBlur(20)))
+    # hard drop shadow + dark outline
+    sh = Image.new("L", img.size, 0)
+    ImageDraw.Draw(sh).text((xy[0] + 10, xy[1] + 12), text, font=f, fill=255, anchor="mm", stroke_width=10)
+    img.paste((20, 4, 34), (0, 0), sh)
+    ol = Image.new("L", img.size, 0)
+    ImageDraw.Draw(ol).text(xy, text, font=f, fill=255, anchor="mm", stroke_width=10)
+    img.paste((20, 4, 34), (0, 0), ol)
+    ol2 = Image.new("L", img.size, 0)
+    ImageDraw.Draw(ol2).text(xy, text, font=f, fill=255, anchor="mm", stroke_width=5)
+    img.paste(outline, (0, 0), ol2)
+    # sunset-gradient fill with a chrome horizon line through the middle
+    fill = gradient(w, y1 - y0, [(0, top), (0.5, (255, 240, 200)), (0.52, (255, 120, 60)), (1, bottom)])
+    full = Image.new("RGB", img.size)
+    full.paste(fill, (0, y0))
+    img.paste(full, (0, 0), mask)
+
+
+def rounded_flag(img, cx, y, width, height):
+    d = ImageDraw.Draw(img)
+    d.rounded_rectangle([cx - width // 2 - 5, y - 5, cx + width // 2 + 5, y + height + 5], radius=12, fill=(20, 4, 34))
+    m = Image.new("L", img.size, 0)
+    ImageDraw.Draw(m).rounded_rectangle([cx - width // 2, y, cx + width // 2, y + height], radius=8, fill=255)
+    bars = Image.new("RGB", img.size)
+    bd = ImageDraw.Draw(bars)
+    for i, c in enumerate(FLAG):
+        bd.rectangle([cx - width // 2, y + i * height // 3, cx + width // 2, y + (i + 1) * height // 3], fill=c)
+    img.paste(bars, (0, 0), m)
+
+
+def vignette(img):
+    w, h = img.size
+    m = Image.new("L", img.size, 0)
+    ImageDraw.Draw(m).ellipse([w * 0.08, h * 0.08, w * 0.92, h * 0.92], fill=255)
+    m = m.filter(ImageFilter.GaussianBlur(70))
+    dark = Image.new("RGB", img.size, (8, 2, 18))
+    img.paste(Image.composite(img, dark, m))
+
+
 def banner() -> None:
-    # 2560x1440; YouTube only guarantees the centre 1546x423 is visible on every device.
+    # 2560x1440; YouTube only guarantees the centre 1546x423 (y 508-931) is visible on every device.
     w, h, horizon = 2560, 1440, 1000
     img = gradient(w, h, [(t * horizon / h, c) for t, c in SKY] + [(1.0, (255, 150, 60))])
-    sun(img, w // 2, horizon, 360)
+    sun(img, w // 2, horizon, 380)
     water(img, horizon)
+    grid(img, horizon)
     d = ImageDraw.Draw(img)
-    skyline(d, w, horizon, 1.0, seed=7)
-    palm(d, (180, h + 40), 900, 0.18)
-    palm(d, (420, h + 60), 700, 0.32)
-    palm(d, (2380, h + 40), 920, -0.2)
-    palm(d, (2150, h + 60), 680, -0.34)
-    glow_text(img, (w // 2, 640), "GTA DEUTSCHLAND", font("impact.ttf", 190))
-    flag_bar(d, w // 2, 760, 560, 24)
-    glow_text(img, (w // 2, 850), "NEWS  •  TRAILER-ANALYSEN  •  CLIPS", font("arialbd.ttf", 56),
-              glow=(255, 120, 60), radius=10)
+    skyline_sides(d, w, horizon, 1.0, seed=7)
+    palm(d, (160, h + 40), 900, 0.18)
+    palm(d, (330, h + 60), 640, 0.22)
+    palm(d, (2400, h + 40), 920, -0.2)
+    palm(d, (2230, h + 60), 620, -0.24)
+    gradient_text(img, (w // 2, 640), "GTA DEUTSCHLAND", font("impact.ttf", 170),
+                  top=(255, 255, 255), bottom=(255, 40, 140))
+    rounded_flag(img, w // 2, 768, 620, 30)
+    glow_text(img, (w // 2, 868), "NEWS  •  GAMEPLAY  •  CLIPS  •  TIPPS & TRICKS",
+              font("arialbd.ttf", 54), glow=(255, 120, 60), radius=10)
     img.save(OUT / "banner.png")
 
 
 def profile() -> None:
-    s, horizon = 800, 560
+    s, horizon = 800, 545
     img = gradient(s, s, [(t * horizon / s, c) for t, c in SKY] + [(1.0, (255, 150, 60))])
-    sun(img, s // 2, horizon, 230)
+    sun(img, s // 2, horizon, 250)
     water(img, horizon)
+    grid(img, horizon)
     d = ImageDraw.Draw(img)
-    skyline(d, s, horizon, 0.45, seed=3)
-    palm(d, (40, s + 30), 520, 0.25)
-    palm(d, (770, s + 30), 520, -0.25)
-    glow_text(img, (s // 2, 330), "GTA", font("impact.ttf", 300), radius=22)
-    flag_bar(d, s // 2, 500, 330, 36)
+    skyline_sides(d, s, horizon, 0.5, seed=3)
+    palm(d, (-10, s + 40), 470, 0.18)
+    palm(d, (810, s + 40), 470, -0.18)
+    vignette(img)
+    gradient_text(img, (s // 2, 315), "GTA", font("impact.ttf", 330),
+                  top=(255, 255, 255), bottom=(255, 40, 140))
+    rounded_flag(img, s // 2, 470, 300, 42)
     img.save(OUT / "profile.png")
 
 
