@@ -1,0 +1,19 @@
+{
+  "game_name": "Grand Theft Auto V",
+  "lookback_hours": 24,
+  "clips_per_run": 10,
+  "min_views": 500,
+  "min_duration_sec": 8,
+  "max_duration_sec": 60,
+  "languages": ["en"],
+
+  "channel_allowlist": [],
+  "channel_blocklist": [],
+
+  "layout": "blur",
+  "captions": true,
+  "whisper_model": "small",
+  "whisper_device": "cpu",
+  "explainer_voice": "en-US-AndrewNeural",
+  "hashtags": ["#gta", "#gta5", "#gtarp", "#shorts"]
+}

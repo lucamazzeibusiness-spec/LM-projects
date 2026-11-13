@@ -1,0 +1,14 @@
+# Secrets
+.env
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Downloaded footage, rendered videos and working files (large, and not ours to redistribute)
+output/
+data/
+
+# One-off local helper (contains machine-specific paths)
+watch_progress.ps1

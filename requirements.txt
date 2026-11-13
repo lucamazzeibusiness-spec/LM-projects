@@ -1,0 +1,11 @@
+requests>=2.31
+python-dotenv>=1.0
+yt-dlp>=2025.1.1
+anthropic>=1.0
+pydantic>=2.7
+edge-tts>=7.0
+faster-whisper>=1.0.3
+# faster-whisper passes av.open(metadata_errors=...), which newer PyAV dropped
+av>=11,<16
+yt-dlp-ejs  # YouTube challenge solver used with the node runtime
+pillow>=10  # branding/make_branding.py
