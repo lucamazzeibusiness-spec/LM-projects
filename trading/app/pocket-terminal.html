@@ -461,7 +461,34 @@ textarea{font:16px/1.4 var(--text);background:#0a0b0c;color:var(--char);border:2
       default: return "Couldn't reach Robinhood (" + ((e && e.code) || "error") + "). Tap Refresh to try again.";
     }
   }
-  const showErr = (id, e) => { const el = $(id); el.hidden = false; el.className = "fault"; el.textContent = errCopy(e); };
+  // Robinhood access doctor: Connectors only says Robinhood is linked to claude.ai; this page also needs its own OK.
+  let perm = null, access = "unknown";
+  const ACCESS_CODES = ["not_granted", "approval_required", "not_in_manifest", "consent_required", "capability_disabled"];
+  function accessCopy(){
+    if (access === "denied") return "Robinhood is switched off for this page. Tap “Open permissions” and switch Robinhood on for Pocket Terminal.";
+    if (access === "prompt") return "This page needs your OK to read Robinhood (read only). Tap “Allow Robinhood”.";
+    if (access === "granted") return "Robinhood is allowed but didn't load in this view. Tap “Try again”.";
+    return "This view can't reach your Robinhood connection. Open Pocket Terminal from inside claude.ai or the Claude app (your Artifacts list), not as a standalone browser link.";
+  }
+  async function fixAccess(btn){
+    btn.disabled = true;
+    try {
+      const st = perm ? await perm.state("mcp:Robinhood").catch(() => "unavailable") : "unavailable";
+      if (st === "denied") { try { await perm.manage(); } catch { btn.textContent = "Use the page's ⋯ / Permissions menu"; return; } }
+      else if (st === "prompt") { await perm.request(["mcp:Robinhood"]).catch(() => null); }
+      location.reload();
+    } finally { btn.disabled = false; }
+  }
+  const showErr = (id, e) => {
+    const el = $(id); el.hidden = false; el.className = "fault"; el.replaceChildren();
+    const code = e && e.code, isAccess = ACCESS_CODES.includes(code);
+    const t = mk("div"); t.textContent = isAccess ? accessCopy() : errCopy(e); el.append(t);
+    if (isAccess && access !== "unavailable" && access !== "unknown") {
+      const b = mk("button", "lever"); b.type = "button"; b.style.marginTop = "10px"; b.style.background = "#1b1405"; b.style.color = "var(--lamp)";
+      b.textContent = access === "denied" ? "Open permissions" : access === "prompt" ? "Allow Robinhood" : "Try again";
+      b.addEventListener("click", () => fixAccess(b)); el.append(b);
+    }
+  };
   const clearErr = (id) => { const el = $(id); el.hidden = true; el.textContent = ""; };
 
   async function rh(tool, input, fresh){
@@ -718,8 +745,9 @@ ${JSON.stringify(snapshot()).slice(0, 12000)}`;
   (async () => {
     const C = window.claude;
     const use = (n) => (C && typeof C.use === "function") ? C.use(n).catch(() => null) : Promise.resolve(null);
-    const [m, db, s] = await Promise.all([use("mcp"), use("db"), use("sample")]);
-    mcp = m; sample = s;
+    const [m, db, s, pm] = await Promise.all([use("mcp"), use("db"), use("sample"), use("permissions")]);
+    mcp = m; sample = s; perm = pm;
+    access = perm ? await perm.state("mcp:Robinhood").catch(() => "unavailable") : "unavailable";
     if (!sample) { $("composer").hidden = true; $("chips").hidden = true; setNote("The desk isn't available in this view. Open the page on claude.ai."); }
     if (!mcp) { ["mcp-err","p-err","t-err"].forEach(id => showErr(id, { code: "not_granted" })); $("mcp-upd").textContent = "offline"; }
     else { loadMcp(false); route(); }
