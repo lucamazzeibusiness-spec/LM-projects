@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+output/
+*_work/
+*.mp4
+*.wav
+*.mp3
+cookies.txt

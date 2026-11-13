@@ -1,0 +1,4 @@
+numpy
+pillow
+yt-dlp
+faster-whisper
